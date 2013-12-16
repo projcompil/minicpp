@@ -19,4 +19,4 @@ On a bien fait attention à enregistrer dans la table du lexer hack l'identifian
 
 IV/ Le lexer hack
 
-Le lexer hack consiste simplement en une Hashtbl à l'intérieur du lexer, afin de différencier identifiants de type et les autres identifiants
+Le lexer hack consiste simplement en une Hashtbl à l'intérieur du lexer, afin de différencier identifiants de type et les autres identifiants.
