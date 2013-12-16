@@ -3,7 +3,7 @@
 
 %{
   open Ast
-  open Lexer
+ (* open Lexer*)
   (*open Lexerhack*)
 %}
 
