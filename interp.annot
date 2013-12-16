@@ -1,0 +1,162 @@
+"interp.ml" 8 73 77 "interp.ml" 8 73 88
+type(
+  string -> 'a
+)
+ident(
+  def unbound_var "interp.ml" 9 133 133 "_none_" 1 0 -1
+)
+"interp.ml" 8 73 89 "interp.ml" 8 73 90
+type(
+  string
+)
+ident(
+  def s "interp.ml" 8 73 93 "interp.ml" 8 73 132
+)
+"interp.ml" 8 73 93 "interp.ml" 8 73 98
+type(
+  exn -> 'a
+)
+ident(
+  ext_ref Pervasives.raise
+)
+"interp.ml" 8 73 107 "interp.ml" 8 73 126
+type(
+  string
+)
+"interp.ml" 8 73 127 "interp.ml" 8 73 128
+type(
+  string -> string -> string
+)
+ident(
+  ext_ref Pervasives.( ^ )
+)
+"interp.ml" 8 73 129 "interp.ml" 8 73 130
+type(
+  string
+)
+ident(
+  int_ref s "interp.ml" 8 73 89 "interp.ml" 8 73 90
+)
+"interp.ml" 8 73 106 "interp.ml" 8 73 131
+call(
+  stack
+)
+type(
+  string
+)
+"interp.ml" 8 73 99 "interp.ml" 8 73 132
+type(
+  exn
+)
+"interp.ml" 8 73 93 "interp.ml" 8 73 132
+type(
+  'a
+)
+"interp.ml" 9 133 137 "interp.ml" 9 133 154
+type(
+  string -> 'a
+)
+ident(
+  def unbound_procedure "interp.ml" 10 200 200 "_none_" 1 0 -1
+)
+"interp.ml" 9 133 155 "interp.ml" 9 133 156
+type(
+  string
+)
+ident(
+  def f "interp.ml" 9 133 159 "interp.ml" 9 133 199
+)
+"interp.ml" 9 133 159 "interp.ml" 9 133 164
+type(
+  exn -> 'a
+)
+ident(
+  ext_ref Pervasives.raise
+)
+"interp.ml" 9 133 173 "interp.ml" 9 133 193
+type(
+  string
+)
+"interp.ml" 9 133 194 "interp.ml" 9 133 195
+type(
+  string -> string -> string
+)
+ident(
+  ext_ref Pervasives.( ^ )
+)
+"interp.ml" 9 133 196 "interp.ml" 9 133 197
+type(
+  string
+)
+ident(
+  int_ref f "interp.ml" 9 133 155 "interp.ml" 9 133 156
+)
+"interp.ml" 9 133 172 "interp.ml" 9 133 198
+call(
+  stack
+)
+type(
+  string
+)
+"interp.ml" 9 133 165 "interp.ml" 9 133 199
+type(
+  exn
+)
+"interp.ml" 9 133 159 "interp.ml" 9 133 199
+type(
+  'a
+)
+"interp.ml" 10 200 204 "interp.ml" 10 200 213
+type(
+  string -> 'a
+)
+ident(
+  def bad_arity "interp.ml" 10 200 254 "_none_" 1 0 -1
+)
+"interp.ml" 10 200 214 "interp.ml" 10 200 215
+type(
+  string
+)
+ident(
+  def x "interp.ml" 10 200 218 "interp.ml" 10 200 254
+)
+"interp.ml" 10 200 218 "interp.ml" 10 200 223
+type(
+  exn -> 'a
+)
+ident(
+  ext_ref Pervasives.raise
+)
+"interp.ml" 10 200 232 "interp.ml" 10 200 248
+type(
+  string
+)
+"interp.ml" 10 200 249 "interp.ml" 10 200 250
+type(
+  string -> string -> string
+)
+ident(
+  ext_ref Pervasives.( ^ )
+)
+"interp.ml" 10 200 251 "interp.ml" 10 200 252
+type(
+  string
+)
+ident(
+  int_ref x "interp.ml" 10 200 214 "interp.ml" 10 200 215
+)
+"interp.ml" 10 200 231 "interp.ml" 10 200 253
+call(
+  stack
+)
+type(
+  string
+)
+"interp.ml" 10 200 224 "interp.ml" 10 200 254
+type(
+  exn
+)
+"interp.ml" 10 200 218 "interp.ml" 10 200 254
+type(
+  'a
+)

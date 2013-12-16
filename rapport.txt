@@ -1,0 +1,26 @@
+
+
+
+
+I/ Le lexer
+
+Ici la casse est significative. On a laissé la Hashtbl h qui n'est pas utile pour le moment.
+Le lexer hack se trouve dans le lexer.
+
+La fonction chaine permet de traiter correctement les chaînes de caractères du C++ en faisant attention aux caractères d'échappement.
+
+
+II/ L'arbre de syntaxe abstraite
+
+On est resté proche de la grammaire du sujet pour faire l'arbre de syntaxe abstraite.
+On n'a pas encore décoré les types pour conserver leur position dans le fichier. On le fera dans la deuième partie.
+
+III/ Le parser
+
+
+On a réglé la plupart des conflits par l'utilisation de règles de précédence. (IFX et LPAR)
+On a bien fait attention à enregistrer dans la table du lexer hack l'identifiant de la classe déclarée avant de traiter ses membres (par exemple on déclare dans un ABR des attributs de type ABR).
+
+IV/ Le lexer hack
+
+Le lexer hack consiste simplement en une Hashtbl à l'intérieur du lexer, afin de différencier identifiants de type et les autres identifiants
