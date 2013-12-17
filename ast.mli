@@ -3,6 +3,10 @@
 
 (* ********************************************** *)
 
+
+type loc = Lexing.position * Lexing.position
+
+
 type sup = Super of string list
 
 type typedef =
