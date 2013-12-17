@@ -133,7 +133,7 @@ expr:
 | LAND; x = expr { Land x }
 | NOT; x = expr { Not x }
 | MINUS; x = expr %prec UNAIRE { Op(Sub, Eint 0, x) }
-| PLUS; x = expr %prec UNAIRE { x }
+| PLUS; x = expr %prec UNAIRE {Op(Add, Eint 0,  x) }
 | TIMES; x = expr %prec UNAIRE { Pointeur (x) }
 | INCR; x = expr { Lincr x }
 | DECR; x = expr { Ldecr x }

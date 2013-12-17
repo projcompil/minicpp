@@ -3108,7 +3108,7 @@ and _menhir_goto_expr : _menhir_env -> 'ttv_tail -> _menhir_state -> 'tv_expr ->
             ((let ((_menhir_stack, _menhir_s), _, x) = _menhir_stack in
             let _v : 'tv_expr = 
 # 136 "parser.mly"
-                              ( x )
+                              (Op(Add, Eint 0,  x) )
 # 3113 "parser.ml"
              in
             _menhir_goto_expr _menhir_env _menhir_stack _menhir_s _v) : 'freshtv790)
