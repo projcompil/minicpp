@@ -26,7 +26,6 @@
     let h = Hashtbl.create 17 in
     List.iter (fun (s,t) -> Hashtbl.add h s t) kwd_tbl;
     fun s -> 
-      (*let s = String.lowercase s in la casse n'est pas significative *)
       try List.assoc s kwd_tbl with _ -> if Hashtbl.mem table s then TIDENT s else IDENT s
 
   let newline lexbuf =
