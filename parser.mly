@@ -155,7 +155,7 @@ dexpr:
 ;
 
 expr:
-| d = dexpr { { desc = d ; loc = $startpos, $endpos } }
+| d = dexpr { { dexpr = d ; loc = $startpos, $endpos } }
 ;
 
 %inline operateur:

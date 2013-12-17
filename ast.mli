@@ -54,9 +54,9 @@ type declaration_c =
 
 type operator = Eq | Neq | Lt | Le | Gt | Ge | Add | Sub | Mul | Div | Mod | And | Or
 
-type expression = { desc:desc ; loc:loc; }
+type expression = { dexpr:dexpr ; loc:loc; }
 
-and desc =
+and dexpr  =
   | Eint of int
   | Ethis
   | Ebool of bool
