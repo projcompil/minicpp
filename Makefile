@@ -1,5 +1,5 @@
 CMO=lexer.cmo parser.cmo interp.cmo main.cmo
-GENERATED = lexer.ml parser.ml parser.mli
+GENERATED = lexer.ml parser.ml parser.mli 
 BIN=minic++
 FLAGS=-annot
 
