@@ -54,28 +54,30 @@ type declaration_c =
 
 type operator = Eq | Neq | Lt | Le | Gt | Ge | Add | Sub | Mul | Div | Mod | And | Or
 
-type expression =
+type expression = { desc:desc ; loc:loc; }
+
+and desc =
   | Eint of int
-  | This
+  | Ethis
   | Ebool of bool
-  | Null
+  | Enull
   | Eqident of qidentifiant
-  | Pointeur of expression
-  | Attr of expression * string
-  | Sderef of expression * string
-  | Assign of expression * expression
-  | Fcall of expression * (expression list)
-  | New of string * (expression list)
-  | Lincr of expression
-  | Ldecr of expression
-  | Rincr of expression
-  | Rdecr of expression
-  | Land of expression
-  | Not of expression
-  | Uminus of expression
-  | Uplus of expression
-  | Op of operator * expression * expression
-  | Par of expression
+  | Epointeur of expression
+  | Eattr of expression * string
+  | Esderef of expression * string
+  | Eassign of expression * expression
+  | Efcall of expression * (expression list)
+  | Enew of string * (expression list)
+  | Elincr of expression
+  | Eldecr of expression
+  | Erincr of expression
+  | Erdecr of expression
+  | Eland of expression
+  | Enot of expression
+  | Euminus of expression
+  | Euplus of expression
+  | Eop of operator * expression * expression
+  | Epar of expression
 
 type expression_str = 
   | Esexpr of expression 

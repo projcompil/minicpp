@@ -8,6 +8,8 @@ mips.cmo : mips.cmi
 mips.cmx : mips.cmi
 parser.cmo : lexer.cmo ast.cmi parser.cmi
 parser.cmx : lexer.cmx ast.cmi parser.cmi
+typing.cmo : ast.cmi
+typing.cmx : ast.cmi
 ast.cmi :
 mips.cmi :
 parser.cmi : ast.cmi

@@ -128,29 +128,34 @@ qident:
 | x = TIDENT ; COLON ; COLON ; y = IDENT { Double (x,y) }
 ;
 
-expr:
-| x = expr; y = operateur; z = expr { Op (y,x,z)}
-| LAND; x = expr { Land x }
-| NOT; x = expr { Not x }
-| MINUS; x = expr %prec UNAIRE { Op(Sub, Eint 0, x) }
-| PLUS; x = expr %prec UNAIRE {Op(Add, Eint 0,  x) }
-| TIMES; x = expr %prec UNAIRE { Pointeur (x) }
-| INCR; x = expr { Lincr x }
-| DECR; x = expr { Ldecr x }
-| x = expr; DOT; y = IDENT { Attr (x,y) }
-| x = expr; SDEREF; y = IDENT { Sderef (x,y) }
-| x = expr; ASSIGN; y = expr { Assign (x,y) }
-| x = expr; LPAR; y = separated_list(COMMA, expr) ; RPAR { Fcall (x,y) }
-| x = expr; INCR { Rincr x }
-| x = expr; DECR { Rdecr x }
+
+dexpr:
+| x = expr; y = operateur; z = expr { Eop (y,x,z)}
+| LAND; x = expr { Eland x }
+| NOT; x = expr { Enot x }
+| MINUS; x = expr %prec UNAIRE { Euminus( x) }
+| PLUS; x = expr %prec UNAIRE {Euplus( x) }
+| TIMES; x = expr %prec UNAIRE { Epointeur (x) }
+| INCR; x = expr { Elincr x }
+| DECR; x = expr { Eldecr x }
+| x = expr; DOT; y = IDENT { Eattr (x,y) }
+| x = expr; SDEREF; y = IDENT { Esderef (x,y) }
+| x = expr; ASSIGN; y = expr { Eassign (x,y) }
+| x = expr; LPAR; y = separated_list(COMMA, expr) ; RPAR { Efcall (x,y) }
+| x = expr; INCR { Erincr x }
+| x = expr; DECR { Erdecr x }
 | x = INTEGER { Eint x }
-| THIS { This } 
+| THIS { Ethis } 
 | FALSE { Ebool false}
 | TRUE { Ebool true }
-| NULL { Null }
+| NULL { Enull }
 | x = qident { Eqident x }
-| LPAR; x = expr; RPAR { Par x }
-| NEW; x = TIDENT; LPAR; y = separated_list(COMMA, expr) ; RPAR { New (x,y) }
+| LPAR; x = expr; RPAR { Epar x }
+| NEW; x = TIDENT; LPAR; y = separated_list(COMMA, expr) ; RPAR { Enew (x,y) }
+;
+
+expr:
+| d = dexpr { { desc = d ; loc = $startpos, $endpos } }
 ;
 
 %inline operateur:
