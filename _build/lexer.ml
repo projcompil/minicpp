@@ -19,7 +19,7 @@
     let h = Hashtbl.create 17 in
     List.iter (fun (s,t) -> Hashtbl.add h s t) kwd_tbl;
     fun s -> 
-      try List.assoc s kwd_tbl with _ -> if Hashtbl.mem table s then TIDENT s else IDENT s
+      try Hashtbl.find h s with _ -> if Hashtbl.mem table s then TIDENT s else IDENT s
 
   let newline lexbuf =
     let pos = lexbuf.lex_curr_p in

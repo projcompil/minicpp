@@ -90,7 +90,8 @@ let () =
     | Typing.Error (loc, s) -> 
 	(* Erreur syntaxique. On récupère sa position absolue et on la 
 	   convertit en numéro de ligne *)
-	localisation (Lexing.lexeme_start_p buf) ;
+	localisation (fst loc) ;
+	localisation (snd loc) ;
 	print_string s ;
 	eprintf "Erreur dans le typage@.";
 	exit 1
