@@ -8,7 +8,9 @@ type loc = Lexing.position * Lexing.position
 
 type 'a pos = { v: 'a ; loc:loc }
 
-type sup = Super of string list
+type sup = dsup pos
+
+and dsup = Super of string list
 
 type typedef =
   | Void
@@ -16,36 +18,44 @@ type typedef =
   | Tid of string
 
 
-type var = { dvar:dvar ; loc:loc; }
+type var = dvar pos 
 and dvar =
   | Ident of string
   | Po of var
   | Ad of var
 
+type arg = darg pos
 
+and darg = Arg of typedef * var
 
+type qident = dqident pos 
 
-
-
-type arg = Arg of typedef * var
-
-type qident =
+and dqident =
   | Qident of string
   | Double of string * string
 
-type qvar =
+type qvar = dqvar pos
+
+and dqvar =
   | Qvar of qident
   | Qpo of qvar
   | Qad of qvar
 
-type proto =
+type proto = dproto pos
+
+and dproto =
   | Plong of typedef * qvar * (arg list)
   | Pshort of string * (arg list)
   | Pdouble of string * string * (arg list)
 
-type decl_v = Declv of typedef * (var list)
+type decl_v = ddecl_v pos
 
-type membre =
+and ddecl_v = Declv of typedef * (var list)
+
+
+type membre = dmembre pos
+
+and dmembre =
   | Mvar of decl_v
   | Mvir of bool * proto
 

@@ -74,6 +74,10 @@ ddecl:
 ;
 
 decl_vars:
+| x = position(ddecl_vars) { x }
+;
+
+ddecl_vars:
 | x = typ; y = separated_nonempty_list(COMMA, var) ; SEMICOLON { Declv (x,y) }
 ;
 
@@ -89,17 +93,26 @@ decl_class:
 
 ddecl_class:
 | z = debut_decl_class ;  LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
-{  Class (z, (Super []),y) }
+{  Class (z, { v = (Super []); loc = $startpos, $endpos },y) }
 | z = debut_decl_class ; l = supers  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
 {  Class (z,l,y) }
 ;
 
 supers:
+| x = position(dsupers) { x }
+;
+
+dsupers:
 |COLON; PUBLIC; z = separated_nonempty_list(COMMA, TIDENT) { Super z } 
 ;
 
 
+
 member:
+| x = position(dmember) { x }
+;
+
+dmember:
 | x = decl_vars { Mvar (x) }
 | VIRTUAL; x = proto ; SEMICOLON { Mvir (true,x) }
 | x = proto ; SEMICOLON { Mvir (false,x) }
@@ -107,7 +120,10 @@ member:
 ;
 
 
-proto: x = typ ; y = qvar ; LPAR ; z = separated_list(COMMA, argument) ; RPAR 
+proto:
+| x = position(dproto) { x }
+
+dproto: x = typ ; y = qvar ; LPAR ; z = separated_list(COMMA, argument) ; RPAR 
  { Plong ( x, y, z) }
  | x = TIDENT ;  LPAR ; z = separated_list(COMMA, argument) ; RPAR 
  { Pshort (x , z)}
@@ -121,12 +137,19 @@ typ:
 | s = TIDENT  { Tid s }
 ;
 
-argument: x = typ ; y = var { Arg (x,y) } 
+argument:
+| x = position(dargument) { x }
 ;
 
-var:
-| d = dvar { { dvar = d ; loc = $startpos, $endpos } }
+dargument:
+| x = typ ; y = var { Arg (x,y) } 
 ;
+
+
+var:
+| x = position(dvar) { x }
+;
+
 
 dvar:
 | x = IDENT { Ident x}
@@ -135,13 +158,20 @@ dvar:
 ; 
 
 qvar:
+| x = position(dqvar) { x }
+;
+
+dqvar:
 | x = qident { Qvar x }
 | TIMES ; x = qvar { Qpo x }
 | LAND ; x = qvar { Qad x  }
 ; 
 
-
 qident:
+| x = position(dqident) { x }
+;
+
+dqident:
 | x = IDENT { Qident x }
 | x = TIDENT ; COLON ; COLON ; y = IDENT { Double (x,y) }
 ;
