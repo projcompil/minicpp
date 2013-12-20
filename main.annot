@@ -646,14 +646,14 @@ type(
 )
 "main.ml" 55 1662 1670 "main.ml" 55 1662 1671
 type(
-  Ast.file
+  Ast.fichier
 )
 ident(
   def p "main.ml" 56 1708 1712 "main.ml" 60 1822 1847
 )
 "main.ml" 55 1662 1674 "main.ml" 55 1662 1688
 type(
-  (Lexing.lexbuf -> Parser.token) -> Lexing.lexbuf -> Ast.file
+  (Lexing.lexbuf -> Parser.token) -> Lexing.lexbuf -> Ast.fichier
 )
 ident(
   ext_ref Parser.fichier
@@ -677,7 +677,7 @@ call(
   stack
 )
 type(
-  Ast.file
+  Ast.fichier
 )
 "main.ml" 56 1708 1712 "main.ml" 56 1708 1720
 type(

@@ -345,7 +345,7 @@ decl -> proto . bloc [ VOID TIDENT INT EOF CLASS ]
 -- On bloc shift to state 179
 
 State 49:
-bloc -> LACC . list(instruction) RACC [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE EOF ELSE DECR CLASS ]
+bloc -> LACC . list(inst) RACC [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE EOF ELSE DECR CLASS ]
 -- On WHILE shift to state 50
 -- On VOID shift to state 1
 -- On TRUE shift to state 52
@@ -373,19 +373,19 @@ bloc -> LACC . list(instruction) RACC [ WHILE VOID TRUE TIMES TIDENT THIS STDCOU
 -- On DECR shift to state 68
 -- On typ shift to state 151
 -- On qident shift to state 69
--- On list(instruction) shift to state 175
--- On instruction shift to state 177
+-- On list(inst) shift to state 175
+-- On inst shift to state 177
 -- On expr shift to state 163
 -- On dexpr shift to state 84
 -- On bloc shift to state 165
--- On RACC reduce production list(instruction) -> 
+-- On RACC reduce production list(inst) -> 
 
 State 50:
-instruction -> WHILE . LPAR expr RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> WHILE . LPAR expr RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On LPAR shift to state 51
 
 State 51:
-instruction -> WHILE LPAR . expr RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> WHILE LPAR . expr RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -2439,7 +2439,7 @@ dexpr -> expr . ASSIGN expr [ TIMES SDEREF RPAR PLUS OR NEQ MODULO MINUS LT LPAR
 dexpr -> expr . LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR [ TIMES SDEREF RPAR PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . INCR [ TIMES SDEREF RPAR PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . DECR [ TIMES SDEREF RPAR PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
-instruction -> WHILE LPAR expr . RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> WHILE LPAR expr . RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TIMES shift to state 78
 -- On SDEREF shift to state 71
 -- On RPAR shift to state 124
@@ -2462,7 +2462,7 @@ instruction -> WHILE LPAR expr . RPAR instruction [ WHILE VOID TRUE TIMES TIDENT
 -- On AND shift to state 107
 
 State 124:
-instruction -> WHILE LPAR expr RPAR . instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> WHILE LPAR expr RPAR . inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On WHILE shift to state 50
 -- On VOID shift to state 1
 -- On TRUE shift to state 52
@@ -2490,7 +2490,7 @@ instruction -> WHILE LPAR expr RPAR . instruction [ WHILE VOID TRUE TIMES TIDENT
 -- On DECR shift to state 68
 -- On typ shift to state 151
 -- On qident shift to state 69
--- On instruction shift to state 174
+-- On inst shift to state 174
 -- On expr shift to state 163
 -- On dexpr shift to state 84
 -- On bloc shift to state 165
@@ -2504,13 +2504,13 @@ typ -> TIDENT . [ TIMES LAND IDENT ]
 -- On IDENT reduce production typ -> TIDENT 
 
 State 126:
-instruction -> STDCOUT . nonempty_list(vinstruction) SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> STDCOUT . nonempty_list(vinst) SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On CHEVRON shift to state 127
--- On vinstruction shift to state 131
--- On nonempty_list(vinstruction) shift to state 133
+-- On vinst shift to state 131
+-- On nonempty_list(vinst) shift to state 133
 
 State 127:
-vinstruction -> CHEVRON . expr_str [ SEMICOLON CHEVRON ]
+vinst -> CHEVRON . expr_str [ SEMICOLON CHEVRON ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -2539,9 +2539,9 @@ expr_str -> CHAINE . [ SEMICOLON CHEVRON ]
 -- On CHEVRON reduce production expr_str -> CHAINE 
 
 State 129:
-vinstruction -> CHEVRON expr_str . [ SEMICOLON CHEVRON ]
--- On SEMICOLON reduce production vinstruction -> CHEVRON expr_str 
--- On CHEVRON reduce production vinstruction -> CHEVRON expr_str 
+vinst -> CHEVRON expr_str . [ SEMICOLON CHEVRON ]
+-- On SEMICOLON reduce production vinst -> CHEVRON expr_str 
+-- On CHEVRON reduce production vinst -> CHEVRON expr_str 
 
 State 130:
 dexpr -> expr . EQ expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR CHEVRON ASSIGN AND ]
@@ -2587,84 +2587,84 @@ expr_str -> expr . [ SEMICOLON CHEVRON ]
 -- On CHEVRON reduce production expr_str -> expr 
 
 State 131:
-nonempty_list(vinstruction) -> vinstruction . [ SEMICOLON ]
-nonempty_list(vinstruction) -> vinstruction . nonempty_list(vinstruction) [ SEMICOLON ]
+nonempty_list(vinst) -> vinst . [ SEMICOLON ]
+nonempty_list(vinst) -> vinst . nonempty_list(vinst) [ SEMICOLON ]
 -- On CHEVRON shift to state 127
--- On vinstruction shift to state 131
--- On nonempty_list(vinstruction) shift to state 132
--- On SEMICOLON reduce production nonempty_list(vinstruction) -> vinstruction 
+-- On vinst shift to state 131
+-- On nonempty_list(vinst) shift to state 132
+-- On SEMICOLON reduce production nonempty_list(vinst) -> vinst 
 
 State 132:
-nonempty_list(vinstruction) -> vinstruction nonempty_list(vinstruction) . [ SEMICOLON ]
--- On SEMICOLON reduce production nonempty_list(vinstruction) -> vinstruction nonempty_list(vinstruction) 
+nonempty_list(vinst) -> vinst nonempty_list(vinst) . [ SEMICOLON ]
+-- On SEMICOLON reduce production nonempty_list(vinst) -> vinst nonempty_list(vinst) 
 
 State 133:
-instruction -> STDCOUT nonempty_list(vinstruction) . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> STDCOUT nonempty_list(vinst) . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On SEMICOLON shift to state 134
 
 State 134:
-instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On VOID reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On TRUE reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On TIMES reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On TIDENT reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On THIS reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On STDCOUT reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On SEMICOLON reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On RETURN reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On RACC reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On PLUS reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On NULL reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On NOT reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On NEW reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On MINUS reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On LPAR reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On LAND reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On LACC reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On INTEGER reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On INT reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On INCR reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On IF reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On IDENT reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On FOR reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On FALSE reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On ELSE reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
--- On DECR reduce production instruction -> STDCOUT nonempty_list(vinstruction) SEMICOLON 
+inst -> STDCOUT nonempty_list(vinst) SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On VOID reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On TRUE reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On TIMES reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On TIDENT reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On THIS reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On STDCOUT reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On SEMICOLON reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On RETURN reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On RACC reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On PLUS reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On NULL reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On NOT reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On NEW reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On MINUS reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On LPAR reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On LAND reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On LACC reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On INTEGER reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On INT reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On INCR reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On IF reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On IDENT reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On FOR reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On FALSE reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On ELSE reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
+-- On DECR reduce production inst -> STDCOUT nonempty_list(vinst) SEMICOLON 
 
 State 135:
-instruction -> SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> SEMICOLON 
--- On VOID reduce production instruction -> SEMICOLON 
--- On TRUE reduce production instruction -> SEMICOLON 
--- On TIMES reduce production instruction -> SEMICOLON 
--- On TIDENT reduce production instruction -> SEMICOLON 
--- On THIS reduce production instruction -> SEMICOLON 
--- On STDCOUT reduce production instruction -> SEMICOLON 
--- On SEMICOLON reduce production instruction -> SEMICOLON 
--- On RETURN reduce production instruction -> SEMICOLON 
--- On RACC reduce production instruction -> SEMICOLON 
--- On PLUS reduce production instruction -> SEMICOLON 
--- On NULL reduce production instruction -> SEMICOLON 
--- On NOT reduce production instruction -> SEMICOLON 
--- On NEW reduce production instruction -> SEMICOLON 
--- On MINUS reduce production instruction -> SEMICOLON 
--- On LPAR reduce production instruction -> SEMICOLON 
--- On LAND reduce production instruction -> SEMICOLON 
--- On LACC reduce production instruction -> SEMICOLON 
--- On INTEGER reduce production instruction -> SEMICOLON 
--- On INT reduce production instruction -> SEMICOLON 
--- On INCR reduce production instruction -> SEMICOLON 
--- On IF reduce production instruction -> SEMICOLON 
--- On IDENT reduce production instruction -> SEMICOLON 
--- On FOR reduce production instruction -> SEMICOLON 
--- On FALSE reduce production instruction -> SEMICOLON 
--- On ELSE reduce production instruction -> SEMICOLON 
--- On DECR reduce production instruction -> SEMICOLON 
+inst -> SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> SEMICOLON 
+-- On VOID reduce production inst -> SEMICOLON 
+-- On TRUE reduce production inst -> SEMICOLON 
+-- On TIMES reduce production inst -> SEMICOLON 
+-- On TIDENT reduce production inst -> SEMICOLON 
+-- On THIS reduce production inst -> SEMICOLON 
+-- On STDCOUT reduce production inst -> SEMICOLON 
+-- On SEMICOLON reduce production inst -> SEMICOLON 
+-- On RETURN reduce production inst -> SEMICOLON 
+-- On RACC reduce production inst -> SEMICOLON 
+-- On PLUS reduce production inst -> SEMICOLON 
+-- On NULL reduce production inst -> SEMICOLON 
+-- On NOT reduce production inst -> SEMICOLON 
+-- On NEW reduce production inst -> SEMICOLON 
+-- On MINUS reduce production inst -> SEMICOLON 
+-- On LPAR reduce production inst -> SEMICOLON 
+-- On LAND reduce production inst -> SEMICOLON 
+-- On LACC reduce production inst -> SEMICOLON 
+-- On INTEGER reduce production inst -> SEMICOLON 
+-- On INT reduce production inst -> SEMICOLON 
+-- On INCR reduce production inst -> SEMICOLON 
+-- On IF reduce production inst -> SEMICOLON 
+-- On IDENT reduce production inst -> SEMICOLON 
+-- On FOR reduce production inst -> SEMICOLON 
+-- On FALSE reduce production inst -> SEMICOLON 
+-- On ELSE reduce production inst -> SEMICOLON 
+-- On DECR reduce production inst -> SEMICOLON 
 
 State 136:
-instruction -> RETURN . expr SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> RETURN . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> RETURN . expr SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> RETURN . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -2687,34 +2687,34 @@ instruction -> RETURN . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SE
 -- On dexpr shift to state 84
 
 State 137:
-instruction -> RETURN SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> RETURN SEMICOLON 
--- On VOID reduce production instruction -> RETURN SEMICOLON 
--- On TRUE reduce production instruction -> RETURN SEMICOLON 
--- On TIMES reduce production instruction -> RETURN SEMICOLON 
--- On TIDENT reduce production instruction -> RETURN SEMICOLON 
--- On THIS reduce production instruction -> RETURN SEMICOLON 
--- On STDCOUT reduce production instruction -> RETURN SEMICOLON 
--- On SEMICOLON reduce production instruction -> RETURN SEMICOLON 
--- On RETURN reduce production instruction -> RETURN SEMICOLON 
--- On RACC reduce production instruction -> RETURN SEMICOLON 
--- On PLUS reduce production instruction -> RETURN SEMICOLON 
--- On NULL reduce production instruction -> RETURN SEMICOLON 
--- On NOT reduce production instruction -> RETURN SEMICOLON 
--- On NEW reduce production instruction -> RETURN SEMICOLON 
--- On MINUS reduce production instruction -> RETURN SEMICOLON 
--- On LPAR reduce production instruction -> RETURN SEMICOLON 
--- On LAND reduce production instruction -> RETURN SEMICOLON 
--- On LACC reduce production instruction -> RETURN SEMICOLON 
--- On INTEGER reduce production instruction -> RETURN SEMICOLON 
--- On INT reduce production instruction -> RETURN SEMICOLON 
--- On INCR reduce production instruction -> RETURN SEMICOLON 
--- On IF reduce production instruction -> RETURN SEMICOLON 
--- On IDENT reduce production instruction -> RETURN SEMICOLON 
--- On FOR reduce production instruction -> RETURN SEMICOLON 
--- On FALSE reduce production instruction -> RETURN SEMICOLON 
--- On ELSE reduce production instruction -> RETURN SEMICOLON 
--- On DECR reduce production instruction -> RETURN SEMICOLON 
+inst -> RETURN SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> RETURN SEMICOLON 
+-- On VOID reduce production inst -> RETURN SEMICOLON 
+-- On TRUE reduce production inst -> RETURN SEMICOLON 
+-- On TIMES reduce production inst -> RETURN SEMICOLON 
+-- On TIDENT reduce production inst -> RETURN SEMICOLON 
+-- On THIS reduce production inst -> RETURN SEMICOLON 
+-- On STDCOUT reduce production inst -> RETURN SEMICOLON 
+-- On SEMICOLON reduce production inst -> RETURN SEMICOLON 
+-- On RETURN reduce production inst -> RETURN SEMICOLON 
+-- On RACC reduce production inst -> RETURN SEMICOLON 
+-- On PLUS reduce production inst -> RETURN SEMICOLON 
+-- On NULL reduce production inst -> RETURN SEMICOLON 
+-- On NOT reduce production inst -> RETURN SEMICOLON 
+-- On NEW reduce production inst -> RETURN SEMICOLON 
+-- On MINUS reduce production inst -> RETURN SEMICOLON 
+-- On LPAR reduce production inst -> RETURN SEMICOLON 
+-- On LAND reduce production inst -> RETURN SEMICOLON 
+-- On LACC reduce production inst -> RETURN SEMICOLON 
+-- On INTEGER reduce production inst -> RETURN SEMICOLON 
+-- On INT reduce production inst -> RETURN SEMICOLON 
+-- On INCR reduce production inst -> RETURN SEMICOLON 
+-- On IF reduce production inst -> RETURN SEMICOLON 
+-- On IDENT reduce production inst -> RETURN SEMICOLON 
+-- On FOR reduce production inst -> RETURN SEMICOLON 
+-- On FALSE reduce production inst -> RETURN SEMICOLON 
+-- On ELSE reduce production inst -> RETURN SEMICOLON 
+-- On DECR reduce production inst -> RETURN SEMICOLON 
 
 State 138:
 dexpr -> expr . EQ expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
@@ -2736,7 +2736,7 @@ dexpr -> expr . ASSIGN expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT
 dexpr -> expr . LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . INCR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . DECR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
-instruction -> RETURN expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> RETURN expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TIMES shift to state 78
 -- On SEMICOLON shift to state 139
 -- On SDEREF shift to state 71
@@ -2759,43 +2759,43 @@ instruction -> RETURN expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCO
 -- On AND shift to state 107
 
 State 139:
-instruction -> RETURN expr SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> RETURN expr SEMICOLON 
--- On VOID reduce production instruction -> RETURN expr SEMICOLON 
--- On TRUE reduce production instruction -> RETURN expr SEMICOLON 
--- On TIMES reduce production instruction -> RETURN expr SEMICOLON 
--- On TIDENT reduce production instruction -> RETURN expr SEMICOLON 
--- On THIS reduce production instruction -> RETURN expr SEMICOLON 
--- On STDCOUT reduce production instruction -> RETURN expr SEMICOLON 
--- On SEMICOLON reduce production instruction -> RETURN expr SEMICOLON 
--- On RETURN reduce production instruction -> RETURN expr SEMICOLON 
--- On RACC reduce production instruction -> RETURN expr SEMICOLON 
--- On PLUS reduce production instruction -> RETURN expr SEMICOLON 
--- On NULL reduce production instruction -> RETURN expr SEMICOLON 
--- On NOT reduce production instruction -> RETURN expr SEMICOLON 
--- On NEW reduce production instruction -> RETURN expr SEMICOLON 
--- On MINUS reduce production instruction -> RETURN expr SEMICOLON 
--- On LPAR reduce production instruction -> RETURN expr SEMICOLON 
--- On LAND reduce production instruction -> RETURN expr SEMICOLON 
--- On LACC reduce production instruction -> RETURN expr SEMICOLON 
--- On INTEGER reduce production instruction -> RETURN expr SEMICOLON 
--- On INT reduce production instruction -> RETURN expr SEMICOLON 
--- On INCR reduce production instruction -> RETURN expr SEMICOLON 
--- On IF reduce production instruction -> RETURN expr SEMICOLON 
--- On IDENT reduce production instruction -> RETURN expr SEMICOLON 
--- On FOR reduce production instruction -> RETURN expr SEMICOLON 
--- On FALSE reduce production instruction -> RETURN expr SEMICOLON 
--- On ELSE reduce production instruction -> RETURN expr SEMICOLON 
--- On DECR reduce production instruction -> RETURN expr SEMICOLON 
+inst -> RETURN expr SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> RETURN expr SEMICOLON 
+-- On VOID reduce production inst -> RETURN expr SEMICOLON 
+-- On TRUE reduce production inst -> RETURN expr SEMICOLON 
+-- On TIMES reduce production inst -> RETURN expr SEMICOLON 
+-- On TIDENT reduce production inst -> RETURN expr SEMICOLON 
+-- On THIS reduce production inst -> RETURN expr SEMICOLON 
+-- On STDCOUT reduce production inst -> RETURN expr SEMICOLON 
+-- On SEMICOLON reduce production inst -> RETURN expr SEMICOLON 
+-- On RETURN reduce production inst -> RETURN expr SEMICOLON 
+-- On RACC reduce production inst -> RETURN expr SEMICOLON 
+-- On PLUS reduce production inst -> RETURN expr SEMICOLON 
+-- On NULL reduce production inst -> RETURN expr SEMICOLON 
+-- On NOT reduce production inst -> RETURN expr SEMICOLON 
+-- On NEW reduce production inst -> RETURN expr SEMICOLON 
+-- On MINUS reduce production inst -> RETURN expr SEMICOLON 
+-- On LPAR reduce production inst -> RETURN expr SEMICOLON 
+-- On LAND reduce production inst -> RETURN expr SEMICOLON 
+-- On LACC reduce production inst -> RETURN expr SEMICOLON 
+-- On INTEGER reduce production inst -> RETURN expr SEMICOLON 
+-- On INT reduce production inst -> RETURN expr SEMICOLON 
+-- On INCR reduce production inst -> RETURN expr SEMICOLON 
+-- On IF reduce production inst -> RETURN expr SEMICOLON 
+-- On IDENT reduce production inst -> RETURN expr SEMICOLON 
+-- On FOR reduce production inst -> RETURN expr SEMICOLON 
+-- On FALSE reduce production inst -> RETURN expr SEMICOLON 
+-- On ELSE reduce production inst -> RETURN expr SEMICOLON 
+-- On DECR reduce production inst -> RETURN expr SEMICOLON 
 
 State 140:
-instruction -> IF . LPAR expr RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> IF . LPAR expr RPAR instruction ELSE instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF . LPAR expr RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF . LPAR expr RPAR inst ELSE inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On LPAR shift to state 141
 
 State 141:
-instruction -> IF LPAR . expr RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> IF LPAR . expr RPAR instruction ELSE instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR . expr RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR . expr RPAR inst ELSE inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -2836,8 +2836,8 @@ dexpr -> expr . ASSIGN expr [ TIMES SDEREF RPAR PLUS OR NEQ MODULO MINUS LT LPAR
 dexpr -> expr . LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR [ TIMES SDEREF RPAR PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . INCR [ TIMES SDEREF RPAR PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . DECR [ TIMES SDEREF RPAR PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
-instruction -> IF LPAR expr . RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> IF LPAR expr . RPAR instruction ELSE instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR expr . RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR expr . RPAR inst ELSE inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TIMES shift to state 78
 -- On SDEREF shift to state 71
 -- On RPAR shift to state 143
@@ -2860,8 +2860,8 @@ instruction -> IF LPAR expr . RPAR instruction ELSE instruction [ WHILE VOID TRU
 -- On AND shift to state 107
 
 State 143:
-instruction -> IF LPAR expr RPAR . instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> IF LPAR expr RPAR . instruction ELSE instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR expr RPAR . inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR expr RPAR . inst ELSE inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On WHILE shift to state 50
 -- On VOID shift to state 1
 -- On TRUE shift to state 52
@@ -2889,19 +2889,19 @@ instruction -> IF LPAR expr RPAR . instruction ELSE instruction [ WHILE VOID TRU
 -- On DECR shift to state 68
 -- On typ shift to state 151
 -- On qident shift to state 69
--- On instruction shift to state 171
+-- On inst shift to state 171
 -- On expr shift to state 163
 -- On dexpr shift to state 84
 -- On bloc shift to state 165
 
 State 144:
-instruction -> FOR . LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> FOR . LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR . LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR . LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On LPAR shift to state 145
 
 State 145:
-instruction -> FOR LPAR . loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> FOR LPAR . loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR . loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR . loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -2926,13 +2926,13 @@ instruction -> FOR LPAR . loption(separated_nonempty_list(COMMA,expr)) SEMICOLON
 -- On SEMICOLON reduce production loption(separated_nonempty_list(COMMA,expr)) -> 
 
 State 146:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) . SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) . SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) . SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) . SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On SEMICOLON shift to state 147
 
 State 147:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON . expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON . SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON . expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON . SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -2955,7 +2955,7 @@ instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON .
 -- On dexpr shift to state 84
 
 State 148:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON . loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON . loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -2980,11 +2980,11 @@ instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON S
 -- On RPAR reduce production loption(separated_nonempty_list(COMMA,expr)) -> 
 
 State 149:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) . RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) . RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On RPAR shift to state 150
 
 State 150:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR . instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR . inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On WHILE shift to state 50
 -- On VOID shift to state 1
 -- On TRUE shift to state 52
@@ -3012,60 +3012,60 @@ instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON S
 -- On DECR shift to state 68
 -- On typ shift to state 151
 -- On qident shift to state 69
--- On instruction shift to state 162
+-- On inst shift to state 162
 -- On expr shift to state 163
 -- On dexpr shift to state 84
 -- On bloc shift to state 165
 
 State 151:
-instruction -> typ . var SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> typ . var ASSIGN expr SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> typ . var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ . var SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ . var ASSIGN expr SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ . var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TIMES shift to state 7
 -- On LAND shift to state 8
 -- On IDENT shift to state 9
 -- On var shift to state 152
 
 State 152:
-instruction -> typ var . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> typ var . ASSIGN expr SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> typ var . ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var . ASSIGN expr SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var . ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On SEMICOLON shift to state 153
 -- On ASSIGN shift to state 154
 
 State 153:
-instruction -> typ var SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> typ var SEMICOLON 
--- On VOID reduce production instruction -> typ var SEMICOLON 
--- On TRUE reduce production instruction -> typ var SEMICOLON 
--- On TIMES reduce production instruction -> typ var SEMICOLON 
--- On TIDENT reduce production instruction -> typ var SEMICOLON 
--- On THIS reduce production instruction -> typ var SEMICOLON 
--- On STDCOUT reduce production instruction -> typ var SEMICOLON 
--- On SEMICOLON reduce production instruction -> typ var SEMICOLON 
--- On RETURN reduce production instruction -> typ var SEMICOLON 
--- On RACC reduce production instruction -> typ var SEMICOLON 
--- On PLUS reduce production instruction -> typ var SEMICOLON 
--- On NULL reduce production instruction -> typ var SEMICOLON 
--- On NOT reduce production instruction -> typ var SEMICOLON 
--- On NEW reduce production instruction -> typ var SEMICOLON 
--- On MINUS reduce production instruction -> typ var SEMICOLON 
--- On LPAR reduce production instruction -> typ var SEMICOLON 
--- On LAND reduce production instruction -> typ var SEMICOLON 
--- On LACC reduce production instruction -> typ var SEMICOLON 
--- On INTEGER reduce production instruction -> typ var SEMICOLON 
--- On INT reduce production instruction -> typ var SEMICOLON 
--- On INCR reduce production instruction -> typ var SEMICOLON 
--- On IF reduce production instruction -> typ var SEMICOLON 
--- On IDENT reduce production instruction -> typ var SEMICOLON 
--- On FOR reduce production instruction -> typ var SEMICOLON 
--- On FALSE reduce production instruction -> typ var SEMICOLON 
--- On ELSE reduce production instruction -> typ var SEMICOLON 
--- On DECR reduce production instruction -> typ var SEMICOLON 
+inst -> typ var SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> typ var SEMICOLON 
+-- On VOID reduce production inst -> typ var SEMICOLON 
+-- On TRUE reduce production inst -> typ var SEMICOLON 
+-- On TIMES reduce production inst -> typ var SEMICOLON 
+-- On TIDENT reduce production inst -> typ var SEMICOLON 
+-- On THIS reduce production inst -> typ var SEMICOLON 
+-- On STDCOUT reduce production inst -> typ var SEMICOLON 
+-- On SEMICOLON reduce production inst -> typ var SEMICOLON 
+-- On RETURN reduce production inst -> typ var SEMICOLON 
+-- On RACC reduce production inst -> typ var SEMICOLON 
+-- On PLUS reduce production inst -> typ var SEMICOLON 
+-- On NULL reduce production inst -> typ var SEMICOLON 
+-- On NOT reduce production inst -> typ var SEMICOLON 
+-- On NEW reduce production inst -> typ var SEMICOLON 
+-- On MINUS reduce production inst -> typ var SEMICOLON 
+-- On LPAR reduce production inst -> typ var SEMICOLON 
+-- On LAND reduce production inst -> typ var SEMICOLON 
+-- On LACC reduce production inst -> typ var SEMICOLON 
+-- On INTEGER reduce production inst -> typ var SEMICOLON 
+-- On INT reduce production inst -> typ var SEMICOLON 
+-- On INCR reduce production inst -> typ var SEMICOLON 
+-- On IF reduce production inst -> typ var SEMICOLON 
+-- On IDENT reduce production inst -> typ var SEMICOLON 
+-- On FOR reduce production inst -> typ var SEMICOLON 
+-- On FALSE reduce production inst -> typ var SEMICOLON 
+-- On ELSE reduce production inst -> typ var SEMICOLON 
+-- On DECR reduce production inst -> typ var SEMICOLON 
 
 State 154:
-instruction -> typ var ASSIGN . expr SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> typ var ASSIGN . TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var ASSIGN . expr SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var ASSIGN . TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 155
@@ -3087,13 +3087,13 @@ instruction -> typ var ASSIGN . TIDENT LPAR loption(separated_nonempty_list(COMM
 -- On dexpr shift to state 84
 
 State 155:
-instruction -> typ var ASSIGN TIDENT . LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var ASSIGN TIDENT . LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 qident -> TIDENT . COLON COLON IDENT [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 -- On LPAR shift to state 156
 -- On COLON shift to state 31
 
 State 156:
-instruction -> typ var ASSIGN TIDENT LPAR . loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var ASSIGN TIDENT LPAR . loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -3118,42 +3118,42 @@ instruction -> typ var ASSIGN TIDENT LPAR . loption(separated_nonempty_list(COMM
 -- On RPAR reduce production loption(separated_nonempty_list(COMMA,expr)) -> 
 
 State 157:
-instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) . RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) . RPAR SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On RPAR shift to state 158
 
 State 158:
-instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On SEMICOLON shift to state 159
 
 State 159:
-instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On VOID reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On TRUE reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On TIMES reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On TIDENT reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On THIS reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On STDCOUT reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On SEMICOLON reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On RETURN reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On RACC reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On PLUS reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On NULL reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On NOT reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On NEW reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On MINUS reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On LPAR reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On LAND reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On LACC reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On INTEGER reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On INT reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On INCR reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On IF reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On IDENT reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On FOR reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On FALSE reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On ELSE reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
--- On DECR reduce production instruction -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On VOID reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On TRUE reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On TIMES reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On TIDENT reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On THIS reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On STDCOUT reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On SEMICOLON reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On RETURN reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On RACC reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On PLUS reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On NULL reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On NOT reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On NEW reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On MINUS reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On LPAR reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On LAND reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On LACC reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On INTEGER reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On INT reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On INCR reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On IF reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On IDENT reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On FOR reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On FALSE reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On ELSE reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
+-- On DECR reduce production inst -> typ var ASSIGN TIDENT LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR SEMICOLON 
 
 State 160:
 dexpr -> expr . EQ expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
@@ -3175,7 +3175,7 @@ dexpr -> expr . ASSIGN expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT
 dexpr -> expr . LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . INCR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . DECR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
-instruction -> typ var ASSIGN expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> typ var ASSIGN expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TIMES shift to state 78
 -- On SEMICOLON shift to state 161
 -- On SDEREF shift to state 71
@@ -3198,64 +3198,64 @@ instruction -> typ var ASSIGN expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT TH
 -- On AND shift to state 107
 
 State 161:
-instruction -> typ var ASSIGN expr SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On VOID reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On TRUE reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On TIMES reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On TIDENT reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On THIS reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On STDCOUT reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On SEMICOLON reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On RETURN reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On RACC reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On PLUS reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On NULL reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On NOT reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On NEW reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On MINUS reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On LPAR reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On LAND reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On LACC reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On INTEGER reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On INT reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On INCR reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On IF reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On IDENT reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On FOR reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On FALSE reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On ELSE reduce production instruction -> typ var ASSIGN expr SEMICOLON 
--- On DECR reduce production instruction -> typ var ASSIGN expr SEMICOLON 
+inst -> typ var ASSIGN expr SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On VOID reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On TRUE reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On TIMES reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On TIDENT reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On THIS reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On STDCOUT reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On SEMICOLON reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On RETURN reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On RACC reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On PLUS reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On NULL reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On NOT reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On NEW reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On MINUS reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On LPAR reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On LAND reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On LACC reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On INTEGER reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On INT reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On INCR reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On IF reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On IDENT reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On FOR reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On FALSE reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On ELSE reduce production inst -> typ var ASSIGN expr SEMICOLON 
+-- On DECR reduce production inst -> typ var ASSIGN expr SEMICOLON 
 
 State 162:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On VOID reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On TRUE reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On TIMES reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On TIDENT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On THIS reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On STDCOUT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On SEMICOLON reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On RETURN reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On RACC reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On PLUS reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On NULL reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On NOT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On NEW reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On MINUS reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On LPAR reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On LAND reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On LACC reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On INTEGER reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On INT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On INCR reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On IF reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On IDENT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On FOR reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On FALSE reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On ELSE reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On DECR reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On VOID reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On TRUE reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On TIMES reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On TIDENT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On THIS reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On STDCOUT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On SEMICOLON reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On RETURN reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On RACC reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On PLUS reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On NULL reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On NOT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On NEW reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On MINUS reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On LPAR reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On LAND reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On LACC reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On INTEGER reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On INT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On INCR reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On IF reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On IDENT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On FOR reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On FALSE reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On ELSE reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On DECR reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
 
 State 163:
 dexpr -> expr . EQ expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
@@ -3277,7 +3277,7 @@ dexpr -> expr . ASSIGN expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT
 dexpr -> expr . LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . INCR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . DECR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
-instruction -> expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TIMES shift to state 78
 -- On SEMICOLON shift to state 164
 -- On SDEREF shift to state 71
@@ -3300,64 +3300,64 @@ instruction -> expr . SEMICOLON [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMI
 -- On AND shift to state 107
 
 State 164:
-instruction -> expr SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> expr SEMICOLON 
--- On VOID reduce production instruction -> expr SEMICOLON 
--- On TRUE reduce production instruction -> expr SEMICOLON 
--- On TIMES reduce production instruction -> expr SEMICOLON 
--- On TIDENT reduce production instruction -> expr SEMICOLON 
--- On THIS reduce production instruction -> expr SEMICOLON 
--- On STDCOUT reduce production instruction -> expr SEMICOLON 
--- On SEMICOLON reduce production instruction -> expr SEMICOLON 
--- On RETURN reduce production instruction -> expr SEMICOLON 
--- On RACC reduce production instruction -> expr SEMICOLON 
--- On PLUS reduce production instruction -> expr SEMICOLON 
--- On NULL reduce production instruction -> expr SEMICOLON 
--- On NOT reduce production instruction -> expr SEMICOLON 
--- On NEW reduce production instruction -> expr SEMICOLON 
--- On MINUS reduce production instruction -> expr SEMICOLON 
--- On LPAR reduce production instruction -> expr SEMICOLON 
--- On LAND reduce production instruction -> expr SEMICOLON 
--- On LACC reduce production instruction -> expr SEMICOLON 
--- On INTEGER reduce production instruction -> expr SEMICOLON 
--- On INT reduce production instruction -> expr SEMICOLON 
--- On INCR reduce production instruction -> expr SEMICOLON 
--- On IF reduce production instruction -> expr SEMICOLON 
--- On IDENT reduce production instruction -> expr SEMICOLON 
--- On FOR reduce production instruction -> expr SEMICOLON 
--- On FALSE reduce production instruction -> expr SEMICOLON 
--- On ELSE reduce production instruction -> expr SEMICOLON 
--- On DECR reduce production instruction -> expr SEMICOLON 
+inst -> expr SEMICOLON . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> expr SEMICOLON 
+-- On VOID reduce production inst -> expr SEMICOLON 
+-- On TRUE reduce production inst -> expr SEMICOLON 
+-- On TIMES reduce production inst -> expr SEMICOLON 
+-- On TIDENT reduce production inst -> expr SEMICOLON 
+-- On THIS reduce production inst -> expr SEMICOLON 
+-- On STDCOUT reduce production inst -> expr SEMICOLON 
+-- On SEMICOLON reduce production inst -> expr SEMICOLON 
+-- On RETURN reduce production inst -> expr SEMICOLON 
+-- On RACC reduce production inst -> expr SEMICOLON 
+-- On PLUS reduce production inst -> expr SEMICOLON 
+-- On NULL reduce production inst -> expr SEMICOLON 
+-- On NOT reduce production inst -> expr SEMICOLON 
+-- On NEW reduce production inst -> expr SEMICOLON 
+-- On MINUS reduce production inst -> expr SEMICOLON 
+-- On LPAR reduce production inst -> expr SEMICOLON 
+-- On LAND reduce production inst -> expr SEMICOLON 
+-- On LACC reduce production inst -> expr SEMICOLON 
+-- On INTEGER reduce production inst -> expr SEMICOLON 
+-- On INT reduce production inst -> expr SEMICOLON 
+-- On INCR reduce production inst -> expr SEMICOLON 
+-- On IF reduce production inst -> expr SEMICOLON 
+-- On IDENT reduce production inst -> expr SEMICOLON 
+-- On FOR reduce production inst -> expr SEMICOLON 
+-- On FALSE reduce production inst -> expr SEMICOLON 
+-- On ELSE reduce production inst -> expr SEMICOLON 
+-- On DECR reduce production inst -> expr SEMICOLON 
 
 State 165:
-instruction -> bloc . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> bloc 
--- On VOID reduce production instruction -> bloc 
--- On TRUE reduce production instruction -> bloc 
--- On TIMES reduce production instruction -> bloc 
--- On TIDENT reduce production instruction -> bloc 
--- On THIS reduce production instruction -> bloc 
--- On STDCOUT reduce production instruction -> bloc 
--- On SEMICOLON reduce production instruction -> bloc 
--- On RETURN reduce production instruction -> bloc 
--- On RACC reduce production instruction -> bloc 
--- On PLUS reduce production instruction -> bloc 
--- On NULL reduce production instruction -> bloc 
--- On NOT reduce production instruction -> bloc 
--- On NEW reduce production instruction -> bloc 
--- On MINUS reduce production instruction -> bloc 
--- On LPAR reduce production instruction -> bloc 
--- On LAND reduce production instruction -> bloc 
--- On LACC reduce production instruction -> bloc 
--- On INTEGER reduce production instruction -> bloc 
--- On INT reduce production instruction -> bloc 
--- On INCR reduce production instruction -> bloc 
--- On IF reduce production instruction -> bloc 
--- On IDENT reduce production instruction -> bloc 
--- On FOR reduce production instruction -> bloc 
--- On FALSE reduce production instruction -> bloc 
--- On ELSE reduce production instruction -> bloc 
--- On DECR reduce production instruction -> bloc 
+inst -> bloc . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> bloc 
+-- On VOID reduce production inst -> bloc 
+-- On TRUE reduce production inst -> bloc 
+-- On TIMES reduce production inst -> bloc 
+-- On TIDENT reduce production inst -> bloc 
+-- On THIS reduce production inst -> bloc 
+-- On STDCOUT reduce production inst -> bloc 
+-- On SEMICOLON reduce production inst -> bloc 
+-- On RETURN reduce production inst -> bloc 
+-- On RACC reduce production inst -> bloc 
+-- On PLUS reduce production inst -> bloc 
+-- On NULL reduce production inst -> bloc 
+-- On NOT reduce production inst -> bloc 
+-- On NEW reduce production inst -> bloc 
+-- On MINUS reduce production inst -> bloc 
+-- On LPAR reduce production inst -> bloc 
+-- On LAND reduce production inst -> bloc 
+-- On LACC reduce production inst -> bloc 
+-- On INTEGER reduce production inst -> bloc 
+-- On INT reduce production inst -> bloc 
+-- On INCR reduce production inst -> bloc 
+-- On IF reduce production inst -> bloc 
+-- On IDENT reduce production inst -> bloc 
+-- On FOR reduce production inst -> bloc 
+-- On FALSE reduce production inst -> bloc 
+-- On ELSE reduce production inst -> bloc 
+-- On DECR reduce production inst -> bloc 
 
 State 166:
 dexpr -> expr . EQ expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
@@ -3379,7 +3379,7 @@ dexpr -> expr . ASSIGN expr [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT
 dexpr -> expr . LPAR loption(separated_nonempty_list(COMMA,expr)) RPAR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . INCR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
 dexpr -> expr . DECR [ TIMES SEMICOLON SDEREF PLUS OR NEQ MODULO MINUS LT LPAR LE INCR GT GE EQ DOT DIV DECR ASSIGN AND ]
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr . SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr . SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TIMES shift to state 78
 -- On SEMICOLON shift to state 167
 -- On SDEREF shift to state 71
@@ -3402,7 +3402,7 @@ instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON e
 -- On AND shift to state 107
 
 State 167:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON . loption(separated_nonempty_list(COMMA,expr)) RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON . loption(separated_nonempty_list(COMMA,expr)) RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On TRUE shift to state 52
 -- On TIMES shift to state 53
 -- On TIDENT shift to state 30
@@ -3427,11 +3427,11 @@ instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON e
 -- On RPAR reduce production loption(separated_nonempty_list(COMMA,expr)) -> 
 
 State 168:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) . RPAR instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) . RPAR inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On RPAR shift to state 169
 
 State 169:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR . instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR . inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On WHILE shift to state 50
 -- On VOID shift to state 1
 -- On TRUE shift to state 52
@@ -3459,74 +3459,74 @@ instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON e
 -- On DECR shift to state 68
 -- On typ shift to state 151
 -- On qident shift to state 69
--- On instruction shift to state 170
+-- On inst shift to state 170
 -- On expr shift to state 163
 -- On dexpr shift to state 84
 -- On bloc shift to state 165
 
 State 170:
-instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On VOID reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On TRUE reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On TIMES reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On TIDENT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On THIS reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On STDCOUT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On SEMICOLON reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On RETURN reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On RACC reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On PLUS reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On NULL reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On NOT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On NEW reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On MINUS reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On LPAR reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On LAND reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On LACC reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On INTEGER reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On INT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On INCR reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On IF reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On IDENT reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On FOR reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On FALSE reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On ELSE reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
--- On DECR reduce production instruction -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR instruction 
+inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On VOID reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On TRUE reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On TIMES reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On TIDENT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On THIS reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On STDCOUT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On SEMICOLON reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On RETURN reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On RACC reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On PLUS reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On NULL reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On NOT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On NEW reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On MINUS reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On LPAR reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On LAND reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On LACC reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On INTEGER reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On INT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On INCR reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On IF reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On IDENT reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On FOR reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On FALSE reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On ELSE reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
+-- On DECR reduce production inst -> FOR LPAR loption(separated_nonempty_list(COMMA,expr)) SEMICOLON expr SEMICOLON loption(separated_nonempty_list(COMMA,expr)) RPAR inst 
 
 State 171:
-instruction -> IF LPAR expr RPAR instruction . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
-instruction -> IF LPAR expr RPAR instruction . ELSE instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR expr RPAR inst . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR expr RPAR inst . ELSE inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On ELSE shift to state 172
--- On WHILE reduce production instruction -> IF LPAR expr RPAR instruction 
--- On VOID reduce production instruction -> IF LPAR expr RPAR instruction 
--- On TRUE reduce production instruction -> IF LPAR expr RPAR instruction 
--- On TIMES reduce production instruction -> IF LPAR expr RPAR instruction 
--- On TIDENT reduce production instruction -> IF LPAR expr RPAR instruction 
--- On THIS reduce production instruction -> IF LPAR expr RPAR instruction 
--- On STDCOUT reduce production instruction -> IF LPAR expr RPAR instruction 
--- On SEMICOLON reduce production instruction -> IF LPAR expr RPAR instruction 
--- On RETURN reduce production instruction -> IF LPAR expr RPAR instruction 
--- On RACC reduce production instruction -> IF LPAR expr RPAR instruction 
--- On PLUS reduce production instruction -> IF LPAR expr RPAR instruction 
--- On NULL reduce production instruction -> IF LPAR expr RPAR instruction 
--- On NOT reduce production instruction -> IF LPAR expr RPAR instruction 
--- On NEW reduce production instruction -> IF LPAR expr RPAR instruction 
--- On MINUS reduce production instruction -> IF LPAR expr RPAR instruction 
--- On LPAR reduce production instruction -> IF LPAR expr RPAR instruction 
--- On LAND reduce production instruction -> IF LPAR expr RPAR instruction 
--- On LACC reduce production instruction -> IF LPAR expr RPAR instruction 
--- On INTEGER reduce production instruction -> IF LPAR expr RPAR instruction 
--- On INT reduce production instruction -> IF LPAR expr RPAR instruction 
--- On INCR reduce production instruction -> IF LPAR expr RPAR instruction 
--- On IF reduce production instruction -> IF LPAR expr RPAR instruction 
--- On IDENT reduce production instruction -> IF LPAR expr RPAR instruction 
--- On FOR reduce production instruction -> IF LPAR expr RPAR instruction 
--- On FALSE reduce production instruction -> IF LPAR expr RPAR instruction 
--- On DECR reduce production instruction -> IF LPAR expr RPAR instruction 
+-- On WHILE reduce production inst -> IF LPAR expr RPAR inst 
+-- On VOID reduce production inst -> IF LPAR expr RPAR inst 
+-- On TRUE reduce production inst -> IF LPAR expr RPAR inst 
+-- On TIMES reduce production inst -> IF LPAR expr RPAR inst 
+-- On TIDENT reduce production inst -> IF LPAR expr RPAR inst 
+-- On THIS reduce production inst -> IF LPAR expr RPAR inst 
+-- On STDCOUT reduce production inst -> IF LPAR expr RPAR inst 
+-- On SEMICOLON reduce production inst -> IF LPAR expr RPAR inst 
+-- On RETURN reduce production inst -> IF LPAR expr RPAR inst 
+-- On RACC reduce production inst -> IF LPAR expr RPAR inst 
+-- On PLUS reduce production inst -> IF LPAR expr RPAR inst 
+-- On NULL reduce production inst -> IF LPAR expr RPAR inst 
+-- On NOT reduce production inst -> IF LPAR expr RPAR inst 
+-- On NEW reduce production inst -> IF LPAR expr RPAR inst 
+-- On MINUS reduce production inst -> IF LPAR expr RPAR inst 
+-- On LPAR reduce production inst -> IF LPAR expr RPAR inst 
+-- On LAND reduce production inst -> IF LPAR expr RPAR inst 
+-- On LACC reduce production inst -> IF LPAR expr RPAR inst 
+-- On INTEGER reduce production inst -> IF LPAR expr RPAR inst 
+-- On INT reduce production inst -> IF LPAR expr RPAR inst 
+-- On INCR reduce production inst -> IF LPAR expr RPAR inst 
+-- On IF reduce production inst -> IF LPAR expr RPAR inst 
+-- On IDENT reduce production inst -> IF LPAR expr RPAR inst 
+-- On FOR reduce production inst -> IF LPAR expr RPAR inst 
+-- On FALSE reduce production inst -> IF LPAR expr RPAR inst 
+-- On DECR reduce production inst -> IF LPAR expr RPAR inst 
 
 State 172:
-instruction -> IF LPAR expr RPAR instruction ELSE . instruction [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+inst -> IF LPAR expr RPAR inst ELSE . inst [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
 -- On WHILE shift to state 50
 -- On VOID shift to state 1
 -- On TRUE shift to state 52
@@ -3554,109 +3554,109 @@ instruction -> IF LPAR expr RPAR instruction ELSE . instruction [ WHILE VOID TRU
 -- On DECR shift to state 68
 -- On typ shift to state 151
 -- On qident shift to state 69
--- On instruction shift to state 173
+-- On inst shift to state 173
 -- On expr shift to state 163
 -- On dexpr shift to state 84
 -- On bloc shift to state 165
 
 State 173:
-instruction -> IF LPAR expr RPAR instruction ELSE instruction . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On VOID reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On TRUE reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On TIMES reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On TIDENT reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On THIS reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On STDCOUT reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On SEMICOLON reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On RETURN reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On RACC reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On PLUS reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On NULL reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On NOT reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On NEW reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On MINUS reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On LPAR reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On LAND reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On LACC reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On INTEGER reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On INT reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On INCR reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On IF reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On IDENT reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On FOR reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On FALSE reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On ELSE reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
--- On DECR reduce production instruction -> IF LPAR expr RPAR instruction ELSE instruction 
+inst -> IF LPAR expr RPAR inst ELSE inst . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On VOID reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On TRUE reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On TIMES reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On TIDENT reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On THIS reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On STDCOUT reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On SEMICOLON reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On RETURN reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On RACC reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On PLUS reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On NULL reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On NOT reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On NEW reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On MINUS reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On LPAR reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On LAND reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On LACC reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On INTEGER reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On INT reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On INCR reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On IF reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On IDENT reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On FOR reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On FALSE reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On ELSE reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
+-- On DECR reduce production inst -> IF LPAR expr RPAR inst ELSE inst 
 
 State 174:
-instruction -> WHILE LPAR expr RPAR instruction . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
--- On WHILE reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On VOID reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On TRUE reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On TIMES reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On TIDENT reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On THIS reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On STDCOUT reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On SEMICOLON reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On RETURN reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On RACC reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On PLUS reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On NULL reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On NOT reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On NEW reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On MINUS reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On LPAR reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On LAND reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On LACC reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On INTEGER reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On INT reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On INCR reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On IF reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On IDENT reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On FOR reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On FALSE reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On ELSE reduce production instruction -> WHILE LPAR expr RPAR instruction 
--- On DECR reduce production instruction -> WHILE LPAR expr RPAR instruction 
+inst -> WHILE LPAR expr RPAR inst . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE ELSE DECR ]
+-- On WHILE reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On VOID reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On TRUE reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On TIMES reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On TIDENT reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On THIS reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On STDCOUT reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On SEMICOLON reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On RETURN reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On RACC reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On PLUS reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On NULL reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On NOT reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On NEW reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On MINUS reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On LPAR reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On LAND reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On LACC reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On INTEGER reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On INT reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On INCR reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On IF reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On IDENT reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On FOR reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On FALSE reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On ELSE reduce production inst -> WHILE LPAR expr RPAR inst 
+-- On DECR reduce production inst -> WHILE LPAR expr RPAR inst 
 
 State 175:
-bloc -> LACC list(instruction) . RACC [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE EOF ELSE DECR CLASS ]
+bloc -> LACC list(inst) . RACC [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE EOF ELSE DECR CLASS ]
 -- On RACC shift to state 176
 
 State 176:
-bloc -> LACC list(instruction) RACC . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE EOF ELSE DECR CLASS ]
--- On WHILE reduce production bloc -> LACC list(instruction) RACC 
--- On VOID reduce production bloc -> LACC list(instruction) RACC 
--- On TRUE reduce production bloc -> LACC list(instruction) RACC 
--- On TIMES reduce production bloc -> LACC list(instruction) RACC 
--- On TIDENT reduce production bloc -> LACC list(instruction) RACC 
--- On THIS reduce production bloc -> LACC list(instruction) RACC 
--- On STDCOUT reduce production bloc -> LACC list(instruction) RACC 
--- On SEMICOLON reduce production bloc -> LACC list(instruction) RACC 
--- On RETURN reduce production bloc -> LACC list(instruction) RACC 
--- On RACC reduce production bloc -> LACC list(instruction) RACC 
--- On PLUS reduce production bloc -> LACC list(instruction) RACC 
--- On NULL reduce production bloc -> LACC list(instruction) RACC 
--- On NOT reduce production bloc -> LACC list(instruction) RACC 
--- On NEW reduce production bloc -> LACC list(instruction) RACC 
--- On MINUS reduce production bloc -> LACC list(instruction) RACC 
--- On LPAR reduce production bloc -> LACC list(instruction) RACC 
--- On LAND reduce production bloc -> LACC list(instruction) RACC 
--- On LACC reduce production bloc -> LACC list(instruction) RACC 
--- On INTEGER reduce production bloc -> LACC list(instruction) RACC 
--- On INT reduce production bloc -> LACC list(instruction) RACC 
--- On INCR reduce production bloc -> LACC list(instruction) RACC 
--- On IF reduce production bloc -> LACC list(instruction) RACC 
--- On IDENT reduce production bloc -> LACC list(instruction) RACC 
--- On FOR reduce production bloc -> LACC list(instruction) RACC 
--- On FALSE reduce production bloc -> LACC list(instruction) RACC 
--- On EOF reduce production bloc -> LACC list(instruction) RACC 
--- On ELSE reduce production bloc -> LACC list(instruction) RACC 
--- On DECR reduce production bloc -> LACC list(instruction) RACC 
--- On CLASS reduce production bloc -> LACC list(instruction) RACC 
+bloc -> LACC list(inst) RACC . [ WHILE VOID TRUE TIMES TIDENT THIS STDCOUT SEMICOLON RETURN RACC PLUS NULL NOT NEW MINUS LPAR LAND LACC INTEGER INT INCR IF IDENT FOR FALSE EOF ELSE DECR CLASS ]
+-- On WHILE reduce production bloc -> LACC list(inst) RACC 
+-- On VOID reduce production bloc -> LACC list(inst) RACC 
+-- On TRUE reduce production bloc -> LACC list(inst) RACC 
+-- On TIMES reduce production bloc -> LACC list(inst) RACC 
+-- On TIDENT reduce production bloc -> LACC list(inst) RACC 
+-- On THIS reduce production bloc -> LACC list(inst) RACC 
+-- On STDCOUT reduce production bloc -> LACC list(inst) RACC 
+-- On SEMICOLON reduce production bloc -> LACC list(inst) RACC 
+-- On RETURN reduce production bloc -> LACC list(inst) RACC 
+-- On RACC reduce production bloc -> LACC list(inst) RACC 
+-- On PLUS reduce production bloc -> LACC list(inst) RACC 
+-- On NULL reduce production bloc -> LACC list(inst) RACC 
+-- On NOT reduce production bloc -> LACC list(inst) RACC 
+-- On NEW reduce production bloc -> LACC list(inst) RACC 
+-- On MINUS reduce production bloc -> LACC list(inst) RACC 
+-- On LPAR reduce production bloc -> LACC list(inst) RACC 
+-- On LAND reduce production bloc -> LACC list(inst) RACC 
+-- On LACC reduce production bloc -> LACC list(inst) RACC 
+-- On INTEGER reduce production bloc -> LACC list(inst) RACC 
+-- On INT reduce production bloc -> LACC list(inst) RACC 
+-- On INCR reduce production bloc -> LACC list(inst) RACC 
+-- On IF reduce production bloc -> LACC list(inst) RACC 
+-- On IDENT reduce production bloc -> LACC list(inst) RACC 
+-- On FOR reduce production bloc -> LACC list(inst) RACC 
+-- On FALSE reduce production bloc -> LACC list(inst) RACC 
+-- On EOF reduce production bloc -> LACC list(inst) RACC 
+-- On ELSE reduce production bloc -> LACC list(inst) RACC 
+-- On DECR reduce production bloc -> LACC list(inst) RACC 
+-- On CLASS reduce production bloc -> LACC list(inst) RACC 
 
 State 177:
-list(instruction) -> instruction . list(instruction) [ RACC ]
+list(inst) -> inst . list(inst) [ RACC ]
 -- On WHILE shift to state 50
 -- On VOID shift to state 1
 -- On TRUE shift to state 52
@@ -3684,16 +3684,16 @@ list(instruction) -> instruction . list(instruction) [ RACC ]
 -- On DECR shift to state 68
 -- On typ shift to state 151
 -- On qident shift to state 69
--- On list(instruction) shift to state 178
--- On instruction shift to state 177
+-- On list(inst) shift to state 178
+-- On inst shift to state 177
 -- On expr shift to state 163
 -- On dexpr shift to state 84
 -- On bloc shift to state 165
--- On RACC reduce production list(instruction) -> 
+-- On RACC reduce production list(inst) -> 
 
 State 178:
-list(instruction) -> instruction list(instruction) . [ RACC ]
--- On RACC reduce production list(instruction) -> instruction list(instruction) 
+list(inst) -> inst list(inst) . [ RACC ]
+-- On RACC reduce production list(inst) -> inst list(inst) 
 
 State 179:
 decl -> proto bloc . [ VOID TIDENT INT EOF CLASS ]

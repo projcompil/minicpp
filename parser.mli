@@ -53,4 +53,4 @@ type token =
   | AND
 
 
-val fichier: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.file)
+val fichier: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.fichier)

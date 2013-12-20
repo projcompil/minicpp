@@ -52,9 +52,9 @@ type declaration_c =
   
 
 
-type operator = Eq | Neq | Lt | Le | Gt | Ge | Add | Sub | Mul | Div | Mod | And | Or
+type operateur = Eq | Neq | Lt | Le | Gt | Ge | Add | Sub | Mul | Div | Mod | And | Or
 
-type expression = { dexpr:dexpr ; loc:loc; }
+type expr = { dexpr:dexpr ; loc:loc; }
 
 and dexpr  =
   | Eint of int
@@ -62,41 +62,41 @@ and dexpr  =
   | Ebool of bool
   | Enull
   | Eqident of qidentifiant
-  | Epointeur of expression
-  | Eattr of expression * string
-  | Esderef of expression * string
-  | Eassign of expression * expression
-  | Efcall of expression * (expression list)
-  | Enew of string * (expression list)
-  | Elincr of expression
-  | Eldecr of expression
-  | Erincr of expression
-  | Erdecr of expression
-  | Eland of expression
-  | Enot of expression
-  | Euminus of expression
-  | Euplus of expression
-  | Eop of operator * expression * expression
-  | Epar of expression
+  | Epointeur of expr
+  | Eattr of expr * string
+  | Esderef of expr * string
+  | Eassign of expr * expr
+  | Efcall of expr * (expr list)
+  | Enew of string * (expr list)
+  | Elincr of expr
+  | Eldecr of expr
+  | Erincr of expr
+  | Erdecr of expr
+  | Eland of expr
+  | Enot of expr
+  | Euminus of expr
+  | Euplus of expr
+  | Eop of operateur * expr * expr
+  | Epar of expr
 
-type expression_str = 
-  | Esexpr of expression 
+type expr_str = 
+  | Esexpr of expr 
   | Estring of string
 
 type inst =
   | Nothing
-  | Iexpr of expression
+  | Iexpr of expr
   | Idecls of typedef * variable
-  | Idecl of typedef * variable * expression
-  | Aidecl of typedef * variable * string * (expression list)
-  | If of expression * inst
-  | Ifelse of expression * inst * inst
-  | While of expression * inst
-  | For of (expression list) * expression * (expression list) * inst
-  | Afor of (expression list) * (expression list) * inst
+  | Idecl of typedef * variable * expr
+  | Aidecl of typedef * variable * string * (expr list)
+  | If of expr * inst
+  | Ifelse of expr * inst * inst
+  | While of expr * inst
+  | For of (expr list) * expr * (expr list) * inst
+  | Afor of (expr list) * (expr list) * inst
   | Ibloc of bloc
-  | Cout of expression_str list
-  | Return of expression
+  | Cout of expr_str list
+  | Return of expr
   | Areturn
 
 and bloc = Bloc of inst list
@@ -105,7 +105,8 @@ and declaration =
   | Dv of declaration_v
   | Dc of declaration_c
   | Db of prototype * bloc
-type file =
+
+type fichier =
   { bincludeios : bool;
     declarations: declaration list;
   }

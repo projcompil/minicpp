@@ -46,7 +46,7 @@
 %nonassoc ELSE
 
 /* Point d'entrée de la grammaire */
-%start <Ast.file>fichier
+%start <Ast.fichier>fichier
 
 /* Type des valeurs retournées par l'analyseur syntaxique */
 
@@ -165,26 +165,26 @@ expr:
 ;
 
 
-vinstruction: CHEVRON ; e = expr_str { e }
+vinst: CHEVRON ; e = expr_str { e }
 ;
 
-instruction:
+inst:
 | SEMICOLON { Nothing }
 | e = expr ; SEMICOLON { Iexpr e }
 | t = typ; v = var ; SEMICOLON { Idecls (t,v) }
 | t = typ; v = var ; ASSIGN; e = expr SEMICOLON { Idecl (t,v,e) }
 | t = typ; v = var ; ASSIGN; s = TIDENT ; LPAR; e = separated_list(COMMA, expr) ; RPAR ; SEMICOLON
 {Aidecl (t,v,s,e) }
-| IF ; LPAR ; e = expr ; RPAR ; i = instruction %prec IFX { If (e,i) }
-| IF ; LPAR ; e = expr ; RPAR ; i = instruction ; ELSE ; y = instruction 
+| IF ; LPAR ; e = expr ; RPAR ; i = inst %prec IFX { If (e,i) }
+| IF ; LPAR ; e = expr ; RPAR ; i = inst ; ELSE ; y = inst 
 {Ifelse (e,i,y) }
-| WHILE ; LPAR ; e = expr ; RPAR ; i = instruction  { While (e,i) }
+| WHILE ; LPAR ; e = expr ; RPAR ; i = inst  { While (e,i) }
 | FOR LPAR ; e = separated_list (COMMA , expr); SEMICOLON;  x = expr  ; SEMICOLON;
- f = separated_list (COMMA , expr) ; RPAR ; i = instruction { For (e,x,f,i) }
+ f = separated_list (COMMA , expr) ; RPAR ; i = inst { For (e,x,f,i) }
 | FOR LPAR ; e = separated_list (COMMA , expr); SEMICOLON; SEMICOLON;
-f = separated_list (COMMA , expr)  ; RPAR ; i = instruction { Afor (e,f,i) }
+f = separated_list (COMMA , expr)  ; RPAR ; i = inst { Afor (e,f,i) }
 | b = bloc { Ibloc b }
-| STDCOUT ; l = nonempty_list (vinstruction); SEMICOLON { Cout l }
+| STDCOUT ; l = nonempty_list (vinst); SEMICOLON { Cout l }
 | RETURN ; e = expr  ; SEMICOLON  { Return e }
 | RETURN ; SEMICOLON { Areturn }
 ;
@@ -195,7 +195,7 @@ expr_str:
 ;
 
 bloc:
-  LACC; x = instruction * ; RACC { Bloc x }
+  LACC; x = inst * ; RACC { Bloc x }
 ;
 
 
