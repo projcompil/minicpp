@@ -6,6 +6,7 @@
 
 type loc = Lexing.position * Lexing.position
 
+type 'a pos = { v: 'a ; loc:loc }
 
 type sup = Super of string list
 
@@ -55,7 +56,7 @@ type decl_c =
 
 type operateur = Eq | Neq | Lt | Le | Gt | Ge | Add | Sub | Mul | Div | Mod | And | Or
 
-type expr = { dexpr:dexpr ; loc:loc; }
+type expr = { dexpr:dexpr ; loc:loc }
 
 and dexpr  =
   | Eint of int

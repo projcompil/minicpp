@@ -56,6 +56,9 @@ fichier:
 | y=boption(INCLUDEIOS)  ; x = decl * ; EOF { {bincludeios = y ; decls =  x} }
 ;
 
+position(X):
+| x = X { {v = x ; loc=($startpos, $endpos) }} 
+
 decl:
 | x = decl_vars { Dv (x) }
 | x = decl_class { Dc (x) }
@@ -133,8 +136,11 @@ qident:
 ;
 
 
+expr:
+| x = dexpr { { dexpr = x ; loc = $startpos, $endpos } }
+
 dexpr:
-| x = expr; y = operateur; z = expr { Eop (y,x,z)}
+| x = expr; y = operateur; z = expr {  Eop (y,x,z) }
 | LAND; x = expr { Eland x }
 | NOT; x = expr { Enot x }
 | MINUS; x = expr %prec UNAIRE { Euminus( x) }
@@ -158,9 +164,6 @@ dexpr:
 | NEW; x = TIDENT; LPAR; y = separated_list(COMMA, expr) ; RPAR { Enew (x,y) }
 ;
 
-expr:
-| d = dexpr { { dexpr = d ; loc = $startpos, $endpos } }
-;
 
 %inline operateur:
 | EQ {Eq}| NEQ {Neq}| LT {Lt} | LE {Le} | GT {Gt} | GE {Ge} 

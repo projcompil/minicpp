@@ -1642,12 +1642,12 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
   fun _menhir_env _menhir_stack _menhir_s _v _startpos _endpos ->
     let _menhir_stack = Obj.magic _menhir_stack in
     let _menhir_stack = Obj.magic _menhir_stack in
-    let d = _v in
-    let _startpos_d_ = _startpos in
-    let _endpos_d_ = _endpos in
-    let _startpos = _startpos_d_ in
-    let _endpos = _endpos_d_ in
-    let _v : (Ast.expr) =             ( { dexpr = d ; loc = _startpos, _endpos } ) in
+    let x = _v in
+    let _startpos_x_ = _startpos in
+    let _endpos_x_ = _endpos in
+    let _startpos = _startpos_x_ in
+    let _endpos = _endpos_x_ in
+    let _v : (Ast.expr) =             ( { dexpr = x ; loc = _startpos, _endpos } ) in
     let _menhir_stack = (_menhir_stack, _menhir_s, _v, _startpos, _endpos) in
     match _menhir_s with
     | MenhirState71 ->
@@ -1795,7 +1795,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                                  (Mul)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -1832,7 +1832,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                      (Add)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -1863,7 +1863,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                                                             (Mod)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -1894,7 +1894,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                                              (Div)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -1949,7 +1949,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                (Or)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -1998,7 +1998,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                              (Neq)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -2035,7 +2035,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                    (Sub)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -2076,7 +2076,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                        (Lt)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -2117,7 +2117,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                                  (Le)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -2158,7 +2158,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                                            (Gt)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -2199,7 +2199,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                                                                      (Ge)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -2248,7 +2248,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                    (Eq)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -2301,7 +2301,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let _v : (Ast.dexpr) = let y =
                     (And)
             in
-                                                ( Eop (y,x,z)) in
+                                                (  Eop (y,x,z) ) in
             _menhir_goto_dexpr _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));

@@ -9,6 +9,7 @@ all: $(BIN)
 $(BIN):
 	ocamlbuild -use-menhir $(BIN)
 	cp _build/$(BIN) minic++
+	rm main.native
 
 .SUFFIXES: .mli .ml .cmi .cmo .mll .mly
 

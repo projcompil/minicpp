@@ -3,7 +3,7 @@
 
 open Format
 open Lexing
-
+open Typing
 (* Option de compilation, pour s'arrêter à l'issue du parser *)
 let parse_only = ref false
 let type_only = ref false
@@ -62,8 +62,11 @@ let () =
 		exit 0;
 	end
    	else begin
-		let tarbre = Typing.tfichier in
+		let tarbre = Typing.typfichier p in
+		if tarbre.tbincludeios then print_string "Alors\n"
+		else print_string "Bon\n" ;
    			if !type_only then begin
+				print_string "Typage correct\n";
 				close_in f ;
 				exit 0;
 			end
