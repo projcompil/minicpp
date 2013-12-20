@@ -15,7 +15,8 @@ type typedef =
   | Tid of string
 
 
-type var =
+type var = { dvar:dvar ; loc:loc; }
+and dvar =
   | Ident of string
   | Po of var
   | Ad of var

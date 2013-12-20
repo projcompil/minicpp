@@ -53,9 +53,7 @@
 %%
 
 fichier:
-| INCLUDEIOS  ; x = decl * ; EOF { {bincludeios = true ; decls =  x} }
-| x = decl * ; EOF { {bincludeios = false ; decls =  x }}
-
+| y=boption(INCLUDEIOS)  ; x = decl * ; EOF { {bincludeios = y ; decls =  x} }
 ;
 
 decl:
@@ -113,6 +111,10 @@ argument: x = typ ; y = var { Arg (x,y) }
 ;
 
 var:
+| d = dvar { { dvar = d ; loc = $startpos, $endpos } }
+;
+
+dvar:
 | x = IDENT { Ident x}
 | TIMES ; x = var { Po x }
 | LAND ; x = var { Ad x }
