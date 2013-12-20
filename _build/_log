@@ -30,9 +30,13 @@ menhir --ocamlc /usr/bin/ocamlc --infer parser.mly # cached
 # Target: main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o main.cmo main.ml
 + /usr/bin/ocamlc -c -o main.cmo main.ml
-File "main.ml", line 55, characters 8-9:
+File "main.ml", line 75, characters 1-13:
+Warning 20: this argument will not be used by the function.
+File "main.ml", line 75, characters 14-21:
+Warning 20: this argument will not be used by the function.
+File "main.ml", line 58, characters 8-9:
 Warning 26: unused variable p.
-File "main.ml", line 56, characters 8-14:
+File "main.ml", line 65, characters 6-12:
 Warning 26: unused variable tarbre.
 # Target: lexerhack.cmx, tags: { compile, extension:cmx, extension:ml, file:lexerhack.cmx, file:lexerhack.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o lexerhack.cmx lexerhack.ml # cached
@@ -43,13 +47,17 @@ Warning 26: unused variable tarbre.
 # Target: lexer.cmx, tags: { compile, extension:cmx, extension:ml, file:lexer.cmx, file:lexer.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o lexer.cmx lexer.ml # cached
 # Target: typing.cmx, tags: { compile, extension:cmx, extension:ml, file:typing.cmx, file:typing.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o typing.cmx typing.ml
+/usr/bin/ocamlopt -c -o typing.cmx typing.ml # cached
 # Target: main.cmx, tags: { compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o main.cmx main.ml
 + /usr/bin/ocamlopt -c -o main.cmx main.ml
-File "main.ml", line 55, characters 8-9:
+File "main.ml", line 75, characters 1-13:
+Warning 20: this argument will not be used by the function.
+File "main.ml", line 75, characters 14-21:
+Warning 20: this argument will not be used by the function.
+File "main.ml", line 58, characters 8-9:
 Warning 26: unused variable p.
-File "main.ml", line 56, characters 8-14:
+File "main.ml", line 65, characters 6-12:
 Warning 26: unused variable tarbre.
 # Target: main.native, tags: { dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet }
 /usr/bin/ocamlopt lexerhack.cmx parser.cmx lexer.cmx typing.cmx main.cmx -o main.native
