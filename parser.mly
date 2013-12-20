@@ -81,7 +81,7 @@ decl_class:
 ;
 
 supers:
-|COLON; PUBLIC; z = separated_nonempty_list(COMMA, TIDENT) { Super z } /* plutôt que de considérer supers non vide pour ensuite mettre une option, autant considérer qu'il peut être vide, ce qui évite les complications et produit une grammaire équivalente */
+|COLON; PUBLIC; z = separated_nonempty_list(COMMA, TIDENT) { Super z } 
 ;
 
 
