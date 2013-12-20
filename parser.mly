@@ -1,5 +1,5 @@
 
-/* Analyseur syntaxique pour Arith */
+/* Analyseur syntaxique pour Mini-C++ */
 
 %{
   open Ast

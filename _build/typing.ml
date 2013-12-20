@@ -1,3 +1,6 @@
+(* Typage pour Mini-C++ *)
+
+
 open Ast
 
 exception Error of loc * string
