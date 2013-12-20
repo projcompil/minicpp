@@ -25,4 +25,4 @@
 "Resource: /home/nm/Documents/minicpp/lexer.mll": "\192!\030F.\227\134\193\199\247O\178\012\232\011\001"
 "Rule: ocaml: ml -> cmo & cmi (%=typing )": "\000\200\144\0072\175.,-\219\000S_\022s*"
 "Rule: ocaml: mli -> cmi (%=parser )": "\252\241)\1726\212\16232\000M\189\001\136\012\004"
-"Rule: ocaml: cmx* & o* -> native (%=main )": "7}\233\151ceU\223\130`\217\162\182F\191<"
+"Rule: ocaml: cmx* & o* -> native (%=main )": "\140\028o\240\197\228\"\209\163\214\147\149\149\135\140\167"
