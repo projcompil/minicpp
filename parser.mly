@@ -197,5 +197,3 @@ expr_str:
 bloc:
   LACC; x = inst * ; RACC { Bloc x }
 ;
-
-

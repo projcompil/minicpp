@@ -15,33 +15,33 @@ type typedef =
   | Tid of string
 
 
-type variable =
+type var =
   | Ident of string
-  | Po of variable
-  | Ad of variable
+  | Po of var
+  | Ad of var
 
 
 
 
 
 
-type arg = Arg of typedef * variable
+type arg = Arg of typedef * var
 
 type qidentifiant =
   | Qident of string
   | Double of string * string
 
-type qvariable =
+type qvar =
   | Qvar of qidentifiant
-  | Qpo of qvariable
-  | Qad of qvariable
+  | Qpo of qvar
+  | Qad of qvar
 
 type prototype =
-  | Plong of typedef * qvariable * (arg list)
+  | Plong of typedef * qvar * (arg list)
   | Pshort of string * (arg list)
   | Pdouble of string * string * (arg list)
 
-type declaration_v = Declv of typedef * (variable list)
+type declaration_v = Declv of typedef * (var list)
 
 type membre =
   | Mvar of declaration_v
@@ -86,9 +86,9 @@ type expr_str =
 type inst =
   | Nothing
   | Iexpr of expr
-  | Idecls of typedef * variable
-  | Idecl of typedef * variable * expr
-  | Aidecl of typedef * variable * string * (expr list)
+  | Idecls of typedef * var
+  | Idecl of typedef * var * expr
+  | Aidecl of typedef * var * string * (expr list)
   | If of expr * inst
   | Ifelse of expr * inst * inst
   | While of expr * inst
