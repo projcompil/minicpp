@@ -196,7 +196,11 @@ inst:
 | d = dinst { { dinst = d ; loc = $startpos, $endpos } }
 ;
 
+
 expr_str:
+| d = dexpr_str { { dexpr_str = d ; loc = $startpos, $endpos } }
+;
+dexpr_str:
 | x = expr { Esexpr x }
 | x = CHAINE { Estring x}
 ;

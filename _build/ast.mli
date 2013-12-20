@@ -79,7 +79,9 @@ and dexpr  =
   | Eop of operateur * expr * expr
   | Epar of expr
 
-type expr_str = 
+
+type expr_str = { dexpr_str:dexpr_str ; loc:loc; }
+and dexpr_str =
   | Esexpr of expr 
   | Estring of string
 
