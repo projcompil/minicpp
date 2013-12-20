@@ -53,12 +53,13 @@ let () =
        La fonction Lexer.token est utilisée par Parser.prog pour obtenir 
        le prochain token. *)
     let p = Parser.fichier Lexer.token buf in
-    close_in f;
+    let tarbre = Typing.tfichier in
+	close_in f;
     
-    (* On s'arrête ici si on ne veut faire que le parsing *)
-    if !parse_only then exit 0;
-    print_string "OK.\n";
-    (*Interp.prog p *)
+       	(* On s'arrête ici si on ne veut faire que le parsing *)
+   	if !parse_only then exit 0;
+	print_string "OK.\n";
+       	(*Interp.prog p *)
   with
     | Lexer.Lexing_error c -> 
 	(* Erreur lexicale. On récupère sa position absolue et 
