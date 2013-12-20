@@ -48,7 +48,7 @@ type membre =
   | Mvir of bool * proto
 
 type decl_c =
-  | Class of bool * string * (membre list)
+  | Class of string * sup * (membre list)
   
 
 

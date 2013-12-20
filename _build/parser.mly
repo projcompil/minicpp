@@ -76,8 +76,10 @@ debut_decl_class:
 | CLASS ; z = IDENT; { Hashtbl.add (Lexerhack.table) z () ; z }
 
 decl_class:
-| z = debut_decl_class ; x = boption(supers)  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
-{  Class (x,z,y) }
+| z = debut_decl_class ;  LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
+{  Class (z, (Super []),y) }
+| z = debut_decl_class ; l = supers  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
+{  Class (z,l,y) }
 ;
 
 supers:
