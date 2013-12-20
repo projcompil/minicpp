@@ -49,7 +49,9 @@ type membre =
   | Mvar of decl_v
   | Mvir of bool * proto
 
-type decl_c =
+type decl_c = ddecl_c pos
+
+and ddecl_c =
   | Class of string * sup * (membre list)
   
 
@@ -82,13 +84,13 @@ and dexpr  =
   | Epar of expr
 
 
-type expr_str = { dexpr_str:dexpr_str ; loc:loc; }
+type expr_str = dexpr_str pos 
 and dexpr_str =
   | Esexpr of expr 
   | Estring of string
 
 
-type inst = { dinst:dinst ; loc:loc; }
+type inst = dinst pos 
 
 and dinst =
   | Nothing
@@ -106,14 +108,20 @@ and dinst =
   | Return of expr
   | Areturn
 
-and bloc = Bloc of inst list
+and bloc = dbloc pos
 
-and decl =
+and dbloc = Bloc of inst list
+
+and decl = ddecl pos
+
+and ddecl =
   | Dv of decl_v
   | Dc of decl_c
   | Db of proto * bloc
 
-type fichier =
+type fichier = dfichier pos
+
+and dfichier =
   { bincludeios : bool;
     decls: decl list;
   }

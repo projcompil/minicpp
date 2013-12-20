@@ -53,13 +53,21 @@
 %%
 
 fichier:
+| x = position(dfichier) { x }
+;
+
+dfichier:
 | y=boption(INCLUDEIOS)  ; x = decl * ; EOF { {bincludeios = y ; decls =  x} }
 ;
 
 position(X):
 | x = X { {v = x ; loc=($startpos, $endpos) }} 
 
+
 decl:
+| x = position(ddecl) { x }
+
+ddecl:
 | x = decl_vars { Dv (x) }
 | x = decl_class { Dc (x) }
 | x = proto ; y = bloc { Db (x,y)}
@@ -77,6 +85,9 @@ debut_decl_class:
 | CLASS ; z = IDENT; { Hashtbl.add (Lexerhack.table) z () ; z }
 
 decl_class:
+| x = position(ddecl_class) {x}
+
+ddecl_class:
 | z = debut_decl_class ;  LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
 {  Class (z, (Super []),y) }
 | z = debut_decl_class ; l = supers  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
@@ -198,19 +209,24 @@ f = separated_list (COMMA , expr)  ; RPAR ; i = inst { Afor (e,f,i) }
 
 
 inst:
-| d = dinst { { dinst = d ; loc = $startpos, $endpos } }
+| x = position(dinst) { x } 
 ;
 
 
 expr_str:
-| d = dexpr_str { { dexpr_str = d ; loc = $startpos, $endpos } }
+| x = position(dexpr_str) { x }
 ;
 dexpr_str:
 | x = expr { Esexpr x }
 | x = CHAINE { Estring x}
 ;
 
+
 bloc:
+| x = position(dbloc) { x }
+;
+
+dbloc:
   LACC; x = inst * ; RACC { Bloc x }
 ;
 

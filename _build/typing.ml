@@ -139,19 +139,26 @@ let typbloc bl env = match bl with
 	| Bloc of [] -> (*(TBloc []) , env*) failwith "non implémenté"
 	| Bloc of (i::l) -> failwith "non implémenté"
 *)
+
+(*
 let typdecl p env = match p with
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
 				(TDb (TProtovide, r)), envir
 	| _ -> failwith "non implémenté"
 				
-
-let typfichier p =
+*)
+let typfichier p = 
+	failwith "non implémenté"
+(*
     let rec auxf l envi = match l with
 	| [] -> [] 
 	| x::l -> let (r, envir) = typdecl x envi in
 			r::(auxf l envir)
     in  { tbincludeios = p.bincludeios ;
 	tdecls= (auxf (p.decls) Smap.empty) }
+
+
+*)
 
 
 
