@@ -53,8 +53,8 @@
 %%
 
 fichier:
-| INCLUDEIOS  ; x = decl * ; EOF { {bincludeios = true ; declarations =  x} }
-| x = decl * ; EOF { {bincludeios = false ; declarations =  x }}
+| INCLUDEIOS  ; x = decl * ; EOF { {bincludeios = true ; decls =  x} }
+| x = decl * ; EOF { {bincludeios = false ; decls =  x }}
 
 ;
 
@@ -197,3 +197,4 @@ expr_str:
 bloc:
   LACC; x = inst * ; RACC { Bloc x }
 ;
+

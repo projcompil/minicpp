@@ -27,12 +27,12 @@ type var =
 
 type arg = Arg of typedef * var
 
-type qidentifiant =
+type qident =
   | Qident of string
   | Double of string * string
 
 type qvar =
-  | Qvar of qidentifiant
+  | Qvar of qident
   | Qpo of qvar
   | Qad of qvar
 
@@ -41,13 +41,13 @@ type prototype =
   | Pshort of string * (arg list)
   | Pdouble of string * string * (arg list)
 
-type declaration_v = Declv of typedef * (var list)
+type decl_v = Declv of typedef * (var list)
 
 type membre =
-  | Mvar of declaration_v
+  | Mvar of decl_v
   | Mvir of bool * prototype
 
-type declaration_c =
+type decl_c =
   | Class of bool*string * (membre list)
   
 
@@ -61,7 +61,7 @@ and dexpr  =
   | Ethis
   | Ebool of bool
   | Enull
-  | Eqident of qidentifiant
+  | Eqident of qident
   | Epointeur of expr
   | Eattr of expr * string
   | Esderef of expr * string
@@ -101,12 +101,12 @@ type inst =
 
 and bloc = Bloc of inst list
 
-and declaration =
-  | Dv of declaration_v
-  | Dc of declaration_c
+and decl =
+  | Dv of decl_v
+  | Dc of decl_c
   | Db of prototype * bloc
 
 type fichier =
   { bincludeios : bool;
-    declarations: declaration list;
+    decls: decl list;
   }
