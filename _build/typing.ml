@@ -25,6 +25,10 @@ Hashtbl.add table_c "" "";;
 type tfichier =
     | Tfichier
 
+
+let tinst p =
+    ()
+
 let tfichier p =
     let rec auxf p envi =
 	Tfichier

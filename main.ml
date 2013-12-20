@@ -87,6 +87,13 @@ let () =
 	localisation (Lexing.lexeme_start_p buf);
 	eprintf "Erreur dans l'analyse syntaxique@.";
 	exit 1
+    | Typing.Error (loc, s) -> 
+	(* Erreur syntaxique. On récupère sa position absolue et on la 
+	   convertit en numéro de ligne *)
+	localisation (Lexing.lexeme_start_p buf) ;
+	print_string s ;
+	eprintf "Erreur dans le typage@.";
+	exit 1
    | _ -> 
         localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur.";
