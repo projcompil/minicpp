@@ -63,16 +63,16 @@ let () =
 	end
    	else begin
 		let tarbre = Typing.tfichier in
-   		if !type_only then begin
-			close_in f ;
-			exit 0;
-		end
-		else begin
-			close_in f ;
-			exit 0;
-		end
+   			if !type_only then begin
+				close_in f ;
+				exit 0;
+			end
+			else begin
+				print_string "OK.\n";
+				close_in f ;
+				exit 0;
+			end
 	end
-	print_string "OK.\n";
        	(*Interp.prog p *)
   with
     | Lexer.Lexing_error c -> 
