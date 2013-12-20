@@ -4164,7 +4164,7 @@ and _menhir_goto_decl : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.decl) 
         _menhir_env._menhir_shifted <- (-1);
         _menhir_errorcase _menhir_env (Obj.magic _menhir_stack) MenhirState184
 
-and _menhir_goto_proto : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.prototype) -> 'ttv_return =
+and _menhir_goto_proto : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.proto) -> 'ttv_return =
   fun _menhir_env _menhir_stack _menhir_s _v ->
     let _menhir_stack = (_menhir_stack, _menhir_s, _v) in
     match _menhir_s with
@@ -4335,7 +4335,7 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_argument__ : _menhir_env 
             let _menhir_stack = Obj.magic _menhir_stack in
             let _endpos__4_ = _endpos in
             let (((_menhir_stack, _menhir_s, x, _startpos_x_), _startpos__2_), _, xs0) = _menhir_stack in
-            let _v : (Ast.prototype) = let z =
+            let _v : (Ast.proto) = let z =
               let xs = xs0 in
                   ( xs )
             in
@@ -4359,7 +4359,7 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_argument__ : _menhir_env 
             let _menhir_stack = Obj.magic _menhir_stack in
             let _endpos__7_ = _endpos in
             let ((((_menhir_stack, _menhir_s, x, _startpos_x_), y, _startpos_y_), _startpos__5_), _, xs0) = _menhir_stack in
-            let _v : (Ast.prototype) = let z =
+            let _v : (Ast.proto) = let z =
               let xs = xs0 in
                   ( xs )
             in
@@ -4383,7 +4383,7 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_argument__ : _menhir_env 
             let _menhir_stack = Obj.magic _menhir_stack in
             let _endpos__5_ = _endpos in
             let ((((_menhir_stack, _menhir_s, x), _, y), _startpos__3_), _, xs0) = _menhir_stack in
-            let _v : (Ast.prototype) = let z =
+            let _v : (Ast.proto) = let z =
               let xs = xs0 in
                   ( xs )
             in

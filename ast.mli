@@ -36,7 +36,7 @@ type qvar =
   | Qpo of qvar
   | Qad of qvar
 
-type prototype =
+type proto =
   | Plong of typedef * qvar * (arg list)
   | Pshort of string * (arg list)
   | Pdouble of string * string * (arg list)
@@ -45,7 +45,7 @@ type decl_v = Declv of typedef * (var list)
 
 type membre =
   | Mvar of decl_v
-  | Mvir of bool * prototype
+  | Mvir of bool * proto
 
 type decl_c =
   | Class of bool*string * (membre list)
@@ -104,7 +104,7 @@ and bloc = Bloc of inst list
 and decl =
   | Dv of decl_v
   | Dc of decl_c
-  | Db of prototype * bloc
+  | Db of proto * bloc
 
 type fichier =
   { bincludeios : bool;
