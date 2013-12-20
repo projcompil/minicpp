@@ -170,7 +170,7 @@ expr:
 vinst: CHEVRON ; e = expr_str { e }
 ;
 
-inst:
+dinst:
 | SEMICOLON { Nothing }
 | e = expr ; SEMICOLON { Iexpr e }
 | t = typ; v = var ; SEMICOLON { Idecls (t,v) }
@@ -189,6 +189,11 @@ f = separated_list (COMMA , expr)  ; RPAR ; i = inst { Afor (e,f,i) }
 | STDCOUT ; l = nonempty_list (vinst); SEMICOLON { Cout l }
 | RETURN ; e = expr  ; SEMICOLON  { Return e }
 | RETURN ; SEMICOLON { Areturn }
+;
+
+
+inst:
+| d = dinst { { dinst = d ; loc = $startpos, $endpos } }
 ;
 
 expr_str:

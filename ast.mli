@@ -83,7 +83,10 @@ type expr_str =
   | Esexpr of expr 
   | Estring of string
 
-type inst =
+
+type inst = { dinst:dinst ; loc:loc; }
+
+and dinst =
   | Nothing
   | Iexpr of expr
   | Idecls of typedef * var
