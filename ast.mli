@@ -8,9 +8,9 @@ type loc = Lexing.position * Lexing.position
 
 type 'a pos = { v: 'a ; loc:loc }
 
-type sup = dsup pos
+(*type sup = dsup pos*)
 
-and dsup = Super of string list
+type dsup = string list
 
 type typedef =
   | Void
@@ -62,7 +62,7 @@ and dmembre =
 type decl_c = ddecl_c pos
 
 and ddecl_c =
-  | Class of string * sup * (membre list)
+  | Class of string * (*sup anciennement *) dsup * (membre list)
   
 
 

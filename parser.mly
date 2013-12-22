@@ -92,18 +92,18 @@ decl_class:
 | x = position(ddecl_class) {x}
 
 ddecl_class:
-| z = debut_decl_class ;  LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
-{  Class (z, { v = (Super []); loc = $startpos, $endpos },y) }
-| z = debut_decl_class ; l = supers  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
-{  Class (z,l,y) }
+/*| z = debut_decl_class ;  LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
+{  Class (z, { v = (Super []); loc = $startpos, $endpos },y) }*/
+| z = debut_decl_class ; l = loption(dsupers)  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
+{  Class (z,l,y) }  /* Anciennement supers à la place de loption(dsupers) */
 ;
-
+/*
 supers:
 | x = position(dsupers) { x }
 ;
-
+*/
 dsupers:
-|COLON; PUBLIC; z = separated_nonempty_list(COMMA, TIDENT) { Super z } 
+|COLON; PUBLIC; z = separated_nonempty_list(COMMA, TIDENT) { z } 
 ;
 
 
