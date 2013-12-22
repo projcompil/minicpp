@@ -62,7 +62,7 @@ and dmembre =
 type decl_c = ddecl_c pos
 
 and ddecl_c =
-  | Class of string * (*sup anciennement *) sup * (membre list)
+  | Class of string *  sup * (membre list)
   
 
 

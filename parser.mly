@@ -92,10 +92,8 @@ decl_class:
 | x = position(ddecl_class) {x}
 
 ddecl_class:
-/*| z = debut_decl_class ;  LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
-{  Class (z, { v = (Super []); loc = $startpos, $endpos },y) }*/
 | z = debut_decl_class ; l = optsupers  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
-{  Class (z,l,y) }  /* Anciennement supers à la place de loption(dsupers) */
+{  Class (z,l,y) }  
 ;
 
 optsupers:
