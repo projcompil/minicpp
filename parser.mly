@@ -94,16 +94,22 @@ decl_class:
 ddecl_class:
 /*| z = debut_decl_class ;  LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
 {  Class (z, { v = (Super []); loc = $startpos, $endpos },y) }*/
-| z = debut_decl_class ; l = loption(dsupers)  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
+| z = debut_decl_class ; l = optsupers  ; LACC ; PUBLIC; COLON; y = member * ; RACC ; SEMICOLON 
 {  Class (z,l,y) }  /* Anciennement supers à la place de loption(dsupers) */
 ;
-/*
+
+optsupers:
+| x = option(supers) { match x with | None -> { v = (Super []) ; loc=($startpos,$endpos) }
+				    | Some a -> a  
+		     }
+;
+
 supers:
 | x = position(dsupers) { x }
 ;
-*/
+
 dsupers:
-|COLON; PUBLIC; z = separated_nonempty_list(COMMA, TIDENT) { z } 
+|COLON; PUBLIC; z = separated_nonempty_list(COMMA, TIDENT) { Super z } 
 ;
 
 
