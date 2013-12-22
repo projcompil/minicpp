@@ -10,7 +10,7 @@ type 'a pos = { v: 'a ; loc:loc }
 
 (*type sup = dsup pos*)
 
-type dsup = string list
+type dsup = (* Super of *) string list
 
 type typedef =
   | Void
