@@ -139,14 +139,32 @@ and tdecl =
   | TDb of tproto * tbloc
 
 
-and tfichier =
+type tfichier =
   { tbincludeios : bool;
     tdecls: tdecl list;
   }
 
 (* ********************************** *)
 
+(* renvoie true si c est une super-classe d'un des éléments de l, ou d'une super-classe de l, false sinon*)
+let rec remonte c l = match l with
+	| [] -> false
+	| ""::ll -> remonte c l
+	| cl::l -> (c = cl) || (remonte c (Hashtbl.find_all table_c cl)) || (remonte c l)
 
+let rec is_sub_class c1 c2 =
+	(c1 = c2) || (
+		try
+			(remonte c2 (Hashtbl.find_all table_c c1))
+		with _ -> failwith ("La classe " ^ c1 ^ " n'est pas définie."))
+
+
+let rec is_sub_type t1 t2 = match (t1, t2) with
+	| Tint, Tint -> true
+	| Tnull, Tpointeur(_) -> true
+	| (Tpointeur a), (Tpointeur b) -> is_sub_type a b
+	| (Tclass a), (Tclass b) -> is_sub_class a b
+	| _ -> false
 
 let typdinst p env= match p with
 	| Nothing -> TNothing
