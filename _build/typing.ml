@@ -178,6 +178,9 @@ let is_left_value e = match e with
 	| Eqident _ | Epointeur _ | Esderef _ -> true
 	| _ -> false  (* y en a-t-ul d'autres ? *)
 
+let not_left loc =
+	raise (Error (loc, "L'expression n'est pas une valeur gauche.\n"))
+
 
 
 let rec typexpr expr env = match expr.v with
@@ -191,7 +194,7 @@ let rec typexpr expr env = match expr.v with
 				| Tpointeur t -> {c = TEpointeur te ; typ = t }
 				| _ -> raise (Error (expr.loc, "Déférencement d'une expression qui n'est pas un pointeur.\n"))
 			end
-		   else raise (Error (expr.loc, "L'expression n'est pas une valeur gauche.\n"))
+		   else not_left expr.loc 
   | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
   | Esderef (e,s) ->failwith "Expression non encore implémentée.\n"
   | Eassign (e,f)-> if is_left_value e.v then
@@ -207,14 +210,32 @@ let rec typexpr expr env = match expr.v with
   | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
   | Elincr e-> if is_left_value e.v then
                         let te = typexpr e env in begin match te.typ with 
-                                | Tint-> {c = TEpointeur te ; typ = Tint }
+                                | Tint-> {c = TElincr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Incrémentation à gauche d'une expression non entière.\n"))
                         end
-                   else raise (Error (expr.loc, "L'expression n'est pas une valeur gauche.\n"))
-  | Eldecr e ->failwith "Expression non encore implémentée.\n"
-  | Erincr e ->failwith "Expression non encore implémentée.\n"
-  | Erdecr e ->failwith "Expression non encore implémentée.\n"
-  | Eaddr e ->failwith "Expression non encore implémentée.\n"
+	       else not_left expr.loc
+  | Eldecr e -> if is_left_value e.v then
+                        let te = typexpr e env in begin match te.typ with
+                                | Tint-> {c = TEldecr te ; typ = Tint }
+                                | _ -> raise (Error (expr.loc, "Décrémentation à gauche d'une expression non entière.\n"))
+                        end
+                else not_left expr.loc 
+  | Erincr e -> if is_left_value e.v then
+                        let te = typexpr e env in begin match te.typ with
+                                | Tint-> {c = TErincr te ; typ = Tint }
+                                | _ -> raise (Error (expr.loc, "Incrémentation à droite d'une expression non entière.\n"))
+                        end
+                else not_left expr.loc
+  | Erdecr e -> if is_left_value e.v then
+                        let te = typexpr e env in begin match te.typ with
+                                | Tint-> {c = TErdecr te ; typ = Tint }
+                                | _ -> raise (Error (expr.loc, "Décrémentation à droite d'une expression non entière.\n"))
+                        end
+                else not_left expr.loc
+  | Eaddr e -> if is_left_value e.v then
+			let te = typexpr e env in
+				{ c = TEaddr te ; typ = te.typ }
+	       else not_left expr.loc
   | Enot e -> let te = typexpr e env in begin match te.typ with
 		| Tint -> { c = TEnot te ; typ = Tint }
 		| _ -> raise (Error (expr.loc, "Négation d'une valeur non entière."))
