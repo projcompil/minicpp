@@ -4365,7 +4365,7 @@ and _menhir_run39 : _menhir_env -> 'ttv_tail * _menhir_state * (string) * Lexing
             let (((_menhir_stack, _menhir_s, x, _startpos_x_, _endpos_x_), _startpos__2_), _startpos__3_) = _menhir_stack in
             let _startpos = _startpos_x_ in
             let _endpos = _endpos_y_ in
-            let _v : (Ast.dqident) =                                          ( Double (x,y) ) in
+            let _v : (Ast.dqident) =                                          (  Static (x,y) ) in
             _menhir_goto_dqident _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));

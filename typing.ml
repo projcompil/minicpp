@@ -16,23 +16,25 @@ type typ =
 type 'a atype = { v:'a ; typ:typ }
 
 
+type ident = { v:string; typ:typ ; lvl:int } 
 
 type tsupers =  TSuper of  string list
 
 
 type tvar = tdvar atype
 and tdvar =
-  | Ident of string
+  | Ident of ident 
   | Po of tvar
   | Ad of tvar
 
 
 type targ = TArg of typ * tvar
 
-type tqident = tdqident atype
-and tdqident =
-  | TQident of string
-  | TDouble of string * string
+
+
+type tqident =
+  | TQident of ident
+  | TStatic of string * ident 
 
 
 type tqvar =
@@ -68,8 +70,8 @@ and tdexpr  =
   | TEnull
   | TEqident of tqident
   | TEpointeur of texpr
-  | TEattr of texpr * string
-  | TEsderef of texpr * string
+  | TEattr of texpr * ident
+  | TEsderef of texpr * ident 
   | TEassign of texpr * texpr
   | TEfcall of texpr * (texpr list)
   | TEnew of string * (texpr list)
