@@ -185,7 +185,7 @@ let rec typexpr expr env = match expr.v with
   | Ethis -> failwith "Expression non encore implémentée.\n"
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
-  | Eqident q -> failwith "Expression non encore implémentée.\n"
+  | Eqident q -> failwith "Expression non encore implémentée.\n" (* à faire !!!! *)
   | Epointeur e -> if is_left_value e.v then
 			let te = typexpr e env in begin match te.typ with 
 				| Tpointeur t -> {c = TEpointeur te ; typ = t }
@@ -205,7 +205,12 @@ let rec typexpr expr env = match expr.v with
 		    else raise (Error (expr.loc, "L'expression n'est pas une valeur gauche.\n"))
   | Efcall (e, l)->failwith "Expression non encore implémentée.\n"
   | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
-  | Elincr e->failwith "Expression non encore implémentée.\n"
+  | Elincr e-> if is_left_value e.v then
+                        let te = typexpr e env in begin match te.typ with 
+                                | Tint-> {c = TEpointeur te ; typ = Tint }
+                                | _ -> raise (Error (expr.loc, "Incrémentation à gauche d'une expression non entière.\n"))
+                        end
+                   else raise (Error (expr.loc, "L'expression n'est pas une valeur gauche.\n"))
   | Eldecr e ->failwith "Expression non encore implémentée.\n"
   | Erincr e ->failwith "Expression non encore implémentée.\n"
   | Erdecr e ->failwith "Expression non encore implémentée.\n"
