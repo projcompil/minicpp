@@ -13,10 +13,10 @@ type typ =
     | Tclass of string
 
 
-type 'a atype = { v:'a ; typ:typ }
+type 'a atype = { c:'a ; typ:typ }
 
 
-type ident = { v:string; typ:typ ; lvl:int } 
+type ident = { rep:string; typ:typ ; lvl:int } 
 
 type tsupers =  TSuper of  string list
 
@@ -170,9 +170,16 @@ let is_num t = match t with
 	| Tnull | Tint | Tpointeur _ -> true
 	| _ -> false
 
+let is_type s = (Hashtbl.find Lexerhack.table s)
 
-let typdinst p env= match p with
-	| Nothing -> TNothing
+
+
+
+
+
+
+let typdinst i env = match i with
+	| Nothing -> TNothing, env
 	| Iexpr e -> failwith "non implementé"
 	| Idecls (tdef, v)-> failwith "non implémenté"
 	| Idecl (tdef, v, e) -> failwith "non implémenté"
@@ -185,15 +192,15 @@ let typdinst p env= match p with
 	| Ibloc _ -> failwith "non implémenté"
  	| Cout _ -> failwith "non implémenté"
 	| Return _ -> failwith "non implémenté"
-	| Areturn -> TAreturn
+	| Areturn -> TAreturn, env
 
+let typinst i env = (typdinst (i.v) env)
 
-let typbloc bl env = match bl with
-	| _ -> failwith "non implémenté"
-(*
-	| Bloc of [] -> (*(TBloc []) , env*) failwith "non implémenté"
-	| Bloc of (i::l) -> failwith "non implémenté"
-*)
+let rec typbloc bl env = match bl with
+	| Bloc [] -> (TBloc [])
+	| Bloc (i::l) -> let (ti, envir) = typinst i env in
+				let (TBloc tl) = typbloc (Bloc l) envir in
+					TBloc (ti::tl)
 
 (*
 let typdecl p env = match p with
