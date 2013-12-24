@@ -166,6 +166,10 @@ let rec is_sub_type t1 t2 = match (t1, t2) with
 	| (Tclass a), (Tclass b) -> is_sub_class a b
 	| _ -> false
 
+
+
+
+
 let typdinst p env= match p with
 	| Nothing -> TNothing
 	| Iexpr e -> failwith "non implementé"
