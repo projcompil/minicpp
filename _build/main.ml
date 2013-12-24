@@ -63,8 +63,6 @@ let () =
 	end
    	else begin
 		let tarbre = Typing.typfichier p in
-		if tarbre.tbincludeios then print_string "Alors\n"
-		else print_string "Bon\n" ;
    			if !type_only then begin
 				print_string "Typage correct\n";
 				close_in f ;

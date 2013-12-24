@@ -183,8 +183,8 @@ let is_left_value e = match e with
 let rec typexpr expr env = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
   | Ethis -> failwith "Expression non encore implémentée.\n"
-  | Ebool b ->failwith "Expression non encore implémentée.\n"
-  | Enull->failwith "Expression non encore implémentée.\n"
+  | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
+  | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> failwith "Expression non encore implémentée.\n"
   | Epointeur e -> failwith "Expression non encore implémentée.\n"
   | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
@@ -197,9 +197,18 @@ let rec typexpr expr env = match expr.v with
   | Erincr e ->failwith "Expression non encore implémentée.\n"
   | Erdecr e ->failwith "Expression non encore implémentée.\n"
   | Eaddr e ->failwith "Expression non encore implémentée.\n"
-  | Enot e ->failwith "Expression non encore implémentée.\n"
-  | Euminus e ->failwith "Expression non encore implémentée.\n"
-  | Euplus e->failwith "Expression non encore implémentée.\n"
+  | Enot e -> let te = typexpr e env in begin match te.typ with
+		| Tint -> { c = TEnot te ; typ = Tint }
+		| _ -> raise (Error (expr.loc, "Négation d'une valeur non entière."))
+		end
+  | Euminus e -> let te = typexpr e env in begin match te.typ with
+                | Tint -> { c = TEuminus te ; typ = Tint }
+                | _ -> raise (Error (expr.loc, "Signe (moins) d'une valeur non entière."))
+                end
+  | Euplus e-> let te = typexpr e env in begin match te.typ with
+                | Tint -> { c = TEuplus te ; typ = Tint }
+                | _ -> raise (Error (expr.loc, "Signe (plus) d'une valeur non entière."))
+                end
   | Eop (op, e, f)-> failwith "Expression non encore implémentée.\n"
   | Epar e ->failwith "Expression non encore implémentée.\n"
 
@@ -234,7 +243,7 @@ let typdecl p env = match p with
 	| _ -> failwith "non implémenté"
 				
 *)
-let typfichier p = 
+let typfichier f = 
 	failwith "non implémenté"
 (*
     let rec auxf l envi = match l with
