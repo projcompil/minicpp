@@ -186,10 +186,23 @@ let rec typexpr expr env = match expr.v with
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> failwith "Expression non encore implémentée.\n"
-  | Epointeur e -> failwith "Expression non encore implémentée.\n"
+  | Epointeur e -> if is_left_value e.v then
+			let te = typexpr e env in begin match te.typ with 
+				| Tpointeur t -> {c = TEpointeur te ; typ = t }
+				| _ -> raise (Error (expr.loc, "Déférencement d'une expression qui n'est pas un pointeur.\n"))
+			end
+		   else raise (Error (expr.loc, "L'expression n'est pas une valeur gauche.\n"))
   | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
   | Esderef (e,s) ->failwith "Expression non encore implémentée.\n"
-  | Eassign (e,f)->failwith "Expression non encore implémentée.\n"
+  | Eassign (e,f)-> if is_left_value e.v then
+			let te = typexpr e env and tf = typexpr env f in
+				if is_sub_type tf.typ te.typ then
+					if is_num te.typ then
+						{ c = TEassign ( te, tf) ; typ = te.typ }
+					else
+						raise (Error (expr.loc, "Le type de la première expression dans l'assignation n'est pas un type numérique.\n"))
+				else raise (Error (expr.loc, "Le type de la deuxième expression dans l'assignation n'est pas un sous-type du type de la première.\n"))
+		    else raise (Error (expr.loc, "L'expression n'est pas une valeur gauche.\n"))
   | Efcall (e, l)->failwith "Expression non encore implémentée.\n"
   | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
   | Elincr e->failwith "Expression non encore implémentée.\n"
