@@ -87,8 +87,7 @@ and tdexpr  =
   | TEpar of texpr
 
 
-type texpr_str = tdexpr_str atype 
-and tdexpr_str =
+type texpr_str =
   | TEsexpr of texpr 
   | TEstring of string
 
@@ -275,7 +274,7 @@ let rec typexpr expr env = match expr.v with
 
 let rec typdinst i env = match i with
 	| Nothing -> TNothing, env
-	| Iexpr e -> failwith "non implementé"
+	| Iexpr e -> TIexpr (typexpr e env), env 
 	| Idecls (tdef, v)-> failwith "non implémenté"
 	| Idecl (tdef, v, e) -> failwith "non implémenté"
 	| Aidecl (tdef, v, s, l)-> failwith "non implémenté"
@@ -285,7 +284,15 @@ let rec typdinst i env = match i with
 	| For _ -> failwith "non implémenté"
 	| Afor _ -> failwith "non implémenté"
 	| Ibloc _ -> failwith "non implémenté"
- 	| Cout _ -> failwith "non implémenté"
+ 	| Cout le -> let rec auxcout l = match l with
+			| [] -> []
+			| x::l -> (match x.v with
+					| Esexpr e -> let te = typexpr e env in
+							if te.typ = Tint then
+								TEsexpr te
+							else raise (Error (x.loc, "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"))
+					| Estring s -> TEstring s)::(auxcout l)
+		in (TCout (auxcout le)), env
 	| Return _ -> failwith "non implémenté"
 	| Areturn -> TAreturn, env
 
