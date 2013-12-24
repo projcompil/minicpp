@@ -98,7 +98,12 @@ let () =
 	print_string s ;
 	eprintf "Erreur dans le typage@.";
 	exit 1
-   | _ -> 
+    | Failure s ->
+	localisation (Lexing.lexeme_start_p buf);
+        eprintf "Erreur du compilateur.";
+	print_string s ;
+	exit 2;
+    | _ -> 
         localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur.";
         exit 2

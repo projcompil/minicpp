@@ -29,8 +29,8 @@ and tdvar =
 
 type targ = TArg of typ * tvar
 
-
-type tqident =
+type tqident = tdqident atype
+and tdqident =
   | TQident of string
   | TDouble of string * string
 
