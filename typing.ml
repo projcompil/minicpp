@@ -53,7 +53,7 @@ type tdecl_v = TDeclv of typ * (tvar list)
 
 type tmembre =
   | TMvar of tdecl_v
-  | TMvir of bool * tproto
+  | TMmeth of bool * tproto
 
 
 type tdecl_c =
@@ -238,7 +238,7 @@ type membre = dmembre pos
 
 and dmembre =
   | Mvar of decl_v
-  | Mvir of bool * proto
+  | Mmeth of bool * proto
 
 type decl_c = ddecl_c pos
 

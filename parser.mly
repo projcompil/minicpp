@@ -118,8 +118,8 @@ member:
 
 dmember:
 | x = decl_vars { Mvar (x) }
-| VIRTUAL; x = proto ; SEMICOLON { Mvir (true,x) }
-| x = proto ; SEMICOLON { Mvir (false,x) }
+| VIRTUAL; x = proto ; SEMICOLON { Mmeth (true,x) }
+| x = proto ; SEMICOLON { Mmeth (false,x) }
 
 ;
 

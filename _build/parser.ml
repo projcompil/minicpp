@@ -4315,7 +4315,7 @@ and _menhir_goto_dproto : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dpro
             let ((_menhir_stack, _menhir_s, _startpos__1_), _, x, _startpos_x_) = _menhir_stack in
             let _startpos = _startpos__1_ in
             let _endpos = _endpos__3_ in
-            let _v : (Ast.dmembre) =                                  ( Mvir (true,x) ) in
+            let _v : (Ast.dmembre) =                                  ( Mmeth (true,x) ) in
             _menhir_goto_dmember _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -4339,7 +4339,7 @@ and _menhir_goto_dproto : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dpro
             let (_menhir_stack, _menhir_s, x, _startpos_x_) = _menhir_stack in
             let _startpos = _startpos_x_ in
             let _endpos = _endpos__2_ in
-            let _v : (Ast.dmembre) =                         ( Mvir (false,x) ) in
+            let _v : (Ast.dmembre) =                         ( Mmeth (false,x) ) in
             _menhir_goto_dmember _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));

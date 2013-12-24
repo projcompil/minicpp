@@ -57,7 +57,7 @@ type membre = dmembre pos
 
 and dmembre =
   | Mvar of decl_v
-  | Mvir of bool * proto
+  | Mmeth of bool * proto
 
 type decl_c = ddecl_c pos
 
