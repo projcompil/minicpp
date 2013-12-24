@@ -198,13 +198,19 @@ let typsupers sup =
 	in match sup.v with Super l -> TSuper (aux l)
 
 
-(*
-type var = dvar pos 
-and dvar =
-  | Ident of string
-  | Po of var
-  | Ad of var
 
+let rec typvar v env = match v.v with
+	| Ident s -> begin try
+			let t = Smap.find s env in
+			{ c = (TIdent { rep = s; typ = t ; lvl = 0 }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
+		     with Not_found -> raise (Error(v.loc, "L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n"))
+		     end
+	| Po va -> let tva = typvar va env in
+			{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
+	| Ad va -> let tva = typvar va env in
+			{ c = (TAd tva) ; typ = tva.typ }
+
+(*
 type arg = darg pos
 
 and darg = Arg of typedef * var
