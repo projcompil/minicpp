@@ -231,14 +231,15 @@ dinst:
 | IF ; LPAR ; e = expr ; RPAR ; i = inst ; ELSE ; y = inst 
 {Ifelse (e,i,y) }
 | WHILE ; LPAR ; e = expr ; RPAR ; i = inst  { While (e,i) }
-| FOR LPAR ; e = separated_list (COMMA , expr); SEMICOLON;  x = expr  ; SEMICOLON;
- f = separated_list (COMMA , expr) ; RPAR ; i = inst { For (e,x,f,i) }
-| FOR LPAR ; e = separated_list (COMMA , expr); SEMICOLON; SEMICOLON;
-f = separated_list (COMMA , expr)  ; RPAR ; i = inst { Afor (e,f,i) }
+| FOR LPAR ; e = separated_list (COMMA , expr); SEMICOLON;  x = option(expr)  ; SEMICOLON;
+ f = separated_list (COMMA , expr) ; RPAR ; i = inst { match x with
+							| None -> Afor (e,f,i)
+							| Some ex -> For (e,ex,f,i) }
 | b = bloc { Ibloc b }
 | STDCOUT ; l = nonempty_list (vinst); SEMICOLON { Cout l }
-| RETURN ; e = expr  ; SEMICOLON  { Return e }
-| RETURN ; SEMICOLON { Areturn }
+| RETURN ; ex = option(expr)  ; SEMICOLON  { match ex with
+						| None -> Areturn
+						| Some e -> Return e }
 ;
 
 

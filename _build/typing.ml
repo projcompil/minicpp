@@ -17,27 +17,6 @@ type 'a atype = { v:'a ; typ:typ }
 
 
 
-
-
-
-(* '*************************)
-module Smap = Map.Make(String)
-
-type env = typ Smap.t
-
-let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles pour prendre en compte la surcharge *)
-
-Hashtbl.add table_f "" [""] ;;
-
-let table_c = Hashtbl.create 17 ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
-
-Hashtbl.add table_c "" "";;
-
-
-(* '*************************)
-
-
-
 type tsupers =  TSuper of  string list
 
 
@@ -48,7 +27,7 @@ and tdvar =
   | Ad of tvar
 
 
-type targ = TArg of typedef * var
+type targ = TArg of typ * tvar
 
 
 type tqident =
@@ -146,6 +125,24 @@ type tfichier =
 
 (* ********************************** *)
 
+(* '*************************)
+module Smap = Map.Make(String)
+
+type env = typ Smap.t
+
+let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles pour prendre en compte la surcharge *)
+
+Hashtbl.add table_f "" ([]:(targ list)) ;;
+
+let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
+
+Hashtbl.add table_c "" "";;
+
+
+(* '*************************)
+
+
+
 (* renvoie true si c est une super-classe d'un des éléments de l, ou d'une super-classe de l, false sinon*)
 let rec remonte c l = match l with
 	| [] -> false
@@ -167,7 +164,9 @@ let rec is_sub_type t1 t2 = match (t1, t2) with
 	| _ -> false
 
 
-
+let is_num t = match t with
+	| Tnull | Tint | Tpointeur _ -> true
+	| _ -> false
 
 
 let typdinst p env= match p with
