@@ -295,13 +295,15 @@ let rec typdinst i env = match i with
                                 else raise (Error (e.loc, "L'expression à l'intérieur du while n'est pas entière.\n"))
 	| For (l1, e, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env) l1 in
 					let te = typexpr e env in
+					if te.typ = Tint then
 						let tl2 = List.map (fun x -> typexpr x env) l2 in
 							let tins, envir = typinst ins env in
 								(TFor (tl1, te, tl2, tins)), env
+					else raise (Error (e.loc, "L'expression de contrôle à l'intérieur du for n'est pas entière.\n"))
 	| Afor (l1, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env) l1 in
                     			let tl2 = List.map (fun x -> typexpr x env) l2 in
                         			let tins, envir = typinst ins env in
-                                			(TAfor (tl1, tl2, tins)), env 
+                                			(TFor (tl1, {c = TEint 1; typ = Tint } , tl2, tins)), env 
 	| Ibloc b -> (TIbloc (typbloc b env)), env
  	| Cout le -> let rec auxcout l = match l with
 			| [] -> []
@@ -311,7 +313,7 @@ let rec typdinst i env = match i with
 								TEsexpr te
 							else raise (Error (x.loc, "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"))
 					| Estring s -> TEstring s)::(auxcout l)
-		in (TCout (auxcout le)), env
+		     in (TCout (auxcout le)), env
 	| Return e -> (TReturn (typexpr e env)), env 
 	| Areturn -> TAreturn, env
 
