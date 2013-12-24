@@ -278,8 +278,16 @@ let rec typdinst i env = match i with
 	| Idecls (tdef, v)-> failwith "non implémenté"
 	| Idecl (tdef, v, e) -> failwith "non implémenté"
 	| Aidecl (tdef, v, s, l)-> failwith "non implémenté"
- 	| If _-> failwith "non implémenté"
-	| Ifelse _-> failwith "non implémenté"
+ 	| If (e, instruction)-> let te = typexpr e env in
+				if te.typ = Tint then
+					let (tins,envir) = typinst instruction env in
+						(TIf (te, tins)), env
+				else raise (Error (e.loc, "L'expression à l'intérieur du if n'est pas entière.\n"))
+	| Ifelse (e, instruction1, instruction2) -> let te = typexpr e env in
+                               				if te.typ = Tint then
+                                        			let (tins1,envir1) = typinst instruction1 env and (tins2, envir2) = typinst instruction2 env in
+                                                		(TIfelse (te, tins1, tins2)), env
+                                			else raise (Error (e.loc, "L'expression à l'intérieur du if n'est pas entière.\n")) 
 	| While _ -> failwith "non implémenté"
 	| For _ -> failwith "non implémenté"
 	| Afor _ -> failwith "non implémenté"
