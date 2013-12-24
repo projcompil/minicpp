@@ -68,7 +68,7 @@ and ddecl_c =
 
 type operateur = Eq | Neq | Lt | Le | Gt | Ge | Add | Sub | Mul | Div | Mod | And | Or
 
-type expr = { dexpr:dexpr ; loc:loc }
+type expr = dexpr pos 
 
 and dexpr  =
   | Eint of int
@@ -86,7 +86,7 @@ and dexpr  =
   | Eldecr of expr
   | Erincr of expr
   | Erdecr of expr
-  | Eland of expr
+  | Eaddr of expr
   | Enot of expr
   | Euminus of expr
   | Euplus of expr

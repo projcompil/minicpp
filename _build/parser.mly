@@ -15,7 +15,7 @@
 %token INCLUDEIOS EOF PUBLIC THIS CLASS VIRTUAL NEW
 %token COMMA SDEREF DOT IF  ELSE RETURN
 %token CHEVRON
-%token NOT INCR DECR LAND 
+%token NOT INCR DECR ADDR 
 %token LACC RACC
 %token LPAR RPAR COLON SEMICOLON WHILE FOR
 %token TIMES DIV MODULO
@@ -38,7 +38,7 @@
 %left LT LE GT GE
 %left PLUS MINUS
 %left TIMES DIV MODULO
-%right NOT INCR DECR LAND UNAIRE
+%right NOT INCR DECR ADDR UNAIRE
 %left  SDEREF DOT LPAR
 
 
@@ -158,7 +158,7 @@ var:
 dvar:
 | x = IDENT { Ident x}
 | TIMES ; x = var { Po x }
-| LAND ; x = var { Ad x }
+| ADDR ; x = var { Ad x }
 ; 
 
 qvar:
@@ -168,7 +168,7 @@ qvar:
 dqvar:
 | x = qident { Qvar x }
 | TIMES ; x = qvar { Qpo x }
-| LAND ; x = qvar { Qad x  }
+| ADDR ; x = qvar { Qad x  }
 ; 
 
 qident:
@@ -182,11 +182,11 @@ dqident:
 
 
 expr:
-| x = dexpr { { dexpr = x ; loc = $startpos, $endpos } }
+| x = position(dexpr) { x }
 
 dexpr:
 | x = expr; y = operateur; z = expr {  Eop (y,x,z) }
-| LAND; x = expr { Eland x }
+| ADDR; x = expr { Eaddr x }
 | NOT; x = expr { Enot x }
 | MINUS; x = expr %prec UNAIRE { Euminus( x) }
 | PLUS; x = expr %prec UNAIRE {Euplus( x) }

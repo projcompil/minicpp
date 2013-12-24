@@ -79,7 +79,7 @@ and tdexpr  =
   | TEldecr of texpr
   | TErincr of texpr
   | TErdecr of texpr
-  | TEland of texpr
+  | TEaddr of texpr
   | TEnot of texpr
   | TEuminus of texpr
   | TEuplus of texpr
@@ -174,9 +174,34 @@ let is_type s = (Hashtbl.find Lexerhack.table s)
 
 
 
+let is_left_value e = match e with
+	| Eqident _ | Epointeur _ | Esderef _ -> true
+	| _ -> false  (* y en a-t-ul d'autres ? *)
 
 
 
+let rec typexpr expr env = match expr.v with
+  | Eint i -> { c = TEint i ; typ = Tint }
+  | Ethis -> failwith "Expression non encore implémentée.\n"
+  | Ebool b ->failwith "Expression non encore implémentée.\n"
+  | Enull->failwith "Expression non encore implémentée.\n"
+  | Eqident q -> failwith "Expression non encore implémentée.\n"
+  | Epointeur e -> failwith "Expression non encore implémentée.\n"
+  | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
+  | Esderef (e,s) ->failwith "Expression non encore implémentée.\n"
+  | Eassign (e,f)->failwith "Expression non encore implémentée.\n"
+  | Efcall (e, l)->failwith "Expression non encore implémentée.\n"
+  | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
+  | Elincr e->failwith "Expression non encore implémentée.\n"
+  | Eldecr e ->failwith "Expression non encore implémentée.\n"
+  | Erincr e ->failwith "Expression non encore implémentée.\n"
+  | Erdecr e ->failwith "Expression non encore implémentée.\n"
+  | Eaddr e ->failwith "Expression non encore implémentée.\n"
+  | Enot e ->failwith "Expression non encore implémentée.\n"
+  | Euminus e ->failwith "Expression non encore implémentée.\n"
+  | Euplus e->failwith "Expression non encore implémentée.\n"
+  | Eop (op, e, f)-> failwith "Expression non encore implémentée.\n"
+  | Epar e ->failwith "Expression non encore implémentée.\n"
 
 let typdinst i env = match i with
 	| Nothing -> TNothing, env

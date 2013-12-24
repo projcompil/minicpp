@@ -26,7 +26,6 @@ type token =
   | LT
   | LPAR
   | LE
-  | LAND
   | LACC
   | INTEGER of (int)
   | INT
@@ -51,6 +50,7 @@ type token =
   | CHAINE of (string)
   | ASSIGN
   | AND
+  | ADDR
 
 
 val fichier: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.fichier)

@@ -57,7 +57,7 @@ rule token = parse
   | '!'     { NOT }
   | "++"    { INCR }
   | "--"    { DECR }
-  | '&'     { LAND }
+  | '&'     { ADDR }
   | '*'     { TIMES }
   | '/'     { DIV }
   | '%'     { MODULO}

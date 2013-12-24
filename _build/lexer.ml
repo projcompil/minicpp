@@ -411,7 +411,7 @@ let
 
   | 15 ->
 # 60 "lexer.mll"
-            ( LAND )
+            ( ADDR )
 # 416 "lexer.ml"
 
   | 16 ->
