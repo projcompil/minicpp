@@ -22,7 +22,7 @@ menhir --ocamlc /usr/bin/ocamlc --infer parser.mly
 # Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
 /usr/bin/ocamlc -c -o parser.cmi parser.mli
 # Target: typing.ml.depends, tags: { extension:ml, file:typing.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep -modules typing.ml > typing.ml.depends # cached
+/usr/bin/ocamldep -modules typing.ml > typing.ml.depends
 # Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o lexer.cmo lexer.ml
 # Target: typing.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:typing.cmo, file:typing.ml, implem, ocaml, quiet }

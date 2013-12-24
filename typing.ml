@@ -34,7 +34,7 @@ type targ = TArg of typ * tvar
 
 type tqident =
   | TQident of ident
-  | TStatic of string * ident 
+  | TDouble of string * ident 
 
 
 type tqvar =
@@ -46,7 +46,7 @@ type tqvar =
 type tproto =
   | TPlong of typ * tqvar * (targ list)
   | TPshort of string * (targ list)
-  | TPdouble of string * string * (targ list)
+  | TPstatic of string * string * (targ list)
 
 
 type tdecl_v = TDeclv of typ * (tvar list)
