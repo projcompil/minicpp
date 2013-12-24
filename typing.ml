@@ -175,7 +175,7 @@ let is_type s = (Hashtbl.find Lexerhack.table s)
 
 
 let is_left_value e = match e with
-	| Eqident _ | Epointeur _ | Esderef _ -> true
+	| Eqident _ (* c'est faux prendre en compte en outre les références qui sont des valeurs gauches *) | Epointeur _ | Esderef _ -> true
 	| _ -> false  (* y en a-t-ul d'autres ? *)
 
 let not_left loc =
@@ -238,18 +238,35 @@ let rec typexpr expr env = match expr.v with
 	       else not_left expr.loc
   | Enot e -> let te = typexpr e env in begin match te.typ with
 		| Tint -> { c = TEnot te ; typ = Tint }
-		| _ -> raise (Error (expr.loc, "Négation d'une valeur non entière."))
+		| _ -> raise (Error (expr.loc, "Négation d'une valeur non entière.\n"))
 		end
   | Euminus e -> let te = typexpr e env in begin match te.typ with
                 | Tint -> { c = TEuminus te ; typ = Tint }
-                | _ -> raise (Error (expr.loc, "Signe (moins) d'une valeur non entière."))
+                | _ -> raise (Error (expr.loc, "Signe (moins) d'une valeur non entière.\n"))
                 end
   | Euplus e-> let te = typexpr e env in begin match te.typ with
                 | Tint -> { c = TEuplus te ; typ = Tint }
-                | _ -> raise (Error (expr.loc, "Signe (plus) d'une valeur non entière."))
+                | _ -> raise (Error (expr.loc, "Signe (plus) d'une valeur non entière.\n"))
                 end
-  | Eop (op, e, f)-> failwith "Expression non encore implémentée.\n"
-  | Epar e ->failwith "Expression non encore implémentée.\n"
+  | Eop (op, e, f)-> begin match op with
+			| Eq | Neq -> let te = typexpr e env in
+					if is_num te.typ then
+						let tf = typexpr f env in
+							if te.typ = tf.typ then
+								{ c = TEop(op, te, tf) ; typ = Tint }
+							else raise (Error(expr.loc, "Les deux expressions n'ont pas le même type, il est impossible de les comparer via == ou !=.\n"))
+					else raise (Error(expr.loc, "Le type de l'expression à gauche de l'opérateur de test d'" ^ (if op = Eq then "" else "in") ^ "égalité n'est pas numérique."))
+			
+			| _ -> let te = typexpr e env in
+					if te.typ = Tint then
+						let tf = typexpr f env in
+							if tf.typ = Tint then
+								{ c = TEop(op, te, tf) ; typ = Tint }
+							else raise (Error (expr.loc, "Opération sur une valeur non entière. L'expression de droite n'est pas entière\n"))
+					else raise (Error (expr.loc, "Opération sur une valeur non entière. L'expression de gauche n'est pas entière\n"))
+		     end
+  | Epar e -> let te = typexpr e env in
+		{ c = TEpar te ; typ = te.typ }
 
 let typdinst i env = match i with
 	| Nothing -> TNothing, env
