@@ -283,7 +283,7 @@ let rec typdinst i env = match i with
 	| While _ -> failwith "non implémenté"
 	| For _ -> failwith "non implémenté"
 	| Afor _ -> failwith "non implémenté"
-	| Ibloc _ -> failwith "non implémenté"
+	| Ibloc b -> (TIbloc (typbloc b env)), env
  	| Cout le -> let rec auxcout l = match l with
 			| [] -> []
 			| x::l -> (match x.v with
@@ -293,16 +293,17 @@ let rec typdinst i env = match i with
 							else raise (Error (x.loc, "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"))
 					| Estring s -> TEstring s)::(auxcout l)
 		in (TCout (auxcout le)), env
-	| Return _ -> failwith "non implémenté"
+	| Return e -> (TReturn (typexpr e env)), env 
 	| Areturn -> TAreturn, env
 
 and typinst i env = (typdinst (i.v) env)
 
-and typbloc bl env = match bl with
+and typdbloc bl env = match bl with
 	| Bloc [] -> (TBloc [])
 	| Bloc (i::l) -> let (ti, envir) = typinst i env in
-				let (TBloc tl) = typbloc (Bloc l) envir in
+				let (TBloc tl) = typdbloc (Bloc l) envir in
 					TBloc (ti::tl)
+and typbloc bl env = (typdbloc (bl.v) env)
 
 (*
 let typdecl p env = match p with
