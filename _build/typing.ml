@@ -130,9 +130,9 @@ module Smap = Map.Make(String)
 
 type env = typ Smap.t
 
-let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles pour prendre en compte la surcharge *)
+let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles et de valeurs de retour possibles  pour prendre en compte la surcharge *)
 
-Hashtbl.add table_f "" ([]:(targ list)) ;;
+Hashtbl.add table_f "" ((Tnull,[]):(typ * (targ list))) ;;
 
 let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
 
