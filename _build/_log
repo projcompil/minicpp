@@ -10,21 +10,21 @@
 # Target: lexerhack.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexerhack.cmo, file:lexerhack.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o lexerhack.cmo lexerhack.ml # cached
 # Target: parser.mly.depends, tags: { extension:mly, file:parser.mly, menhir_ocamldep, ocaml, ocamldep, quiet }
-menhir --raw-depend --ocamldep '/usr/bin/ocamldep -modules' parser.mly > parser.mly.depends
+menhir --raw-depend --ocamldep '/usr/bin/ocamldep -modules' parser.mly > parser.mly.depends # cached
 # Target: ast.mli.depends, tags: { extension:mli, file:ast.mli, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep -modules ast.mli > ast.mli.depends
+/usr/bin/ocamldep -modules ast.mli > ast.mli.depends # cached
 # Target: ast.cmi, tags: { byte, compile, extension:mli, file:ast.mli, interf, ocaml, quiet }
-/usr/bin/ocamlc -c -o ast.cmi ast.mli
+/usr/bin/ocamlc -c -o ast.cmi ast.mli # cached
 # Target: parser.mly, tags: { byte, compile, extension:mly, file:parser.mly, menhir, ocaml, parser, quiet }
-menhir --ocamlc /usr/bin/ocamlc --infer parser.mly
+menhir --ocamlc /usr/bin/ocamlc --infer parser.mly # cached
 # Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
 /usr/bin/ocamldep -modules parser.mli > parser.mli.depends # cached
 # Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
-/usr/bin/ocamlc -c -o parser.cmi parser.mli
+/usr/bin/ocamlc -c -o parser.cmi parser.mli # cached
+# Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
+/usr/bin/ocamlc -c -o lexer.cmo lexer.ml # cached
 # Target: typing.ml.depends, tags: { extension:ml, file:typing.ml, ocaml, ocamldep, quiet }
 /usr/bin/ocamldep -modules typing.ml > typing.ml.depends
-# Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
-/usr/bin/ocamlc -c -o lexer.cmo lexer.ml
 # Target: typing.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:typing.cmo, file:typing.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o typing.cmo typing.ml
 # Target: main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet }
@@ -35,11 +35,11 @@ Warning 26: unused variable tarbre.
 # Target: lexerhack.cmx, tags: { compile, extension:cmx, extension:ml, file:lexerhack.cmx, file:lexerhack.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o lexerhack.cmx lexerhack.ml # cached
 # Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep -modules parser.ml > parser.ml.depends
+/usr/bin/ocamldep -modules parser.ml > parser.ml.depends # cached
 # Target: parser.cmx, tags: { compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o parser.cmx parser.ml
+/usr/bin/ocamlopt -c -o parser.cmx parser.ml # cached
 # Target: lexer.cmx, tags: { compile, extension:cmx, extension:ml, file:lexer.cmx, file:lexer.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o lexer.cmx lexer.ml
+/usr/bin/ocamlopt -c -o lexer.cmx lexer.ml # cached
 # Target: typing.cmx, tags: { compile, extension:cmx, extension:ml, file:typing.cmx, file:typing.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o typing.cmx typing.ml
 # Target: main.cmx, tags: { compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet }

@@ -23,9 +23,9 @@ type tsupers =  TSuper of  typ list
 
 type tvar = tdvar atype
 and tdvar =
-  | Ident of ident 
-  | Po of tvar
-  | Ad of tvar
+  | TIdent of ident 
+  | TPo of tvar
+  | TAd of tvar
 
 
 type targ = TArg of typ * tvar
