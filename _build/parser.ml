@@ -4897,7 +4897,7 @@ and _menhir_goto_separated_nonempty_list_COMMA_TIDENT_ : _menhir_env -> 'ttv_tai
         let (_menhir_stack, _startpos__1_) = _menhir_stack in
         let _startpos = _startpos__1_ in
         let _endpos = _endpos_z_ in
-        let _v : (Ast.dsup) =                                                            ( Super z ) in
+        let _v : (Ast.dsupers) =                                                            ( Super z ) in
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let x = _v in
@@ -4905,7 +4905,7 @@ and _menhir_goto_separated_nonempty_list_COMMA_TIDENT_ : _menhir_env -> 'ttv_tai
         let _endpos_x_ = _endpos in
         let _startpos = _startpos_x_ in
         let _endpos = _endpos_x_ in
-        let _v : (Ast.sup) =         ( {v = x ; loc=(_startpos, _endpos) }) in
+        let _v : (Ast.supers) =         ( {v = x ; loc=(_startpos, _endpos) }) in
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let x = _v in
@@ -4913,7 +4913,7 @@ and _menhir_goto_separated_nonempty_list_COMMA_TIDENT_ : _menhir_env -> 'ttv_tai
         let _endpos_x_ = _endpos in
         let _startpos = _startpos_x_ in
         let _endpos = _endpos_x_ in
-        let _v : (Ast.sup) =                         ( x ) in
+        let _v : (Ast.supers) =                         ( x ) in
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
         let x = _v in
@@ -4921,7 +4921,7 @@ and _menhir_goto_separated_nonempty_list_COMMA_TIDENT_ : _menhir_env -> 'ttv_tai
         let _endpos_x_ = _endpos in
         let _startpos = _startpos_x_ in
         let _endpos = _endpos_x_ in
-        let _v : (Ast.sup option) =     ( Some x ) in
+        let _v : (Ast.supers option) =     ( Some x ) in
         _menhir_goto_option_supers_ _menhir_env _menhir_stack _v _startpos _endpos
     | _ ->
         _menhir_fail ()
@@ -5064,7 +5064,7 @@ and _menhir_goto_typ : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.typedef
     | _ ->
         _menhir_fail ()
 
-and _menhir_goto_option_supers_ : _menhir_env -> 'ttv_tail -> (Ast.sup option) -> Lexing.position -> Lexing.position -> 'ttv_return =
+and _menhir_goto_option_supers_ : _menhir_env -> 'ttv_tail -> (Ast.supers option) -> Lexing.position -> Lexing.position -> 'ttv_return =
   fun _menhir_env _menhir_stack _v _startpos _endpos ->
     let _menhir_stack = Obj.magic _menhir_stack in
     let _menhir_stack = Obj.magic _menhir_stack in
@@ -5073,7 +5073,7 @@ and _menhir_goto_option_supers_ : _menhir_env -> 'ttv_tail -> (Ast.sup option) -
     let _endpos_x_ = _endpos in
     let _startpos = _startpos_x_ in
     let _endpos = _endpos_x_ in
-    let _v : (Ast.sup) =                      ( match x with | None -> { v = (Super []) ; loc=(_startpos,_endpos) }
+    let _v : (Ast.supers) =                      ( match x with | None -> { v = (Super []) ; loc=(_startpos,_endpos) }
 				    | Some a -> a  
 		     ) in
     let _menhir_stack = (_menhir_stack, _v) in
@@ -5585,7 +5585,7 @@ and _menhir_run34 : _menhir_env -> 'ttv_tail -> _menhir_state -> Lexing.position
             let _menhir_stack = Obj.magic _menhir_stack in
             let _startpos = _menhir_env._menhir_startp in
             let _endpos = _startpos in
-            let _v : (Ast.sup option) =     ( None ) in
+            let _v : (Ast.supers option) =     ( None ) in
             _menhir_goto_option_supers_ _menhir_env _menhir_stack _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
