@@ -18,7 +18,7 @@ type 'a atype = { c:'a ; typ:typ }
 
 type ident = { rep:string; typ:typ ; lvl:int } 
 
-type tsupers =  TSuper of  string list
+type tsupers =  TSuper of  typ list
 
 
 type tvar = tdvar atype
@@ -185,7 +185,67 @@ let is_left_value e = match e with
 let not_left loc =
 	raise (Error (loc, "L'expression n'est pas une valeur gauche.\n"))
 
+(* ******************************************************************************* *)
 
+
+
+let typsupers sup =
+	let rec aux l = match l with
+		| [] -> []
+		| s::l -> if Hashtbl.mem table_c s then
+				(Tclass s)::(aux l)
+			  else raise (Error (sup.loc, "Le nom " ^ s ^ " n'est pas le nom d'une classe déjà définie plus haut\n"))
+	in match sup.v with Super l -> TSuper (aux l)
+
+
+(*
+type var = dvar pos 
+and dvar =
+  | Ident of string
+  | Po of var
+  | Ad of var
+
+type arg = darg pos
+
+and darg = Arg of typedef * var
+
+type qident = dqident pos 
+
+and dqident =
+  | Qident of string
+  | Double of string * string
+
+type qvar = dqvar pos
+
+and dqvar =
+  | Qvar of qident
+  | Qpo of qvar
+  | Qad of qvar
+
+type proto = dproto pos
+
+and dproto =
+  | Plong of typedef * qvar * (arg list)
+  | Pshort of string * (arg list)
+  | Pstatic of string * string * (arg list)
+
+type decl_v = ddecl_v pos
+
+and ddecl_v = Declv of typedef * (var list)
+
+
+type membre = dmembre pos
+
+and dmembre =
+  | Mvar of decl_v
+  | Mvir of bool * proto
+
+type decl_c = ddecl_c pos
+
+and ddecl_c =
+  | Class of string *  supers * (membre list)
+  
+*)
 
 let rec typexpr expr env = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
@@ -326,6 +386,16 @@ and typdbloc bl env = match bl with
 					TBloc (ti::tl)
 and typbloc bl env = (typdbloc (bl.v) env)
 
+
+(*
+and decl = ddecl pos
+
+and ddecl =
+  | Dv of decl_v
+  | Dc of decl_c
+  | Db of proto * bloc
+
+*)
 (*
 let typdecl p env = match p with
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
