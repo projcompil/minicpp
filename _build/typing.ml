@@ -170,8 +170,13 @@ let is_num t = match t with
 	| Tnull | Tint | Tpointeur _ -> true
 	| _ -> false
 
-let is_type s = (Hashtbl.find Lexerhack.table s)
+let is_type s = (Hashtbl.mem Lexerhack.table s)
 
+let rec is_bf t = match t with
+	| Tint -> true
+	| Tpointeur t -> is_bf t
+	| Tclass s -> Hashtbl.mem table_c s
+	| _ -> false
 
 
 let is_left_value e = match e with
@@ -268,7 +273,7 @@ let rec typexpr expr env = match expr.v with
   | Epar e -> let te = typexpr e env in
 		{ c = TEpar te ; typ = te.typ }
 
-let typdinst i env = match i with
+let rec typdinst i env = match i with
 	| Nothing -> TNothing, env
 	| Iexpr e -> failwith "non implementé"
 	| Idecls (tdef, v)-> failwith "non implémenté"
@@ -284,9 +289,9 @@ let typdinst i env = match i with
 	| Return _ -> failwith "non implémenté"
 	| Areturn -> TAreturn, env
 
-let typinst i env = (typdinst (i.v) env)
+and typinst i env = (typdinst (i.v) env)
 
-let rec typbloc bl env = match bl with
+and typbloc bl env = match bl with
 	| Bloc [] -> (TBloc [])
 	| Bloc (i::l) -> let (ti, envir) = typinst i env in
 				let (TBloc tl) = typbloc (Bloc l) envir in
