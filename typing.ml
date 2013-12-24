@@ -278,19 +278,30 @@ let rec typdinst i env = match i with
 	| Idecls (tdef, v)-> failwith "non implémenté"
 	| Idecl (tdef, v, e) -> failwith "non implémenté"
 	| Aidecl (tdef, v, s, l)-> failwith "non implémenté"
- 	| If (e, instruction)-> let te = typexpr e env in
+ 	| If (e, ins)-> let te = typexpr e env in
 				if te.typ = Tint then
-					let (tins,envir) = typinst instruction env in
+					let (tins,envir) = typinst ins env in
 						(TIf (te, tins)), env
 				else raise (Error (e.loc, "L'expression à l'intérieur du if n'est pas entière.\n"))
-	| Ifelse (e, instruction1, instruction2) -> let te = typexpr e env in
+	| Ifelse (e, ins1, ins2) -> let te = typexpr e env in
                                				if te.typ = Tint then
-                                        			let (tins1,envir1) = typinst instruction1 env and (tins2, envir2) = typinst instruction2 env in
+                                        			let (tins1,envir1) = typinst ins1 env and (tins2, envir2) = typinst ins2 env in
                                                 		(TIfelse (te, tins1, tins2)), env
                                 			else raise (Error (e.loc, "L'expression à l'intérieur du if n'est pas entière.\n")) 
-	| While _ -> failwith "non implémenté"
-	| For _ -> failwith "non implémenté"
-	| Afor _ -> failwith "non implémenté"
+	| While (e, ins) -> let te = typexpr e env in
+                                if te.typ = Tint then
+                                        let (tins,envir) = typinst ins env in
+                                                (TWhile (te, tins)), env
+                                else raise (Error (e.loc, "L'expression à l'intérieur du while n'est pas entière.\n"))
+	| For (l1, e, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env) l1 in
+					let te = typexpr e env in
+						let tl2 = List.map (fun x -> typexpr x env) l2 in
+							let tins, envir = typinst ins env in
+								(TFor (tl1, te, tl2, tins)), env
+	| Afor (l1, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env) l1 in
+                    			let tl2 = List.map (fun x -> typexpr x env) l2 in
+                        			let tins, envir = typinst ins env in
+                                			(TAfor (tl1, tl2, tins)), env 
 	| Ibloc b -> (TIbloc (typbloc b env)), env
  	| Cout le -> let rec auxcout l = match l with
 			| [] -> []
