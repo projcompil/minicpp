@@ -448,7 +448,9 @@ let typfichier f =
                                         tdecls= (auxtfichier ((f.v).decls) Smap.empty) } in
 			match (Hashtbl.find_all table_f "main") with
 				| [] -> raise (Error (f.loc, "Il n'y a pas de fonction main déclarée dans le fichier.\n"))
-				| [ m ] -> tf
+				| [ (Tint, []) ]-> tf
+				| [ (_, []) ]-> raise (Error (f.loc, "L'unique fonction main du fichier n'est pas de type int.\n"))
+				| [ (Tint, _) ] -> raise (Error (f.loc, "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé.\n"))
 
 				| _ -> raise (Error (f.loc, "Il y a plusieurs fonctions main déclarées dans le fichier.\n"))
 
