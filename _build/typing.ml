@@ -237,22 +237,20 @@ let typqident q env = match q.v with
 		      with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
 		end
   | Static (st, s) -> failwith "Non implémenté\n"
+
+
+let rec typqvar v env = match v.v with
+	| Qvar q -> failwith "Non implémenté\n"
+	| Qpo qv -> failwith "Non implémenté\n" 
+	| Qad qv -> failwith "Non implémenté\n"
+
+let typproto p env = match p.v with
+	| Plong (t, q, l) -> failwith "Non implémenté\n"
+	| Pshort (s, l) -> failwith "Non implémenté\n"
+	| Pdouble (s, s2, l) -> failwith "Non implémenté\n"
+
 (*
-type qvar = dqvar pos
 
-and dqvar =
-  | Qvar of qident
-  | Qpo of qvar
-  | Qad of qvar
-
-
-
-type proto = dproto pos
-
-and dproto =
-  | Plong of typedef * qvar * (arg list)
-  | Pshort of string * (arg list)
-  | Pdouble of string * string * (arg list)
 
 type decl_v = ddecl_v pos
 
