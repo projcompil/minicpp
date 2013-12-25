@@ -260,7 +260,14 @@ and ddecl_c =
 
 let rec typexpr expr env = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
-  | Ethis -> failwith "Expression non encore implémentée.\n"
+  | Ethis -> (*failwith "Expression non encore implémentée.\n"*)
+		begin try 
+			let t = Smap.find "this" env in 
+  				begin match t with 
+  					| Tpointeur (Tclass s) -> { c = TEthis ; typ = t }
+  					| _ -> raise (Error (expr.loc, "this est un pointeur vers un objeti\n"))
+				end
+  			with Not_found -> raise (Error (expr.loc, "Utilisation de this en dehors d'une classe.\n")) end	
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> failwith "Expression non encore implémentée.\n" (* à faire !!!! *)
