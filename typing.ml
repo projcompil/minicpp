@@ -244,31 +244,29 @@ let rec typqvar v env = match v.v with
 	| Qpo qv -> failwith "Non implémenté\n" 
 	| Qad qv -> failwith "Non implémenté\n"
 
+
+(* vérifier les doublons *)
+
 let typproto p env = match p.v with
 	| Plong (t, q, l) -> failwith "Non implémenté\n"
 	| Pshort (s, l) -> failwith "Non implémenté\n"
 	| Pdouble (s, s2, l) -> failwith "Non implémenté\n"
 
-(*
+(* Retourner l'environnement, vérifier les doublons *)
+let typdecl_v dv env = match dv.v with
+	| Declv(t, l) -> failwith "Non implémenté\n"
 
 
-type decl_v = ddecl_v pos
 
-and ddecl_v = Declv of typedef * (var list)
+let typmembre m env = match m.v with
+	| Mvar dv -> failwith "Non implémenté\n"
+	| Mmeth (b, p) -> failwith "Non implémenté\n" 
 
 
-type membre = dmembre pos
-
-and dmembre =
-  | Mvar of decl_v
-  | Mmeth of bool * proto
-
-type decl_c = ddecl_c pos
-
-and ddecl_c =
-  | Class of string *  supers * (membre list)
+let typdecl_c dc env = match dc.v with
+  | Class (s, sup, l) -> failwith "Non implémenté\n" 
   
-*)
+
 
 let rec typexpr expr env = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
@@ -426,13 +424,19 @@ and ddecl =
   | Db of proto * bloc
 
 *)
+
+let typdecl d env = match d.v with
+	| Dv dv -> failwith "non implémenté\n"
+        | Dc dc -> failwith "non implémenté\n"
+        | Db (p, bl) -> failwith "non implémenté\n"
+
 (*
-let typdecl p env = match p with
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
 				(TDb (TProtovide, r)), envir
+	|
 	| _ -> failwith "non implémenté"
-				
-*)
+*)				
+
 let typfichier f = 
 	failwith "non implémenté"
 (*
