@@ -273,7 +273,7 @@ let rec typexpr expr env = match expr.v with
 			let t = Smap.find "this" env in 
   				begin match t with 
   					| Tpointeur (Tclass s) -> { c = TEthis ; typ = t }
-  					| _ -> raise (Error (expr.loc, "this est un pointeur vers un objeti\n"))
+  					| _ -> raise (Error (expr.loc, "this est un pointeur vers un objet\n"))
 				end
   			with Not_found -> raise (Error (expr.loc, "Utilisation de this en dehors d'une classe.\n")) end	
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
@@ -441,6 +441,7 @@ let typfichier f =
 
 
 *)
+(*ça marche bien*)
 
 
 
