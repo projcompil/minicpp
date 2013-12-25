@@ -438,17 +438,16 @@ let typdecl d env = match d.v with
 *)				
 
 let typfichier f = 
-	failwith "non implémenté"
-(*
-    let rec auxf l envi = match l with
-	| [] -> [] 
-	| x::l -> let (r, envir) = typdecl x envi in
+	(*failwith "non implémenté\n"*)
+	let rec auxf l env = match l with
+		| [] -> [] 
+		| x::l -> let (r, envir) = typdecl x env in
 			r::(auxf l envir)
-    in  { tbincludeios = p.bincludeios ;
-	tdecls= (auxf (p.decls) Smap.empty) }
+    		in  { tbincludeios = (f.v).bincludeios ;
+			tdecls= (auxf ((f.v).decls) Smap.empty) }
 
 
-*)
+
 
 
 
