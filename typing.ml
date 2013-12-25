@@ -139,7 +139,7 @@ let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, l
 
 Hashtbl.add table_c "" "";;
 
-
+let biostream = ref false
 (* '*************************)
 
 
@@ -239,6 +239,12 @@ let typqident q env = match q.v with
   | Static (st, s) -> failwith "Non implémenté\n"
 
 
+
+
+
+(* ******************************* Non implémenté ************************* *)
+
+
 let rec typqvar v env = match v.v with
 	| Qvar q -> failwith "Non implémenté\n"
 	| Qpo qv -> failwith "Non implémenté\n" 
@@ -267,6 +273,7 @@ let typdecl_c dc env = match dc.v with
   | Class (s, sup, l) -> failwith "Non implémenté\n" 
   
 
+(* ***********************Fin Non implémenté ************************* *)
 
 let rec typexpr expr env = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
@@ -360,7 +367,7 @@ let rec typexpr expr env = match expr.v with
   | Epar e -> let te = typexpr e env in
 		{ c = TEpar te ; typ = te.typ }
 
-let rec typdinst i env = match i with
+let rec typinst i env = match i.v with
 	| Nothing -> TNothing, env
 	| Iexpr e -> TIexpr (typexpr e env), env 
 	| Idecls (tdef, v)-> failwith "non implémenté"
@@ -393,7 +400,10 @@ let rec typdinst i env = match i with
                         			let tins, envir = typinst ins env in
                                 			(TFor (tl1, {c = TEint 1; typ = Tint } , tl2, tins)), env 
 	| Ibloc b -> (TIbloc (typbloc b env)), env
- 	| Cout le -> let rec auxcout l = match l with
+
+ 	| Cout le -> if (not !biostream) then raise (Error (i.loc, "Appel de std::cout, mais le fichier n'inclut pas la bibliothèque iostream.\n"))
+		     else
+			let rec auxcout l = match l with
 			| [] -> []
 			| x::l -> (match x.v with
 					| Esexpr e -> let te = typexpr e env in
@@ -402,10 +412,11 @@ let rec typdinst i env = match i with
 							else raise (Error (x.loc, "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"))
 					| Estring s -> TEstring s)::(auxcout l)
 		     in (TCout (auxcout le)), env
+
 	| Return e -> (TReturn (typexpr e env)), env 
 	| Areturn -> TAreturn, env
 
-and typinst i env = (typdinst (i.v) env)
+(* and typinst i env = (typdinst (i.v) env)*)
 
 and typdbloc bl env = match bl with
 	| Bloc [] -> (TBloc [])
@@ -415,15 +426,6 @@ and typdbloc bl env = match bl with
 and typbloc bl env = (typdbloc (bl.v) env)
 
 
-(*
-and decl = ddecl pos
-
-and ddecl =
-  | Dv of decl_v
-  | Dc of decl_c
-  | Db of proto * bloc
-
-*)
 
 let typdecl d env = match d.v with
 	| Dv dv -> failwith "non implémenté\n"
@@ -434,20 +436,20 @@ let typdecl d env = match d.v with
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
 				(TDb (TProtovide, r)), envir
 	|
-	| _ -> failwith "non implémenté"
 *)				
 
+let rec auxtfichier l env = match l with
+	| [] -> [] 
+	| x::l -> let (r, envir) = typdecl x env in
+			r::(auxtfichier l envir)
 let typfichier f = 
-	(*failwith "non implémenté\n"*)
-	let rec auxf l env = match l with
-		| [] -> [] 
-		| x::l -> let (r, envir) = typdecl x env in
-			r::(auxf l envir)
-    		in  { tbincludeios = (f.v).bincludeios ;
-			tdecls= (auxf ((f.v).decls) Smap.empty) }
+		biostream := (f.v).bincludeios ;
+		let tf = { tbincludeios = (f.v).bincludeios ;
+                                        tdecls= (auxtfichier ((f.v).decls) Smap.empty) } in
+			match (Hashtbl.find_all table_f "main") with
+				| [] -> raise (Error (f.loc, "Il n'y a pas de fonction main déclarée dans le fichier.\n"))
+				| [ m ] -> tf
 
-
-
-
+				| _ -> raise (Error (f.loc, "Il y a plusieurs fonctions main déclarées dans le fichier.\n"))
 
 
