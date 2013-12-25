@@ -182,7 +182,7 @@ let rec is_left_value e (env:environnement) = match e.v with
 	| Eqident ex -> begin match ex.v with
 				| Qident s -> Smap.mem s env
 				| Static _ -> false	
-			end  (* c'est faux prendre en compte en outre les références qui sont des valeurs gauches *) 
+			end  
 	| Epointeur _ | Esderef _ | Eattr _ -> true
 	| Epar ex -> is_left_value ex env
 	| _ -> false  (* y en a-t-ul d'autres ? *)
@@ -192,6 +192,11 @@ let not_left loc =
 
 (* ******************************************************************************* *)
 
+
+let typtypedef t = match t with
+	| Void -> Tvoid
+	| Int -> Tint
+	| Tid s -> Tclass s
 
 
 let typsupers sup =
@@ -215,6 +220,9 @@ let rec typvar v env = match v.v with
 	| Ad va -> let tva = typvar va env in
 			{ c = (TAd tva) ; typ = tva.typ }
 
+
+let typarg a env = match a.v with
+	| Arg(t, v) -> (* TArg( (typtypedef t), *) failwith "non implémenté\n" (* typvar correcte ? *)
 (*
 type arg = darg pos
 
