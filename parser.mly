@@ -132,7 +132,7 @@ dproto: x = typ ; y = qvar ; LPAR ; z = separated_list(COMMA, argument) ; RPAR
  | x = TIDENT ;  LPAR ; z = separated_list(COMMA, argument) ; RPAR 
  { Pshort (x , z)}
  | x = TIDENT  ; COLON ; COLON  ; y = TIDENT ; LPAR ; z = separated_list(COMMA, argument) ; RPAR 
-   { Pstatic ( x, y, z) } 
+   { Pdouble ( x, y, z) } 
 ;
 
 typ:
@@ -177,7 +177,7 @@ qident:
 
 dqident:
 | x = IDENT { Qident x }
-| x = TIDENT ; COLON ; COLON ; y = IDENT {  Double (x,y) }
+| x = TIDENT ; COLON ; COLON ; y = IDENT {  Static (x,y) }
 ;
 
 

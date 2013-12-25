@@ -34,7 +34,7 @@ type targ = TArg of typ * tvar
 
 type tqident =
   | TQident of ident
-  | TDouble of string * ident 
+  | TStatic of string * ident 
 
 
 type tqvar =
@@ -46,7 +46,7 @@ type tqvar =
 type tproto =
   | TPlong of typ * tqvar * (targ list)
   | TPshort of string * (targ list)
-  | TPstatic of string * string * (targ list)
+  | TPdouble of string * string * (targ list)
 
 
 type tdecl_v = TDeclv of typ * (tvar list)
@@ -129,7 +129,7 @@ type tfichier =
 (* '*************************)
 module Smap = Map.Make(String)
 
-type env = typ Smap.t
+type environnement = typ Smap.t
 
 let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles et de valeurs de retour possibles  pour prendre en compte la surcharge *)
 
@@ -147,7 +147,7 @@ Hashtbl.add table_c "" "";;
 (* renvoie true si c est une super-classe d'un des éléments de l, ou d'une super-classe de l, false sinon*)
 let rec remonte c l = match l with
 	| [] -> false
-	| ""::ll -> remonte c l
+	| ""::l -> remonte c l
 	| cl::l -> (c = cl) || (remonte c (Hashtbl.find_all table_c cl)) || (remonte c l)
 
 let rec is_sub_class c1 c2 =
@@ -178,8 +178,13 @@ let rec is_bf t = match t with
 	| _ -> false
 
 
-let is_left_value e = match e with
-	| Eqident _ (* c'est faux prendre en compte en outre les références qui sont des valeurs gauches *) | Epointeur _ | Esderef _ -> true
+let rec is_left_value e (env:environnement) = match e.v with
+	| Eqident ex -> begin match ex.v with
+				| Qident s -> Smap.mem s env
+				| Static _ -> false	
+			end  (* c'est faux prendre en compte en outre les références qui sont des valeurs gauches *) 
+	| Epointeur _ | Esderef _ | Eattr _ -> true
+	| Epar ex -> is_left_value ex env
 	| _ -> false  (* y en a-t-ul d'autres ? *)
 
 let not_left loc =
@@ -219,7 +224,7 @@ type qident = dqident pos
 
 and dqident =
   | Qident of string
-  | Double of string * string
+  | Static of string * string
 
 type qvar = dqvar pos
 
@@ -233,7 +238,7 @@ type proto = dproto pos
 and dproto =
   | Plong of typedef * qvar * (arg list)
   | Pshort of string * (arg list)
-  | Pstatic of string * string * (arg list)
+  | Pdouble of string * string * (arg list)
 
 type decl_v = ddecl_v pos
 
@@ -259,7 +264,7 @@ let rec typexpr expr env = match expr.v with
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> failwith "Expression non encore implémentée.\n" (* à faire !!!! *)
-  | Epointeur e -> if is_left_value e.v then
+  | Epointeur e -> if is_left_value e env then
 			let te = typexpr e env in begin match te.typ with 
 				| Tpointeur t -> {c = TEpointeur te ; typ = t }
 				| _ -> raise (Error (expr.loc, "Déférencement d'une expression qui n'est pas un pointeur.\n"))
@@ -267,8 +272,8 @@ let rec typexpr expr env = match expr.v with
 		   else not_left expr.loc 
   | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
   | Esderef (e,s) ->failwith "Expression non encore implémentée.\n"
-  | Eassign (e,f)-> if is_left_value e.v then
-			let te = typexpr e env and tf = typexpr env f in
+  | Eassign (e,f)-> if (is_left_value e env) then
+			let te = typexpr e env and tf = typexpr f env in
 				if is_sub_type tf.typ te.typ then
 					if is_num te.typ then
 						{ c = TEassign ( te, tf) ; typ = te.typ }
@@ -278,31 +283,31 @@ let rec typexpr expr env = match expr.v with
 		    else raise (Error (expr.loc, "L'expression n'est pas une valeur gauche.\n"))
   | Efcall (e, l)->failwith "Expression non encore implémentée.\n"
   | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
-  | Elincr e-> if is_left_value e.v then
+  | Elincr e-> if is_left_value e env then
                         let te = typexpr e env in begin match te.typ with 
                                 | Tint-> {c = TElincr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Incrémentation à gauche d'une expression non entière.\n"))
                         end
 	       else not_left expr.loc
-  | Eldecr e -> if is_left_value e.v then
+  | Eldecr e -> if is_left_value e env then
                         let te = typexpr e env in begin match te.typ with
                                 | Tint-> {c = TEldecr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Décrémentation à gauche d'une expression non entière.\n"))
                         end
                 else not_left expr.loc 
-  | Erincr e -> if is_left_value e.v then
+  | Erincr e -> if is_left_value e env then
                         let te = typexpr e env in begin match te.typ with
                                 | Tint-> {c = TErincr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Incrémentation à droite d'une expression non entière.\n"))
                         end
                 else not_left expr.loc
-  | Erdecr e -> if is_left_value e.v then
+  | Erdecr e -> if is_left_value e env then
                         let te = typexpr e env in begin match te.typ with
                                 | Tint-> {c = TErdecr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Décrémentation à droite d'une expression non entière.\n"))
                         end
                 else not_left expr.loc
-  | Eaddr e -> if is_left_value e.v then
+  | Eaddr e -> if is_left_value e env then
 			let te = typexpr e env in
 				{ c = TEaddr te ; typ = te.typ }
 	       else not_left expr.loc

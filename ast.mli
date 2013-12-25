@@ -32,7 +32,7 @@ type qident = dqident pos
 
 and dqident =
   | Qident of string
-  | Double of string * string
+  | Static of string * string
 
 type qvar = dqvar pos
 
@@ -46,7 +46,7 @@ type proto = dproto pos
 and dproto =
   | Plong of typedef * qvar * (arg list)
   | Pshort of string * (arg list)
-  | Pstatic of string * string * (arg list)
+  | Pdouble of string * string * (arg list)
 
 type decl_v = ddecl_v pos
 
