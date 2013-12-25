@@ -33,7 +33,7 @@ type targ = TArg of typ * tvar
 
 
 type tqident =
-  | TQident of ident
+  | TQident of  string * typ (* retour éventuel à string * typ *)
   | TStatic of string * ident 
 
 
@@ -209,34 +209,43 @@ let typsupers sup =
 
 
 
-let rec typvar v env = match v.v with
+let rec typvar v niveau env = match v.v with
 	| Ident s -> begin try
 			let t = Smap.find s env in
-			{ c = (TIdent { rep = s; typ = t ; lvl = 0 }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
+			{ c = (TIdent { rep = s; typ = t ; lvl = niveau }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
 		     with Not_found -> raise (Error(v.loc, "L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n"))
 		     end
-	| Po va -> let tva = typvar va env in
+	| Po va -> let tva = typvar va niveau env in
 			{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
-	| Ad va -> let tva = typvar va env in
+	| Ad va -> let tva = typvar va niveau env in
 			{ c = (TAd tva) ; typ = tva.typ }
 
 
 let typarg a env = match a.v with
-	| Arg(t, v) -> (* TArg( (typtypedef t), *) failwith "non implémenté\n" (* typvar correcte ? *)
+	| Arg(t, v) ->  let tt = typtypedef t in
+				if is_bf tt then
+					TArg( (typtypedef t), (typvar v 1 env))
+				else raise (Error (a.loc, "Le type de l'argument n'est pas bien formé.\n"))
+
+
+
+(* Faux dans certains cas : valeur retour fonction pour qvar --> rajouter argument si type qvar ou non *)
+let typqident q env = match q.v with
+  | Qident s -> begin try
+			let tq = Smap.find s env in
+				TQident (s, tq)
+		      with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
+		end
+  | Static (st, s) -> failwith "Non implémenté\n"
 (*
-
-type qident = dqident pos 
-
-and dqident =
-  | Qident of string
-  | Static of string * string
-
 type qvar = dqvar pos
 
 and dqvar =
   | Qvar of qident
   | Qpo of qvar
   | Qad of qvar
+
+
 
 type proto = dproto pos
 
