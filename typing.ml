@@ -224,9 +224,6 @@ let rec typvar v env = match v.v with
 let typarg a env = match a.v with
 	| Arg(t, v) -> (* TArg( (typtypedef t), *) failwith "non implémenté\n" (* typvar correcte ? *)
 (*
-type arg = darg pos
-
-and darg = Arg of typedef * var
 
 type qident = dqident pos 
 
