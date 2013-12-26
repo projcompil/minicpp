@@ -43,7 +43,10 @@ Warning 26: unused variable tarbre.
 # Target: typing.cmx, tags: { compile, extension:cmx, extension:ml, file:typing.cmx, file:typing.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o typing.cmx typing.ml
 # Target: main.cmx, tags: { compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o main.cmx main.ml # cached
+/usr/bin/ocamlopt -c -o main.cmx main.ml
++ /usr/bin/ocamlopt -c -o main.cmx main.ml
+File "main.ml", line 65, characters 6-12:
+Warning 26: unused variable tarbre.
 # Target: main.native, tags: { dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet }
-/usr/bin/ocamlopt lexerhack.cmx parser.cmx lexer.cmx typing.cmx main.cmx -o main.native # cached
+/usr/bin/ocamlopt lexerhack.cmx parser.cmx lexer.cmx typing.cmx main.cmx -o main.native
 # Compilation successful.

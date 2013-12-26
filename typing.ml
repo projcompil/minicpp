@@ -140,6 +140,9 @@ let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, l
 Hashtbl.add table_c "" "";;
 
 let biostream = ref false
+
+let chtypereturn = "@typereturn"
+
 (* '*************************)
 
 
@@ -420,8 +423,17 @@ let rec typinst i env = match i.v with
 					| Estring s -> TEstring s)::(auxcout l)
 		     in (TCout (auxcout le)), env
 
-	| Return e -> (TReturn (typexpr e env)), env 
-	| Areturn -> TAreturn, env
+	| Return e -> begin try let tr = Smap.find chtypereturn env in
+			let te = (typexpr e env) in 
+				if tr = te.typ then (TReturn te), env 
+				else raise (Error (e.loc, "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"))
+			with Not_found -> raise (Error (i.loc, "Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n"))
+		       end
+	| Areturn -> begin try let tr = Smap.find chtypereturn env in 
+				if tr = Tvoid then TAreturn, env
+                                else raise (Error (i.loc, "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"))
+			with Not_found -> raise (Error (i.loc, "Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n"))
+                     end
 
 (* and typinst i env = (typdinst (i.v) env)*)
 
