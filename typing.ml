@@ -238,8 +238,15 @@ let typqident q env = match q.v with
 		end
   | Static (st, s) -> failwith "Non implémenté\n"
 
+module Sset = Set.Make(String)
 
-
+let find_duplicate liste =
+	let rec auxd l ens  = match l with
+		| [] -> (false, None)
+		| x::l -> if Sset.mem x ens then
+				(true, (Some x))
+			else auxd l (Sset.add x ens)
+	in auxd liste (Sset.empty)
 
 
 (* ******************************* Non implémenté ************************* *)
