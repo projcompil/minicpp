@@ -254,7 +254,7 @@ let rec typqvar v env = match v.v with
 (* vérifier les doublons *)
 
 let typproto p env = match p.v with
-	| Plong (t, q, l) -> failwith "Non implémenté\n"
+	| Plong (t, qv, l) -> failwith "Non implémenté\n"
 	| Pshort (s, l) -> failwith "Non implémenté\n"
 	| Pdouble (s, s2, l) -> failwith "Non implémenté\n"
 
@@ -428,9 +428,11 @@ and typbloc bl env = (typdbloc (bl.v) env)
 
 
 let typdecl d env = match d.v with
-	| Dv dv -> failwith "non implémenté\n"
+	| Dv dv -> let (tdv, envir) = typdecl_v dv env in ( TDv tdv), envir
         | Dc dc -> failwith "non implémenté\n"
-        | Db (p, bl) -> failwith "non implémenté\n"
+        | Db (p, bl) -> let (tp, envir) = typproto p env in
+				let tbl = typbloc bl envir in
+					(TDb (tp, tbl)), env 
 
 (*
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
