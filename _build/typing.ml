@@ -33,7 +33,7 @@ type targ = TArg of typ * tvar
 
 
 type tqident =
-  | TQident of ident
+  | TQident of  string * typ (* retour éventuel à string * typ *)
   | TStatic of string * ident 
 
 
@@ -139,6 +139,9 @@ let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, l
 
 Hashtbl.add table_c "" "";;
 
+let biostream = ref false
+
+let chtypereturn = "@typereturn"
 
 (* '*************************)
 
@@ -209,62 +212,78 @@ let typsupers sup =
 
 
 
-let rec typvar v env = match v.v with
+let rec typvar v niveau env = match v.v with
 	| Ident s -> begin try
 			let t = Smap.find s env in
-			{ c = (TIdent { rep = s; typ = t ; lvl = 0 }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
+			{ c = (TIdent { rep = s; typ = t ; lvl = niveau }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
 		     with Not_found -> raise (Error(v.loc, "L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n"))
 		     end
-	| Po va -> let tva = typvar va env in
+	| Po va -> let tva = typvar va niveau env in
 			{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
-	| Ad va -> let tva = typvar va env in
+	| Ad va -> let tva = typvar va niveau env in
 			{ c = (TAd tva) ; typ = tva.typ }
 
 
 let typarg a env = match a.v with
-	| Arg(t, v) -> (* TArg( (typtypedef t), *) failwith "non implémenté\n" (* typvar correcte ? *)
-(*
-type arg = darg pos
-
-and darg = Arg of typedef * var
-
-type qident = dqident pos 
-
-and dqident =
-  | Qident of string
-  | Static of string * string
-
-type qvar = dqvar pos
-
-and dqvar =
-  | Qvar of qident
-  | Qpo of qvar
-  | Qad of qvar
-
-type proto = dproto pos
-
-and dproto =
-  | Plong of typedef * qvar * (arg list)
-  | Pshort of string * (arg list)
-  | Pdouble of string * string * (arg list)
-
-type decl_v = ddecl_v pos
-
-and ddecl_v = Declv of typedef * (var list)
+	| Arg(t, v) ->  let tt = typtypedef t in
+				if is_bf tt then
+					TArg( (typtypedef t), (typvar v 1 env))
+				else raise (Error (a.loc, "Le type de l'argument n'est pas bien formé.\n"))
 
 
-type membre = dmembre pos
 
-and dmembre =
-  | Mvar of decl_v
-  | Mmeth of bool * proto
+(* Faux dans certains cas : valeur retour fonction pour qvar --> rajouter argument si type qvar ou non *)
+let typqident q env = match q.v with
+  | Qident s -> begin try
+			let tq = Smap.find s env in
+				TQident (s, tq)
+		      with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
+		end
+  | Static (st, s) -> failwith "Non implémenté\n"
 
-type decl_c = ddecl_c pos
+module Sset = Set.Make(String)
 
-and ddecl_c =
-  | Class of string *  supers * (membre list)
+let find_duplicate liste =
+	let rec auxd l ens  = match l with
+		| [] -> (false, None)
+		| x::l -> if Sset.mem x ens then
+				(true, (Some x))
+			else auxd l (Sset.add x ens)
+	in auxd liste (Sset.empty)
+
+
+(* ******************************* Non implémenté ************************* *)
+
+
+let rec typqvar v env = match v.v with
+	| Qvar q -> failwith "Non implémenté\n"
+	| Qpo qv -> failwith "Non implémenté\n" 
+	| Qad qv -> failwith "Non implémenté\n"
+
+
+(* vérifier les doublons *)
+
+let typproto p env = match p.v with
+	| Plong (t, qv, l) -> failwith "Non implémenté\n"
+	| Pshort (s, l) -> failwith "Non implémenté\n"
+	| Pdouble (s, s2, l) -> failwith "Non implémenté\n"
+
+(* Retourner l'environnement, vérifier les doublons *)
+let typdecl_v dv env = match dv.v with
+	| Declv(t, l) -> failwith "Non implémenté\n"
+
+
+
+let typmembre m env = match m.v with
+	| Mvar dv -> failwith "Non implémenté\n"
+	| Mmeth (b, p) -> failwith "Non implémenté\n" 
+
+
+let typdecl_c dc env = match dc.v with
+  | Class (s, sup, l) -> failwith "Non implémenté\n" 
   
-*)
+
+(* ***********************Fin Non implémenté ************************* *)
 
 let rec typexpr expr env = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
@@ -273,7 +292,7 @@ let rec typexpr expr env = match expr.v with
 			let t = Smap.find "this" env in 
   				begin match t with 
   					| Tpointeur (Tclass s) -> { c = TEthis ; typ = t }
-  					| _ -> raise (Error (expr.loc, "this est un pointeur vers un objeti\n"))
+  					| _ -> raise (Error (expr.loc, "this est un pointeur vers un objet\n"))
 				end
   			with Not_found -> raise (Error (expr.loc, "Utilisation de this en dehors d'une classe.\n")) end	
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
@@ -358,7 +377,7 @@ let rec typexpr expr env = match expr.v with
   | Epar e -> let te = typexpr e env in
 		{ c = TEpar te ; typ = te.typ }
 
-let rec typdinst i env = match i with
+let rec typinst i env = match i.v with
 	| Nothing -> TNothing, env
 	| Iexpr e -> TIexpr (typexpr e env), env 
 	| Idecls (tdef, v)-> failwith "non implémenté"
@@ -391,7 +410,10 @@ let rec typdinst i env = match i with
                         			let tins, envir = typinst ins env in
                                 			(TFor (tl1, {c = TEint 1; typ = Tint } , tl2, tins)), env 
 	| Ibloc b -> (TIbloc (typbloc b env)), env
- 	| Cout le -> let rec auxcout l = match l with
+
+ 	| Cout le -> if (not !biostream) then raise (Error (i.loc, "Appel de std::cout, mais le fichier n'inclut pas la bibliothèque iostream.\n"))
+		     else
+			let rec auxcout l = match l with
 			| [] -> []
 			| x::l -> (match x.v with
 					| Esexpr e -> let te = typexpr e env in
@@ -400,10 +422,20 @@ let rec typdinst i env = match i with
 							else raise (Error (x.loc, "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"))
 					| Estring s -> TEstring s)::(auxcout l)
 		     in (TCout (auxcout le)), env
-	| Return e -> (TReturn (typexpr e env)), env 
-	| Areturn -> TAreturn, env
 
-and typinst i env = (typdinst (i.v) env)
+	| Return e -> begin try let tr = Smap.find chtypereturn env in
+			let te = (typexpr e env) in 
+				if tr = te.typ then (TReturn te), env 
+				else raise (Error (e.loc, "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"))
+			with Not_found -> raise (Error (i.loc, "Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n"))
+		       end
+	| Areturn -> begin try let tr = Smap.find chtypereturn env in 
+				if tr = Tvoid then TAreturn, env
+                                else raise (Error (i.loc, "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"))
+			with Not_found -> raise (Error (i.loc, "Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n"))
+                     end
+
+(* and typinst i env = (typdinst (i.v) env)*)
 
 and typdbloc bl env = match bl with
 	| Bloc [] -> (TBloc [])
@@ -413,34 +445,34 @@ and typdbloc bl env = match bl with
 and typbloc bl env = (typdbloc (bl.v) env)
 
 
-(*
-and decl = ddecl pos
 
-and ddecl =
-  | Dv of decl_v
-  | Dc of decl_c
-  | Db of proto * bloc
+let typdecl d env = match d.v with
+	| Dv dv -> let (tdv, envir) = typdecl_v dv env in ( TDv tdv), envir
+        | Dc dc -> failwith "non implémenté\n"
+        | Db (p, bl) -> let (tp, envir) = typproto p env in
+				let tbl = typbloc bl envir in
+					(TDb (tp, tbl)), env 
 
-*)
 (*
-let typdecl p env = match p with
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
 				(TDb (TProtovide, r)), envir
-	| _ -> failwith "non implémenté"
-				
-*)
-let typfichier f = 
-	failwith "non implémenté"
-(*
-    let rec auxf l envi = match l with
+	|
+*)				
+
+let rec auxtfichier l env = match l with
 	| [] -> [] 
-	| x::l -> let (r, envir) = typdecl x envi in
-			r::(auxf l envir)
-    in  { tbincludeios = p.bincludeios ;
-	tdecls= (auxf (p.decls) Smap.empty) }
+	| x::l -> let (r, envir) = typdecl x env in
+			r::(auxtfichier l envir)
+let typfichier f = 
+		biostream := (f.v).bincludeios ;
+		let tf = { tbincludeios = (f.v).bincludeios ;
+                                        tdecls= (auxtfichier ((f.v).decls) Smap.empty) } in
+			match (Hashtbl.find_all table_f "main") with
+				| [] -> raise (Error (f.loc, "Il n'y a pas de fonction main déclarée dans le fichier.\n"))
+				| [ (Tint, []) ]-> tf
+				| [ (_, []) ]-> raise (Error (f.loc, "L'unique fonction main du fichier n'est pas de type int.\n"))
+				| [ (Tint, _) ] -> raise (Error (f.loc, "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé.\n"))
 
-
-*)
-
+				| _ -> raise (Error (f.loc, "Il y a plusieurs fonctions main déclarées dans le fichier.\n"))
 
 
