@@ -160,10 +160,10 @@ let print_in_file ~file p =
  
 
 
-  (* Ici commence l'assemblage \Production de code\*) 
+ (* Ici commence l'assemblage \Production de code\*) 
  (*Une expression entière*)
- let rec int_expr lvl const = match const with 
- 	| TEint i -> ‘li $a0, {n}‘
+let rec int_expr lvl const = match const with 
+ 	| TEint i -> li a0  i
 	| TEop (Add, te, tf) -> begin 
 		int_expr lvl te; push a0; 
 		int_expr lvl tf; pop t1; 
