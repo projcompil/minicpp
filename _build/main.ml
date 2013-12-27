@@ -4,6 +4,7 @@
 open Format
 open Lexing
 open Typing
+(*open Compilateur *)
 (* Option de compilation, pour s'arrêter à l'issue du parser *)
 let parse_only = ref false
 let type_only = ref false
