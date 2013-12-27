@@ -1,3 +1,4 @@
+
 (* BibliothÃ¨que pour produire du code MIPS
 
    2008 Jean-Christophe FilliÃ¢tre (CNRS)
@@ -202,4 +203,90 @@ val move : register -> register -> text
 
 val nop : [> ] asm
 (** l'instruction vide. Peut se trouver dans du text ou du data *)
+
+val label : label ->  [> ] asm
+(** un label. Peut se retrouver dans du text ou du data *)
+
+val syscall : text
+(** l'instruction syscall *)
+
+val comment : string -> [> ] asm
+(** place un commentaire dans le code gÃ©nÃ©rÃ©. Peut se retrouver dans
+    du text ou du data *)
+
+val align : int ->  [> ] asm
+(** [align n] aligne le code suivant l'instruction sur 2^n octets *)
+
+val asciiz : string -> data
+(** place une constante chaÃ®ne de carctÃ¨res (terminÃ©es par 0) dans a
+    zone data *)
+
+val dword : int list -> data
+(** place une liste de mots mÃ©moires dans la zone data *)
+
+val address : label list -> data
+(** place une liste d'adresses (dÃ©notÃ©es par des labels) dans la zone
+    data *)
+
+val ( ++ ) : ([< `text|`data ] asm as 'a)-> 'a -> 'a
+(** concatÃ¨ne deux bouts de codes (soit text avec text, soit data avec
+    data) *)
+
+(** {1 Manipulation de la pile} *)
+
+val push : register -> text
+(** [push r] place le contenu de [r] au sommet de la pile.
+    Rappel : $sp pointe sur l'adresse de la derniÃ¨re case occupÃ©e *)
+
+val pop : register -> text
+(** [pop r] place le mot en sommet de pile dans [r] et dÃ©pile *)
+
+val popn: int -> text
+(** [popn n] dÃ©pile [n] octets *)
+
+val peek : register -> text
+(** [peek r] place le mot en sommet de pile dans [r] sans dÃ©piler *)
+
+(** {1 Exemple } *)
+
+(** Le programme ci-dessous, donnÃ© Ã  gauche en pur MIPS et Ã  droite en
+    OCaml, charge deux constantes, effectue quelques opÃ©rations
+    arithÃ©tiques et affiche le rÃ©sultat Ã  l'Ã©cran
+
+    {[
+        .text                                                |  { text =
+        main:                                                |        label "main"
+         #charge 42 dans $a0 et 23 dans $a1                  |    ++  comment "charge 42 dans $a0 et 23 dans $a1"
+         li $a0,  42                                         |    ++  li  a0 42
+         li $a1,  23                                         |    ++  li  a1 23
+         mul $a0, $a0, $a1                                   |    ++  mul a0 a0 oreg a1 (* on utilise oreg pour dire que la derniÃ¨re
+                                                             |                             operande est un registre *)
+         #place le contenu de $a0 sur la pile                |    ++  comment "place le contenu de $a0 sur la pile"
+         sub $sp, $sp, 4                                     |    ++  sub sp sp oi 4
+         sw  $a0,  0($sp)                                    |    ++  sw a0 areg (0, sp)
+                                                             |
+         #appelle une routine d'affichage                    |    ++  comment "appelle la routine d'affichage"
+         jal print_int                                       |    ++  jal "print_int"
+                                                             |
+         #termine                                            |    ++  comment "termine"
+         li $v0, 10                                          |    ++  li v0 10
+         syscall                                             |    ++  syscall
+                                                             |
+      print_int:                                             |    ++  label "print_int"
+         lw $a0,  0($sp)                                     |    ++  lw a0 areg (0, sp)
+         add $sp, $sp, 4                                     |    ++  add sp sp oi 4
+         li $v0, 1                                           |    ++  li v0 1
+         syscall                                             |    ++  syscall
+         #affiche un retour chariot                          |    ++  comment "affiche un retour chariot"
+         la $a0, newline                                     |    ++  la a0 alab "newline"
+         li $v0, 4                                           |    ++  li v0  4
+         syscall                                             |    ++  syscall
+         jr $ra                                              |    ++  jr ra  ; (* fin du label text *)
+                                                             |
+        .data                                                |    data =
+       newline:                                              |        label "newline"
+        .asciiz  "\n"                                        |    ++  asciiz "\n" ;
+                                                             |  } (* fin du record *)
+    ]}
+*)
 
