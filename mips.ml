@@ -183,7 +183,7 @@ let print_in_file ~file p =
 	| TEop (Mod, te, tf) -> begin 
 		int expr lvl te; push a0; 
 		int_expr lvl tf; pop t1; 
-		div t2 t1 a0; ‘mul t2 t2 a0' ; ‘sub a0 t1 t2‘ 
+		div t2 t1 a0; mul t2 t2 a0 ; sub a0 t1 t2
 	 (* pas sûr que ça marche pour les négatif en gros je dis que a mod b c'est a- (b/a)*a*)end 
 	| TEop (And, te, tf) -> begin 
 		int expr lvl te; push a0; 
