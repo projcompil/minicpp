@@ -10,7 +10,25 @@ let rec concatene = fun
   | x::y::[] -> Cat(x,y)
   | x::l -> Cat(x, (concatene l))
 
+let associe_op op = match op with
+	| Add -> add
+	| Sub -> sub
+	| Mul -> mul
+	| Div -> div
+	| Mul -> mul
+	| And -> and_
+	| Or -> or_
+	| Le -> sle
+	| Ge -> sge
+	| Lt -> slt
+	| Gt -> sgt
 
+let rec int_expr lvl const = match const.c with
+        | TEint i -> li a0  i
+        | TEop (op, te, tf) -> concatene [(int_expr lvl te) ; (push a0) ; (int_expr lvl tf) ; (pop t1) ; ((associe_op op) a0 t1 a0) ]
+
+
+(*
 let rec int_expr lvl const = match const.c with 
  	| TEint i -> li a0  i
 	| TEop (Add, te, tf) -> begin 
@@ -59,6 +77,7 @@ let rec int_expr lvl const = match const.c with
 		int expr lvl te; push a0; 
 		int_expr lvl tf; pop t1; 
 		sgt a0 t1 a0 end
+*)
 (*	| (TIdent { rep = s; typ = t ; lvl = l ; offset = ofs }) ->   begin 
 		assert (l <= lvl);
    		 move t1, fp; 
