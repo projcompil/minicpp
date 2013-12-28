@@ -3,6 +3,13 @@ open Typing
 open Ast
  (* Ici commence l'assemblage \Production de code\*) 
  (*Une expression entière*)
+
+
+let rec concatene = fun
+  | [] -> Nop
+  | x::l -> Cat(x, (concatene l))
+
+
 let rec int_expr lvl const = match const.c with 
  	| TEint i -> li a0  i
 	| TEop (Add, te, tf) -> begin 
