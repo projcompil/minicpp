@@ -41,7 +41,7 @@ let rec int_expr lvl const = match const.c with
 		(int_expr lvl te) ++ (push a0) ++
 		(int_expr lvl tf) ++ (pop t1) ++ 
 		((associe_oplog op) a0 t1 a0)
-
+	| _ -> failwith "Compilation de cette partie non encore implémentée.\n"
 
 (*
 let rec int_expr lvl const = match const.c with 
