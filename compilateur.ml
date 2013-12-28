@@ -7,6 +7,7 @@ open Ast
 
 let rec concatene = fun
   | [] -> Nop
+  | x::y::[] -> Cat(x,y)
   | x::l -> Cat(x, (concatene l))
 
 
