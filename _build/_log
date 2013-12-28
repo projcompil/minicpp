@@ -36,8 +36,45 @@ menhir --ocamlc /usr/bin/ocamlc --infer parser.mly # cached
 # Target: compilateur.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:compilateur.cmo, file:compilateur.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o compilateur.cmo compilateur.ml
 + /usr/bin/ocamlc -c -o compilateur.cmo compilateur.ml
-File "compilateur.ml", line 35, characters 13-15:
-Error: This expression has type Mips.register
-       but an expression was expected of type 'a Mips.operand
-Command exited with code 2.
-# Compilation unsuccessful.
+File "compilateur.ml", line 30, characters 29-548:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a value that is not matched:
+(TEthis|TEbool _|TEnull|TEqident _|TEpointeur _|TEattr (_, _)|
+TEsderef (_, _)|TEassign (_, _)|TEfcall (_, _)|TEnew (_, _)|TElincr _|
+TEldecr _|TErincr _|TErdecr _|TEaddr _|TEnot _|TEuminus _|TEuplus _|TEpar _)
+# Target: main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet }
+/usr/bin/ocamlc -c -o main.cmo main.ml
++ /usr/bin/ocamlc -c -o main.cmo main.ml
+File "main.ml", line 66, characters 6-12:
+Warning 26: unused variable tarbre.
+# Target: mips.ml.depends, tags: { extension:ml, file:mips.ml, ocaml, ocamldep, quiet }
+/usr/bin/ocamldep -modules mips.ml > mips.ml.depends
+# Target: lexerhack.cmx, tags: { compile, extension:cmx, extension:ml, file:lexerhack.cmx, file:lexerhack.ml, implem, native, ocaml, quiet }
+/usr/bin/ocamlopt -c -o lexerhack.cmx lexerhack.ml # cached
+# Target: typing.cmx, tags: { compile, extension:cmx, extension:ml, file:typing.cmx, file:typing.ml, implem, native, ocaml, quiet }
+/usr/bin/ocamlopt -c -o typing.cmx typing.ml # cached
+# Target: mips.cmx, tags: { compile, extension:cmx, extension:ml, file:mips.cmx, file:mips.ml, implem, native, ocaml, quiet }
+/usr/bin/ocamlopt -c -o mips.cmx mips.ml
+# Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
+/usr/bin/ocamldep -modules parser.ml > parser.ml.depends # cached
+# Target: parser.cmx, tags: { compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
+/usr/bin/ocamlopt -c -o parser.cmx parser.ml # cached
+# Target: lexer.cmx, tags: { compile, extension:cmx, extension:ml, file:lexer.cmx, file:lexer.ml, implem, native, ocaml, quiet }
+/usr/bin/ocamlopt -c -o lexer.cmx lexer.ml # cached
+# Target: compilateur.cmx, tags: { compile, extension:cmx, extension:ml, file:compilateur.cmx, file:compilateur.ml, implem, native, ocaml, quiet }
+/usr/bin/ocamlopt -c -o compilateur.cmx compilateur.ml
++ /usr/bin/ocamlopt -c -o compilateur.cmx compilateur.ml
+File "compilateur.ml", line 30, characters 29-548:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a value that is not matched:
+(TEthis|TEbool _|TEnull|TEqident _|TEpointeur _|TEattr (_, _)|
+TEsderef (_, _)|TEassign (_, _)|TEfcall (_, _)|TEnew (_, _)|TElincr _|
+TEldecr _|TErincr _|TErdecr _|TEaddr _|TEnot _|TEuminus _|TEuplus _|TEpar _)
+# Target: main.cmx, tags: { compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet }
+/usr/bin/ocamlopt -c -o main.cmx main.ml
++ /usr/bin/ocamlopt -c -o main.cmx main.ml
+File "main.ml", line 66, characters 6-12:
+Warning 26: unused variable tarbre.
+# Target: main.native, tags: { dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet }
+/usr/bin/ocamlopt lexerhack.cmx mips.cmx typing.cmx compilateur.cmx parser.cmx lexer.cmx main.cmx -o main.native
+# Compilation successful.
