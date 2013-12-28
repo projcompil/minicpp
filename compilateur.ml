@@ -25,16 +25,22 @@ let associe_oplog op = match op with
 	| Gt -> sgt
 	| Eq -> seq
 	| Neq -> sne
-	| _ -> failwith "Opération arithmétique attendue par associe_opar\n"
+	| _ -> failwith "Opération logique attendue par associe_oplog\n"
 
 let rec int_expr lvl const = match const.c with
         | TEint i -> li a0  i
 	| TEop (Mod, te, tf) -> 
-		(int_expr lvl te) ++(push a0) ++
-		(int_expr lvl tf)++(pop t1)++
+		(int_expr lvl te) ++ (push a0) ++
+		(int_expr lvl tf) ++ (pop t1)++
 		(div t2 t1 oreg a0)++(mul t2 t2 oreg a0) ++ (sub a0 t1 oreg t2) 
-	| TEop(op, te, tf) when List.mem op [Add ; Sub ; Mul ; Div] -> concatene [(int_expr lvl te) ; (push a0) ; (int_expr lvl tf) ; (pop t1) ; ((associe_opar op) a0 t1 oreg a0) ]
-        | TEop (op, te, tf) -> concatene [(int_expr lvl te) ; (push a0) ; (int_expr lvl tf) ; (pop t1) ; ((associe_oplog op) a0 t1 a0) ]
+	| TEop(op, te, tf) when List.mem op [Add ; Sub ; Mul ; Div] -> 
+		(int_expr lvl te) ++ (push a0) ++
+		(int_expr lvl tf) ++  (pop t1) ++
+		((associe_opar op) a0 t1 oreg a0)
+        | TEop (op, te, tf) -> 
+		(int_expr lvl te) ++ (push a0) ++
+		(int_expr lvl tf) ++ (pop t1) ++ 
+		((associe_oplog op) a0 t1 a0)
 
 
 (*
