@@ -95,9 +95,8 @@ let rec int_expr lvl const = match const.c with
    		iter (lvl - l) lw t1  8(t1); 
    		(*lw a0 {ofs}($t1)*) end 
 *)
-let rec iter n code = if n=0 then () 
-		      else begin 
-			code; 
-			iter (n - 1) code 
-		      end
+let rec iter n code = if n=0 then nop 
+		      else 
+			code ++
+			(iter (n - 1) code)
 

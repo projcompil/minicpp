@@ -43,7 +43,10 @@ Here is an example of a value that is not matched:
 TEsderef (_, _)|TEassign (_, _)|TEfcall (_, _)|TEnew (_, _)|TElincr _|
 TEldecr _|TErincr _|TErdecr _|TEaddr _|TEnot _|TEuminus _|TEuplus _|TEpar _)
 # Target: main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet }
-/usr/bin/ocamlc -c -o main.cmo main.ml # cached
+/usr/bin/ocamlc -c -o main.cmo main.ml
++ /usr/bin/ocamlc -c -o main.cmo main.ml
+File "main.ml", line 66, characters 6-12:
+Warning 26: unused variable tarbre.
 # Target: mips.ml.depends, tags: { extension:ml, file:mips.ml, ocaml, ocamldep, quiet }
 /usr/bin/ocamldep -modules mips.ml > mips.ml.depends # cached
 # Target: mips.cmx, tags: { compile, extension:cmx, extension:ml, file:mips.cmx, file:mips.ml, implem, native, ocaml, quiet }
@@ -68,7 +71,10 @@ Here is an example of a value that is not matched:
 TEsderef (_, _)|TEassign (_, _)|TEfcall (_, _)|TEnew (_, _)|TElincr _|
 TEldecr _|TErincr _|TErdecr _|TEaddr _|TEnot _|TEuminus _|TEuplus _|TEpar _)
 # Target: main.cmx, tags: { compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o main.cmx main.ml # cached
+/usr/bin/ocamlopt -c -o main.cmx main.ml
++ /usr/bin/ocamlopt -c -o main.cmx main.ml
+File "main.ml", line 66, characters 6-12:
+Warning 26: unused variable tarbre.
 # Target: main.native, tags: { dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet }
 /usr/bin/ocamlopt lexerhack.cmx mips.cmx typing.cmx compilateur.cmx parser.cmx lexer.cmx main.cmx -o main.native
 # Compilation successful.
