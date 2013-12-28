@@ -15,7 +15,6 @@ let associe_opar op = match op with
 	| Sub -> sub
 	| Mul -> mul
 	| Div -> div
-	| Mul -> mul
 	| _ -> failwith "Opération arithmétique attendue par associe_opar\n"
 let associe_oplog op = match op with
 	| And -> and_
@@ -32,7 +31,8 @@ let rec int_expr lvl const = match const.c with
 		(int_expr lvl te) ++(push a0) ++
 		(int_expr lvl tf)++(pop t1)++
 		(div t2 t1 a0)++(mul t2 t2 a0)++ (sub a0 t1 t2) 
-        | TEop (op, te, tf) -> concatene [(int_expr lvl te) ; (push a0) ; (int_expr lvl tf) ; (pop t1) ; ((associe_op op) a0 t1 a0) ]
+	| TEop(op, te, tf) when List.mem op [Add ; Sub ; Mul ; Div] -> concatene [(int_expr lvl te) ; (push a0) ; (int_expr lvl tf) ; (pop t1) ; ((associe_opar op) a0 t1 a0) ]
+        | TEop (op, te, tf) -> concatene [(int_expr lvl te) ; (push a0) ; (int_expr lvl tf) ; (pop t1) ; ((associe_oplog op) a0 t1 a0) ]
 
 
 (*
