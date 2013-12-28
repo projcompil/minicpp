@@ -313,7 +313,9 @@ let rec typexpr expr env = match expr.v with
 			end
 		   else not_left expr.loc 
   | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
-  | Esderef (e,s) ->failwith "Expression non encore implémentée.\n"
+  | Esderef (e,s) -> failwith "Expression non encore implémentée.\n"(* let te = typexpr e env in
+			match te.typ with
+				| Tpointeur (TClass s) -> {} *)
   | Eassign (e,f)-> if (is_left_value e env) then
 			let te = typexpr e env and tf = typexpr f env in
 				if is_sub_type tf.typ te.typ then
@@ -445,6 +447,8 @@ let rec typinst i env = match i.v with
 
 (* and typinst i env = (typdinst (i.v) env)*)
 
+
+(* ajouter la prise en charge des niveaux d'imbrication *)
 and typdbloc bl env = match bl with
 	| Bloc [] -> (TBloc [])
 	| Bloc (i::l) -> let (ti, envir) = typinst i env in
@@ -479,8 +483,8 @@ let typfichier f =
 				| [] -> raise (Error (f.loc, "Il n'y a pas de fonction main déclarée dans le fichier.\n"))
 				| [ (Tint, []) ]-> tf
 				| [ (_, []) ]-> raise (Error (f.loc, "L'unique fonction main du fichier n'est pas de type int.\n"))
-				| [ (Tint, _) ] -> raise (Error (f.loc, "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé.\n"))
+				| [ (Tint, _) ] -> raise (Error (f.loc, "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé en Mini-C++.\n"))
 
-				| _ -> raise (Error (f.loc, "Il y a plusieurs fonctions main déclarées dans le fichier.\n"))
+				| _ -> raise (Error (f.loc, "Il y a plusieurs fonctions main déclarées au sein du fichier.\n"))
 
 
