@@ -10,25 +10,28 @@ let rec concatene = function
   | x::y::[] -> x ++ y
   | x::l -> x ++ (concatene l)
 
-let associe_op op = match op with
+let associe_opar op = match op with
 	| Add -> add
 	| Sub -> sub
 	| Mul -> mul
 	| Div -> div
 	| Mul -> mul
+	| _ -> failwith "Opération arithmétique attendue par associe_opar\n"
+let associe_oplog op = match op with
 	| And -> and_
 	| Or -> or_
 	| Le -> sle
 	| Ge -> sge
 	| Lt -> slt
 	| Gt -> sgt
+	| _ -> failwith "Opération arithmétique attendue par associe_opar\n"
 
 let rec int_expr lvl const = match const.c with
         | TEint i -> li a0  i
 	| TEop (Mod, te, tf) -> 
-		concatene [ (int_expr lvl te) ; (push a0) ; 
-		(int_expr lvl tf); (pop t1); 
-		(div t2 t1 a0); (mul t2 t2 a0) ; (sub a0 t1 t2) ]
+		(int_expr lvl te) ++(push a0) ++
+		(int_expr lvl tf)++(pop t1)++
+		(div t2 t1 a0)++(mul t2 t2 a0)++ (sub a0 t1 t2) 
         | TEop (op, te, tf) -> concatene [(int_expr lvl te) ; (push a0) ; (int_expr lvl tf) ; (pop t1) ; ((associe_op op) a0 t1 a0) ]
 
 

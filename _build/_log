@@ -2,7 +2,7 @@
 # Target: main.ml.depends, tags: { extension:ml, file:main.ml, ocaml, ocamldep, quiet }
 /usr/bin/ocamldep -modules main.ml > main.ml.depends # cached
 # Target: compilateur.ml.depends, tags: { extension:ml, file:compilateur.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep -modules compilateur.ml > compilateur.ml.depends # cached
+/usr/bin/ocamldep -modules compilateur.ml > compilateur.ml.depends
 # Target: ast.mli.depends, tags: { extension:mli, file:ast.mli, ocaml, ocamldep, quiet }
 /usr/bin/ocamldep -modules ast.mli > ast.mli.depends # cached
 # Target: ast.cmi, tags: { byte, compile, extension:mli, file:ast.mli, interf, ocaml, quiet }
@@ -36,11 +36,8 @@ menhir --ocamlc /usr/bin/ocamlc --infer parser.mly # cached
 # Target: compilateur.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:compilateur.cmo, file:compilateur.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o compilateur.cmo compilateur.ml
 + /usr/bin/ocamlc -c -o compilateur.cmo compilateur.ml
-File "compilateur.ml", line 19, characters 10-14:
-Error: This expression has type
-         Mips.register -> Mips.register -> Mips.register -> Mips.text
-       but an expression was expected of type
-         Mips.register -> Mips.register -> 'a Mips.operand -> 'a -> Mips.text
-       Type Mips.register is not compatible with type 'a Mips.operand 
+File "compilateur.ml", line 34, characters 13-15:
+Error: This expression has type Mips.register
+       but an expression was expected of type 'a Mips.operand
 Command exited with code 2.
 # Compilation unsuccessful.
