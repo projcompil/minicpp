@@ -5,10 +5,10 @@ open Ast
  (*Une expression entière*)
 
 
-let rec concatene = fun
-  | [] -> Nop
-  | x::y::[] -> Cat(x,y)
-  | x::l -> Cat(x, (concatene l))
+let rec concatene = function
+  | [] -> nop 
+  | x::y::[] -> x ++ y
+  | x::l -> x ++ (concatene l)
 
 let associe_op op = match op with
 	| Add -> add
@@ -25,6 +25,10 @@ let associe_op op = match op with
 
 let rec int_expr lvl const = match const.c with
         | TEint i -> li a0  i
+	| TEop (Mod, te, tf) -> 
+		concatene [ (int_expr lvl te) ; (push a0) ; 
+		(int_expr lvl tf); (pop t1); 
+		(div t2 t1 a0); (mul t2 t2 a0) ; (sub a0 t1 t2) ]
         | TEop (op, te, tf) -> concatene [(int_expr lvl te) ; (push a0) ; (int_expr lvl tf) ; (pop t1) ; ((associe_op op) a0 t1 a0) ]
 
 
@@ -47,10 +51,6 @@ let rec int_expr lvl const = match const.c with
 		int expr lvl te; push a0; 
 		int_expr lvl tf; pop t1; 
 		div a0 t1 a0 end 
-	| TEop (Mod, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		div t2 t1 a0; mul t2 t2 a0 ; sub a0 t1 t2
 	 (* pas sûr que ça marche pour les négatif en gros je dis que a mod b c'est a- (b/a)*a*)end 
 	| TEop (And, te, tf) -> begin 
 		int expr lvl te; push a0; 
