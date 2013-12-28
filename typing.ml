@@ -193,6 +193,14 @@ let rec is_left_value e (env:environnement) = match e.v with
 let not_left loc =
 	raise (Error (loc, "L'expression n'est pas une valeur gauche.\n"))
 
+
+let rec size_type t = match t with
+	| Tvoid -> 0
+	| Tint -> 4
+	| Tnull -> 4 (* ou 0 ?*)
+	| Tpointeur _ -> 4
+	| Tclass s -> failwith "Taille de type classe non implémentée.\n" (* aller chercher taille dans une table *) 
+
 (* ******************************************************************************* *)
 
 

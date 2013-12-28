@@ -1,6 +1,6 @@
 ### Starting build.
 # Target: main.ml.depends, tags: { extension:ml, file:main.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep -modules main.ml > main.ml.depends
+/usr/bin/ocamldep -modules main.ml > main.ml.depends # cached
 # Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
 /usr/bin/ocamllex -q lexer.mll # cached
 # Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
@@ -24,9 +24,9 @@ menhir --ocamlc /usr/bin/ocamlc --infer parser.mly # cached
 # Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o lexer.cmo lexer.ml # cached
 # Target: typing.ml.depends, tags: { extension:ml, file:typing.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep -modules typing.ml > typing.ml.depends # cached
+/usr/bin/ocamldep -modules typing.ml > typing.ml.depends
 # Target: typing.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:typing.cmo, file:typing.ml, implem, ocaml, quiet }
-/usr/bin/ocamlc -c -o typing.cmo typing.ml # cached
+/usr/bin/ocamlc -c -o typing.cmo typing.ml
 # Target: main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o main.cmo main.ml
 + /usr/bin/ocamlc -c -o main.cmo main.ml
@@ -41,12 +41,12 @@ Warning 26: unused variable tarbre.
 # Target: lexer.cmx, tags: { compile, extension:cmx, extension:ml, file:lexer.cmx, file:lexer.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o lexer.cmx lexer.ml # cached
 # Target: typing.cmx, tags: { compile, extension:cmx, extension:ml, file:typing.cmx, file:typing.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o typing.cmx typing.ml # cached
+/usr/bin/ocamlopt -c -o typing.cmx typing.ml
 # Target: main.cmx, tags: { compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o main.cmx main.ml
 + /usr/bin/ocamlopt -c -o main.cmx main.ml
 File "main.ml", line 66, characters 6-12:
 Warning 26: unused variable tarbre.
 # Target: main.native, tags: { dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet }
-/usr/bin/ocamlopt lexerhack.cmx parser.cmx lexer.cmx typing.cmx main.cmx -o main.native # cached
+/usr/bin/ocamlopt lexerhack.cmx parser.cmx lexer.cmx typing.cmx main.cmx -o main.native
 # Compilation successful.
