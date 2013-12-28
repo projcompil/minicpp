@@ -23,6 +23,8 @@ let associe_oplog op = match op with
 	| Ge -> sge
 	| Lt -> slt
 	| Gt -> sgt
+	| Eq -> seq
+	| Neq -> sne
 	| _ -> failwith "Opération arithmétique attendue par associe_opar\n"
 
 let rec int_expr lvl const = match const.c with

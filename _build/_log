@@ -36,7 +36,7 @@ menhir --ocamlc /usr/bin/ocamlc --infer parser.mly # cached
 # Target: compilateur.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:compilateur.cmo, file:compilateur.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o compilateur.cmo compilateur.ml
 + /usr/bin/ocamlc -c -o compilateur.cmo compilateur.ml
-File "compilateur.ml", line 33, characters 13-15:
+File "compilateur.ml", line 35, characters 13-15:
 Error: This expression has type Mips.register
        but an expression was expected of type 'a Mips.operand
 Command exited with code 2.
