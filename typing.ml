@@ -308,7 +308,7 @@ let typproto p env = match p.v with
 	| Pdouble (s, s2, l) -> failwith "Non implémenté\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
-let typdecl_v dv env = match dv.v with
+let typdecl_v dv env lvl = match dv.v with
 	| Declv(t, l) -> failwith "Non implémenté\n"
 
 
@@ -490,10 +490,10 @@ and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
 
 
 let typdecl d env = match d.v with
-	| Dv dv -> let (tdv, envir) = typdecl_v dv env in ( TDv tdv), envir
+	| Dv dv -> let (tdv, envir) = typdecl_v dv env 0 in ( TDv tdv), envir
         | Dc dc -> failwith "non implémenté\n"
         | Db (p, bl) -> let (tp, envir) = typproto p env in
-				let tbl = typbloc bl envir 0 in
+				let tbl = typbloc bl envir 1 in
 					(TDb (tp, tbl)), env 
 
 (*

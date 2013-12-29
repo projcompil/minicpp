@@ -72,3 +72,7 @@ let rec iter n code = if n=0 then nop
 			code ++
 			(iter (n - 1) code)
 
+
+
+let compile_fichier tf f =
+	() (* A faire *)
