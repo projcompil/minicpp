@@ -4,7 +4,7 @@
 *.class
 *.dll
 *.exe
-*.o
+#*.o soit on les enlève tous, soit on laisse tous les objets
 *.so
 
 # Packages #
