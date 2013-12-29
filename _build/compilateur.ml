@@ -30,71 +30,26 @@ let associe_oplog op = match op with
 	| Neq -> sne
 	| _ -> failwith "Opération logique attendue par associe_oplog\n"
 
-let rec int_expr lvl const = match const.c with
+let rec code_expr lvl const = match const.c with
         | TEint i -> li a0  i
 	| TEop (Mod, te, tf) -> 
-		(int_expr lvl te) ++ (push a0) ++
-		(int_expr lvl tf) ++ (pop t1)++
+		(code_expr lvl te) ++ (push a0) ++
+		(code_expr lvl tf) ++ (pop t1)++
 		(div t2 t1 oreg a0)++(mul t2 t2 oreg a0) ++ (sub a0 t1 oreg t2) 
 	| TEop(op, te, tf) when List.mem op [Add ; Sub ; Mul ; Div] -> 
-		(int_expr lvl te) ++ (push a0) ++
-		(int_expr lvl tf) ++  (pop t1) ++
+		(code_expr lvl te) ++ (push a0) ++
+		(code_expr lvl tf) ++  (pop t1) ++
 		((associe_opar op) a0 t1 oreg a0)
 	| TEop(op, te, tf) when List.mem op [Or ; And ] -> let la = "sortietest" ^ (string_of_int !ntest) in let () = incr ntest in
-		(int_expr lvl te) ++ ((if op = Or then beqz else bnez) a0 la) ++
-		(int_expr lvl tf) ++ (label la)
+		(code_expr lvl te) ++ ((if op = Or then beqz else bnez) a0 la) ++
+		(code_expr lvl tf) ++ (label la)
         | TEop (op, te, tf) -> 
-		(int_expr lvl te) ++ (push a0) ++
-		(int_expr lvl tf) ++ (pop t1) ++ 
+		(code_expr lvl te) ++ (push a0) ++
+		(code_expr lvl tf) ++ (pop t1) ++ 
 		((associe_oplog op) a0 t1 a0)
 	| _ -> failwith "Compilation de cette partie non encore implémentée.\n"
 
-(*
-let rec int_expr lvl const = match const.c with 
- 	| TEint i -> li a0  i
-	| TEop (Add, te, tf) -> begin 
-		int_expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		add a0 t1 a0 end 
-	| 	TEop (Sub, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		sub a0 t1 a0 end 
-	| TEop (Mul, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		mul a0 t1 a0 end 
-	| TEop (Div, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		div a0 t1 a0 end 
-	 (* pas sûr que ça marche pour les négatif en gros je dis que a mod b c'est a- (b/a)*a*)end 
-	| TEop (And, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		and_ t2 t1 a0 end
-	| TEop (Or, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		or_ t2 t1 a0 end
-	| TEop (Le, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		sle a0 t1 a0 end (* on met un 1 ou un 0 dans $a0 selon que c'est plus petit ou égal ou pas, 
-	petit problème l'expression (a=<b)+c est correctement traitée dans ce cas :x*) 
-	| TEop (Ge, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		sge a0 t1 a0 end
-	| TEop (Lt, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		slt a0 t1 a0 end
-	| TEop (Gt, te, tf) -> begin 
-		int expr lvl te; push a0; 
-		int_expr lvl tf; pop t1; 
-		sgt a0 t1 a0 end
-*)
+
 (*	| (TIdent { rep = s; typ = t ; lvl = l ; offset = ofs }) ->   begin 
 		assert (l <= lvl);
    		 move t1, fp; 
