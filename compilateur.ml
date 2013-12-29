@@ -4,6 +4,9 @@ open Ast
  (* Ici commence l'assemblage \Production de code\*) 
  (*Une expression entière*)
 
+let ntest = ref 0
+
+
 
 let rec concatene = function
   | [] -> nop 
@@ -37,6 +40,9 @@ let rec int_expr lvl const = match const.c with
 		(int_expr lvl te) ++ (push a0) ++
 		(int_expr lvl tf) ++  (pop t1) ++
 		((associe_opar op) a0 t1 oreg a0)
+	| TEop(op, te, tf) when List.mem op [Or ; And ] -> let la = "sortietest" ^ (string_of_int !ntest) in let () = incr ntest in
+		(int_expr lvl te) ++ ((if op = Or then beqz else bnez) a0 la) ++
+		(int_expr lvl tf) ++ (label la)
         | TEop (op, te, tf) -> 
 		(int_expr lvl te) ++ (push a0) ++
 		(int_expr lvl tf) ++ (pop t1) ++ 
