@@ -48,16 +48,19 @@ Warning 26: unused variable tarbre.
 /usr/bin/ocamlopt -c -o lexerhack.cmx lexerhack.ml # cached
 # Target: typing.cmx, tags: { compile, extension:cmx, extension:ml, file:typing.cmx, file:typing.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o typing.cmx typing.ml
-# Target: compilateur.cmx, tags: { compile, extension:cmx, extension:ml, file:compilateur.cmx, file:compilateur.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o compilateur.cmx compilateur.ml # cached
 # Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
 /usr/bin/ocamldep -modules parser.ml > parser.ml.depends # cached
 # Target: parser.cmx, tags: { compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o parser.cmx parser.ml # cached
 # Target: lexer.cmx, tags: { compile, extension:cmx, extension:ml, file:lexer.cmx, file:lexer.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o lexer.cmx lexer.ml # cached
+# Target: compilateur.cmx, tags: { compile, extension:cmx, extension:ml, file:compilateur.cmx, file:compilateur.ml, implem, native, ocaml, quiet }
+/usr/bin/ocamlopt -c -o compilateur.cmx compilateur.ml
 # Target: main.cmx, tags: { compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o main.cmx main.ml # cached
+/usr/bin/ocamlopt -c -o main.cmx main.ml
++ /usr/bin/ocamlopt -c -o main.cmx main.ml
+File "main.ml", line 66, characters 6-12:
+Warning 26: unused variable tarbre.
 # Target: main.native, tags: { dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet }
-/usr/bin/ocamlopt lexerhack.cmx mips.cmx typing.cmx compilateur.cmx parser.cmx lexer.cmx main.cmx -o main.native # cached
+/usr/bin/ocamlopt lexerhack.cmx mips.cmx typing.cmx compilateur.cmx parser.cmx lexer.cmx main.cmx -o main.native
 # Compilation successful.
