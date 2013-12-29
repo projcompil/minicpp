@@ -311,7 +311,7 @@ let typdecl_c dc env = match dc.v with
 
 (* ***********************Fin Non implémenté ************************* *)
 
-let rec typexpr expr env = match expr.v with
+let rec typexpr expr env lvl = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
   | Ethis -> (*failwith "Expression non encore implémentée.\n"*)
 		begin try 
@@ -325,17 +325,17 @@ let rec typexpr expr env = match expr.v with
   | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> failwith "Expression non encore implémentée.\n" (* à faire !!!! *)
   | Epointeur e -> if is_left_value e env then
-			let te = typexpr e env in begin match te.typ with 
+			let te = typexpr e env lvl in begin match te.typ with 
 				| Tpointeur t -> {c = TEpointeur te ; typ = t }
 				| _ -> raise (Error (expr.loc, "Déférencement d'une expression qui n'est pas un pointeur.\n"))
 			end
 		   else not_left expr.loc 
   | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
-  | Esderef (e,s) -> failwith "Expression non encore implémentée.\n"(* let te = typexpr e env in
+  | Esderef (e,s) -> failwith "Expression non encore implémentée.\n"(* let te = typexpr e env lvl in
 			match te.typ with
 				| Tpointeur (TClass s) -> {} *)
   | Eassign (e,f)-> if (is_left_value e env) then
-			let te = typexpr e env and tf = typexpr f env in
+			let te = typexpr e env lvl and tf = typexpr f env lvl in
 				if is_sub_type tf.typ te.typ then
 					if is_num te.typ then
 						{ c = TEassign ( te, tf) ; typ = te.typ }
@@ -346,105 +346,105 @@ let rec typexpr expr env = match expr.v with
   | Efcall (e, l)->failwith "Expression non encore implémentée.\n"
   | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
   | Elincr e-> if is_left_value e env then
-                        let te = typexpr e env in begin match te.typ with 
+                        let te = typexpr e env lvl in begin match te.typ with 
                                 | Tint-> {c = TElincr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Incrémentation à gauche d'une expression non entière.\n"))
                         end
 	       else not_left expr.loc
   | Eldecr e -> if is_left_value e env then
-                        let te = typexpr e env in begin match te.typ with
+                        let te = typexpr e env lvl in begin match te.typ with
                                 | Tint-> {c = TEldecr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Décrémentation à gauche d'une expression non entière.\n"))
                         end
                 else not_left expr.loc 
   | Erincr e -> if is_left_value e env then
-                        let te = typexpr e env in begin match te.typ with
+                        let te = typexpr e env lvl in begin match te.typ with
                                 | Tint-> {c = TErincr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Incrémentation à droite d'une expression non entière.\n"))
                         end
                 else not_left expr.loc
   | Erdecr e -> if is_left_value e env then
-                        let te = typexpr e env in begin match te.typ with
+                        let te = typexpr e env lvl in begin match te.typ with
                                 | Tint-> {c = TErdecr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Décrémentation à droite d'une expression non entière.\n"))
                         end
                 else not_left expr.loc
   | Eaddr e -> if is_left_value e env then
-			let te = typexpr e env in
+			let te = typexpr e env lvl in
 				{ c = TEaddr te ; typ = te.typ }
 	       else not_left expr.loc
-  | Enot e -> let te = typexpr e env in begin match te.typ with
+  | Enot e -> let te = typexpr e env lvl in begin match te.typ with
 		| Tint -> { c = TEnot te ; typ = Tint }
 		| _ -> raise (Error (expr.loc, "Négation d'une valeur non entière.\n"))
 		end
-  | Euminus e -> let te = typexpr e env in begin match te.typ with
+  | Euminus e -> let te = typexpr e env lvl in begin match te.typ with
                 | Tint -> { c = TEuminus te ; typ = Tint }
                 | _ -> raise (Error (expr.loc, "Signe (moins) d'une valeur non entière.\n"))
                 end
-  | Euplus e-> let te = typexpr e env in begin match te.typ with
+  | Euplus e-> let te = typexpr e env lvl in begin match te.typ with
                 | Tint -> { c = TEuplus te ; typ = Tint }
                 | _ -> raise (Error (expr.loc, "Signe (plus) d'une valeur non entière.\n"))
                 end
   | Eop (op, e, f)-> begin match op with
-			| Eq | Neq -> let te = typexpr e env in
+			| Eq | Neq -> let te = typexpr e env lvl in
 					if is_num te.typ then
-						let tf = typexpr f env in
+						let tf = typexpr f env lvl in
 							if te.typ = tf.typ then
 								{ c = TEop(op, te, tf) ; typ = Tint }
 							else raise (Error(expr.loc, "Les deux expressions n'ont pas le même type, il est impossible de les comparer via == ou !=.\n"))
 					else raise (Error(expr.loc, "Le type de l'expression à gauche de l'opérateur de test d'" ^ (if op = Eq then "" else "in") ^ "égalité n'est pas numérique."))
 			
-			| _ -> let te = typexpr e env in
+			| _ -> let te = typexpr e env lvl in
 					if te.typ = Tint then
-						let tf = typexpr f env in
+						let tf = typexpr f env lvl in
 							if tf.typ = Tint then
 								{ c = TEop(op, te, tf) ; typ = Tint }
 							else raise (Error (expr.loc, "Opération sur une valeur non entière. L'expression de droite n'est pas entière\n"))
 					else raise (Error (expr.loc, "Opération sur une valeur non entière. L'expression de gauche n'est pas entière\n"))
 		     end
-  | Epar e -> let te = typexpr e env in
+  | Epar e -> let te = typexpr e env lvl in
 		{ c = TEpar te ; typ = te.typ }
 
-let rec typinst i env = match i.v with
+let rec typinst i env lvl = match i.v with
 	| Nothing -> TNothing, env
-	| Iexpr e -> TIexpr (typexpr e env), env 
+	| Iexpr e -> TIexpr (typexpr e env lvl), env 
 	| Idecls (tdef, v)-> failwith "non implémenté"
 	| Idecl (tdef, v, e) -> failwith "non implémenté"
 	| Aidecl (tdef, v, s, l)-> failwith "non implémenté"
- 	| If (e, ins)-> let te = typexpr e env in
+ 	| If (e, ins)-> let te = typexpr e env lvl in
 				if te.typ = Tint then
-					let (tins,envir) = typinst ins env in
+					let (tins,envir) = typinst ins env lvl in
 						(TIf (te, tins)), env
 				else raise (Error (e.loc, "L'expression à l'intérieur du if n'est pas entière.\n"))
-	| Ifelse (e, ins1, ins2) -> let te = typexpr e env in
+	| Ifelse (e, ins1, ins2) -> let te = typexpr e env lvl in
                                				if te.typ = Tint then
-                                        			let (tins1,envir1) = typinst ins1 env and (tins2, envir2) = typinst ins2 env in
+                                        			let (tins1,envir1) = typinst ins1 env lvl and (tins2, envir2) = typinst ins2 env lvl in
                                                 		(TIfelse (te, tins1, tins2)), env
                                 			else raise (Error (e.loc, "L'expression à l'intérieur du if n'est pas entière.\n")) 
-	| While (e, ins) -> let te = typexpr e env in
+	| While (e, ins) -> let te = typexpr e env lvl in
                                 if te.typ = Tint then
-                                        let (tins,envir) = typinst ins env in
+                                        let (tins,envir) = typinst ins env lvl in
                                                 (TWhile (te, tins)), env
                                 else raise (Error (e.loc, "L'expression à l'intérieur du while n'est pas entière.\n"))
-	| For (l1, e, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env) l1 in
-					let te = typexpr e env in
+	| For (l1, e, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env lvl) l1 in
+					let te = typexpr e env lvl in
 					if te.typ = Tint then
-						let tl2 = List.map (fun x -> typexpr x env) l2 in
-							let tins, envir = typinst ins env in
+						let tl2 = List.map (fun x -> typexpr x env lvl) l2 in
+							let tins, envir = typinst ins env lvl in
 								(TFor (tl1, te, tl2, tins)), env
 					else raise (Error (e.loc, "L'expression de contrôle à l'intérieur du for n'est pas entière.\n"))
-	| Afor (l1, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env) l1 in
-                    			let tl2 = List.map (fun x -> typexpr x env) l2 in
-                        			let tins, envir = typinst ins env in
+	| Afor (l1, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env lvl) l1 in
+                    			let tl2 = List.map (fun x -> typexpr x env lvl) l2 in
+                        			let tins, envir = typinst ins env lvl in
                                 			(TFor (tl1, {c = TEint 1; typ = Tint } , tl2, tins)), env 
-	| Ibloc b -> (TIbloc (typbloc b env)), env
+	| Ibloc b -> (TIbloc (typbloc b env (lvl + 1))), env
 
  	| Cout le -> if (not !biostream) then raise (Error (i.loc, "Appel de std::cout, mais le fichier n'inclut pas la bibliothèque iostream.\n"))
 		     else
 			let rec auxcout l = match l with
 			| [] -> []
 			| x::l -> (match x.v with
-					| Esexpr e -> let te = typexpr e env in
+					| Esexpr e -> let te = typexpr e env lvl in
 							if te.typ = Tint then
 								TEsexpr te
 							else raise (Error (x.loc, "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"))
@@ -452,7 +452,7 @@ let rec typinst i env = match i.v with
 		     in (TCout (auxcout le)), env
 
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
-			let te = (typexpr e env) in 
+			let te = (typexpr e env lvl) in 
 				if is_sub_type te.typ tr then (TReturn te), env 
 				else raise (Error (e.loc, "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction.\n"))
 			with Not_found -> raise (Error (i.loc, "Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n"))
@@ -467,12 +467,12 @@ let rec typinst i env = match i.v with
 
 
 (* ajouter la prise en charge des niveaux d'imbrication *)
-and typdbloc bl env = match bl with
+and typdbloc bl env lvl = match bl with
 	| Bloc [] -> (TBloc [])
-	| Bloc (i::l) -> let (ti, envir) = typinst i env in
-				let (TBloc tl) = typdbloc (Bloc l) envir in
+	| Bloc (i::l) -> let (ti, envir) = typinst i env lvl in
+				let (TBloc tl) = typdbloc (Bloc l) envir lvl in
 					TBloc (ti::tl)
-and typbloc bl env = (typdbloc (bl.v) env)
+and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
 
 
 
@@ -480,7 +480,7 @@ let typdecl d env = match d.v with
 	| Dv dv -> let (tdv, envir) = typdecl_v dv env in ( TDv tdv), envir
         | Dc dc -> failwith "non implémenté\n"
         | Db (p, bl) -> let (tp, envir) = typproto p env in
-				let tbl = typbloc bl envir in
+				let tbl = typbloc bl envir 0 in
 					(TDb (tp, tbl)), env 
 
 (*
