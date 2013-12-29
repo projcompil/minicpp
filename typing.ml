@@ -219,6 +219,19 @@ let rec size_type t = match t with
 	| Tpointeur _ -> 4
 	| Tclass s -> failwith "Taille de type classe non implémentée.\n" (* aller chercher taille dans une table *) 
 
+
+let add_meth c m l =
+	Hashtbl.add (Hashtbl.find table_c_meth c) m l
+
+let find_meth c m =
+	Hashtbl.find (Hashtbl.find table_c_meth c) m
+
+let add_member c m i =
+	Hashtbl.add (Hashtbl.find table_c_member c) m i
+
+let find_meth c m =
+        Hashtbl.find (Hashtbl.find table_c_member c) m
+
 (* ******************************************************************************* *)
 
 
