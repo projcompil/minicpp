@@ -435,8 +435,8 @@ let rec typinst i env = match i.v with
 
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env) in 
-				if tr = te.typ then (TReturn te), env 
-				else raise (Error (e.loc, "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"))
+				if is_sub_type te.typ tr then (TReturn te), env 
+				else raise (Error (e.loc, "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction.\n"))
 			with Not_found -> raise (Error (i.loc, "Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n"))
 		       end
 	| Areturn -> begin try let tr = Smap.find chtypereturn env in 

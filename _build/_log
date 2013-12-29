@@ -12,13 +12,13 @@
 # Target: mips.cmi, tags: { byte, compile, extension:mli, file:mips.mli, interf, ocaml, quiet }
 /usr/bin/ocamlc -c -o mips.cmi mips.mli # cached
 # Target: typing.ml.depends, tags: { extension:ml, file:typing.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep -modules typing.ml > typing.ml.depends # cached
+/usr/bin/ocamldep -modules typing.ml > typing.ml.depends
 # Target: lexerhack.ml.depends, tags: { extension:ml, file:lexerhack.ml, ocaml, ocamldep, quiet }
 /usr/bin/ocamldep -modules lexerhack.ml > lexerhack.ml.depends # cached
 # Target: lexerhack.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexerhack.cmo, file:lexerhack.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o lexerhack.cmo lexerhack.ml # cached
 # Target: typing.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:typing.cmo, file:typing.ml, implem, ocaml, quiet }
-/usr/bin/ocamlc -c -o typing.cmo typing.ml # cached
+/usr/bin/ocamlc -c -o typing.cmo typing.ml
 # Target: compilateur.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:compilateur.cmo, file:compilateur.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc -c -o compilateur.cmo compilateur.ml # cached
 # Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
@@ -44,7 +44,7 @@ menhir --ocamlc /usr/bin/ocamlc --infer parser.mly # cached
 # Target: lexerhack.cmx, tags: { compile, extension:cmx, extension:ml, file:lexerhack.cmx, file:lexerhack.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o lexerhack.cmx lexerhack.ml # cached
 # Target: typing.cmx, tags: { compile, extension:cmx, extension:ml, file:typing.cmx, file:typing.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt -c -o typing.cmx typing.ml # cached
+/usr/bin/ocamlopt -c -o typing.cmx typing.ml
 # Target: compilateur.cmx, tags: { compile, extension:cmx, extension:ml, file:compilateur.cmx, file:compilateur.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o compilateur.cmx compilateur.ml # cached
 # Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
@@ -56,5 +56,5 @@ menhir --ocamlc /usr/bin/ocamlc --infer parser.mly # cached
 # Target: main.cmx, tags: { compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt -c -o main.cmx main.ml # cached
 # Target: main.native, tags: { dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet }
-/usr/bin/ocamlopt lexerhack.cmx mips.cmx typing.cmx compilateur.cmx parser.cmx lexer.cmx main.cmx -o main.native # cached
+/usr/bin/ocamlopt lexerhack.cmx mips.cmx typing.cmx compilateur.cmx parser.cmx lexer.cmx main.cmx -o main.native
 # Compilation successful.
