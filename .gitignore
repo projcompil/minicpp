@@ -4,8 +4,17 @@
 *.class
 *.dll
 *.exe
-#*.o soit on les enlève tous, soit on laisse tous les objets
 *.so
+*.annot
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
+*.depends
 
 # Packages #
 ############
