@@ -139,6 +139,21 @@ let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, l
 
 Hashtbl.add table_c "" "";;
 
+(*
+let table_c_meth = (Hashtbl.create 17) ;;
+
+let table_c_member = (Hashtbl.create 17) ;;
+
+let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
+let junk2 = Hashtbl.create 17 ;;
+
+Hashtbl.add junk1 "" ((Tnull,[]):(typ * (targ list))) ;;
+
+Hashtbl.add junk2
+
+
+*)
+
 let biostream = ref false
 
 let chtypereturn = "@typereturn"
