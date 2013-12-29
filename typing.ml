@@ -238,22 +238,22 @@ let typsupers sup =
 
 
 
-let rec typvar v niveau env = match v.v with
+let rec typvar v env lvl = match v.v with
 	| Ident s -> begin try
 			let t = Smap.find s env in
-			{ c = (TIdent { rep = s; typ = t ; lvl = niveau }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
+			{ c = (TIdent { rep = s; typ = t ; lvl = lvl }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
 		     with Not_found -> raise (Error(v.loc, "L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n"))
 		     end
-	| Po va -> let tva = typvar va niveau env in
+	| Po va -> let tva = typvar va env lvl in
 			{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
-	| Ad va -> let tva = typvar va niveau env in
+	| Ad va -> let tva = typvar va env lvl in
 			{ c = (TAd tva) ; typ = tva.typ }
 
 
 let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
 				if is_bf tt then
-					TArg( (typtypedef t), (typvar v 1 env))
+					TArg( (typtypedef t), (typvar v env 1))
 				else raise (Error (a.loc, "Le type de l'argument n'est pas bien formé.\n"))
 
 
