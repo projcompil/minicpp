@@ -16,7 +16,7 @@ type typ =
 type 'a atype = { c:'a ; typ:typ }
 
 
-type ident = { rep:string; typ:typ ; lvl:int } 
+type ident = { rep:string; typ:typ ; lvl:int ;(* byref:bool*)} 
 
 type tsupers =  TSuper of  typ list
 
@@ -33,7 +33,7 @@ type targ = TArg of typ * tvar
 
 
 type tqident =
-  | TQident of  string * typ (* retour éventuel à string * typ *)
+  | TQident of  string * typ (* retour éventuel à ident * typ /// string * typ *)
   | TStatic of string * ident 
 
 
@@ -149,7 +149,7 @@ let junk2 = Hashtbl.create 17 ;;
 
 Hashtbl.add junk1 "" ((Tnull,[]):(typ * (targ list))) ;;
 
-Hashtbl.add junk2 "" { rep = "" ; typ = Tvoid ; lvl = 0 };;
+Hashtbl.add junk2 "" { rep = "" ; typ = Tvoid ; lvl = 0 ; (*byref = false*)};;
 
 Hashtbl.add table_c_meth "" junk1 ;;
 
@@ -257,8 +257,10 @@ let rec typvar v env lvl = match v.v with
 			{ c = (TIdent { rep = s; typ = t ; lvl = lvl }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
 		     with Not_found -> raise (Error(v.loc, "L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n"))
 		     end
+	| Po { v = Ad va ; loc = loc } -> raise (Error (v.loc, "Impossible de de prendre un type de pointeur vers une référence.\n"))
 	| Po va -> let tva = typvar va env lvl in
 			{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
+	| Ad { v = Ad va ; loc = loc } -> raise (Error (v.loc, "Impossible de de prendre une référence de référence.\n"))
 	| Ad va -> let tva = typvar va env lvl in
 			{ c = (TAd tva) ; typ = tva.typ }
 
