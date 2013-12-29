@@ -1,17 +1,10 @@
 BIN=main.native
 
-all: $(BIN) *.ml *.mll *.mly 
-
-
-
-	
-$(BIN):
+all: 
 	ocamlbuild -use-menhir $(BIN)
 	cp _build/$(BIN) minic++
-	rm main.native
 
 
-.SUFFIXES: .mli .ml .mll .mly
 
 clean:
 	rm -rf main.native _build minic++
