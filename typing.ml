@@ -340,7 +340,13 @@ let rec typqvar v env = match v.v with
 
 (* vérifier les doublons *)
 
-(*let rec add_args****)
+
+(* ajoute une liste de variables issues d'arguments à l'environnement *)
+let rec add_args l (*lvl*) env = match l with
+	| [] -> [], env
+	| a::l ->  let (ta, envir) = typarg a env in
+			let (tl, renv) = (add_args l envir) in
+				(ta::tl), renv
 
 let typproto p env = match p.v with
 	| Proto (t, qv, l) -> failwith "Non implémenté\n"
