@@ -329,7 +329,7 @@ let typmembre m env = match m.v with
 	| Mmeth (b, p) -> failwith "Non implémenté\n" 
 
 
-let typdecl_c dc env = match dc.v with
+let typdecl_c dc env lvl = match dc.v with
   | Class (s, sup, l) -> failwith "Non implémenté\n" 
   
 
@@ -502,7 +502,7 @@ and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
 
 let typdecl d env = match d.v with
 	| Dv dv -> let (tdv, envir) = typdecl_v dv env 0 in ( TDv tdv), envir
-        | Dc dc -> failwith "non implémenté\n"
+        | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
         | Db (p, bl) -> let (tp, envir) = typproto p env in
 				let tbl = typbloc bl envir 1 in
 					(TDb (tp, tbl)), env 
