@@ -335,9 +335,14 @@ let typarg a env = match a.v with
 let typqident q env lvl bdecl = match q.v with
   | Qident s -> begin try
 			let tid = Smap.find s env in
-				if tid.lvl <= lvl then
-					TQident tid
-				else erreur q.loc  ("L'identifiant " ^ s ^ " : not in scope.")
+				if not bdecl then
+					if tid.lvl <= lvl then
+						TQident tid
+					else erreur q.loc  ("L'identifiant " ^ s ^ " : not in scope.")
+				else
+					if tid.lvl <> lvl then
+						TQident tid
+					else erreur q.loc ("Impossible de redéfinir l'identifiant " ^ s ^"qui a déjà été défini au même niveau.\n")
 		      with Not_found -> if bdecl || (Hashtbl.mem table_f s) then
 						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
 				else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
