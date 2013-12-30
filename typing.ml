@@ -392,8 +392,9 @@ let typproto p env = match p.v with
 							else begin
 								Hashtbl.add table_f id.rep (tt, tl) ;
 								(* à complétér*)
-								let renv = Smap.add "@typereturn" {rep = "@typereturn" ; typ = tt ; lvl = 1 ; offset = 0 ; byref = false (* à changer *)} envir in
-								(TProto(tt, tqv, tl)), renv
+								let renv = Smap.add (id.rep) { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = false } envir in
+				let brenv = (Smap.add "@typereturn" {rep = "@typereturn" ; typ = tt ; lvl = 1 ; offset = 0 ; byref = false (* à changer *)} renv) in
+								(TProto(tt, tqv, tl)), renv, brenv
 							end
 
 
@@ -623,9 +624,9 @@ and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
 let typdecl d env = match d.v with
 	| Dv dv -> let (tdv, envir) = typdecl_v dv env 0 in ( TDv tdv), envir
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
-        | Db (p, bl) -> let (tp, envir) = typproto p env in
+        | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env in
 				let tbl = typbloc bl envir 1 in
-					(TDb (tp, tbl)), env 
+					(TDb (tp, tbl)), env_hb (* problème ici *) 
 
 (*
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
