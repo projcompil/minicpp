@@ -181,8 +181,7 @@ let rec is_sub_class c1 c2 =
 
 
 let rec is_sub_type t1 t2 = match (t1, t2) with
-	| Tint, Tint -> true
-	| Tnull, Tpointeur(_) -> true
+	| Tint, Tint | Tnull, Tpointeur(_) -> true
 	| (Tpointeur a), (Tpointeur b) -> is_sub_type a b
 	| (Tclass a), (Tclass b) -> is_sub_class a b
 	| _ -> false
@@ -221,6 +220,15 @@ let rec size_type t = match t with
 	| Tnull -> 4 (* ou 0 ?*)
 	| Tpointeur _ -> 4
 	| Tclass s -> failwith "Taille de type classe non implémentée.\n" (* aller chercher taille dans une table *) 
+
+
+let rec extract_var v = match v.v with
+	| Ident s -> s
+	| Po va | Ad va-> extract_var va
+
+let rec extract_qvar qv = match qv.v with
+	| Qvar q -> q
+	| Qpo qva | Qad qva -> extract_qvar qva
 
 
 let add_meth c m l =
