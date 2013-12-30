@@ -263,6 +263,18 @@ let type_of_tqident tq = match tq with
 	| TQident i -> i.typ
 	| _ -> Fonc
 
+
+let rec signaturef l = match l with
+	| [] -> []
+	| (TArg(tt, v))::l -> tt::(signaturef l)
+
+let rec egal_sign l1 l2 =
+	(signaturef l1) = (signaturef l2) (* on peut faire plus efficace en parcourant les deux listes en même temps *)
+
+let rec f_is_in_list l lsf = match lsf with
+	| [] -> false
+	| (tt, lg)::lsf -> (egal_sign l lg) || (f_is_in_list l lsf)
+
 (* ******************************************************************************* *)
 
 
@@ -363,7 +375,21 @@ let rec add_args l (*lvl*) env = match l with
 				(ta::tl), renv
 
 let typproto p env = match p.v with
-	| Proto (t, qv, l) -> failwith "Non implémenté\n"
+	| Proto (t, qv, l) -> let tt = typtypedef t in
+				let tqv = typqvar qv env 0 in
+				   let (tl, envir) = add_args l env in
+				   let tqid = extract_tqvar tqv in begin
+				   match tqid with
+					| TQident id -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
+	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
+							else begin
+								Hashtbl.add table_f id.rep (tt, tl) ;
+								(TProto(tt, tqv, tl)), envir
+							end
+
+
+					| TQmeth(s,id) -> failwith "Non implémenté\n"
+				end
 	| Pcons (s, l) -> failwith "Non implémenté\n"
 	| Pconshc (s, s2, l) -> failwith "Non implémenté\n"
 
@@ -496,6 +522,12 @@ let rec typexpr expr env lvl = match expr.v with
 		     end
   | Epar e -> let te = typexpr e env lvl in
 		{ c = TEpar te ; typ = te.typ }
+
+
+
+
+(** instruction **)
+
 
 let rec typinst i env lvl = match i.v with
 	| Nothing -> TNothing, env
