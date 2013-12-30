@@ -11,6 +11,7 @@ type typ =
     | Tvoid
     | Tpointeur of typ
     | Tclass of string
+    | Fonc
 
 
 type 'a atype = { c:'a ; typ:typ }
@@ -220,7 +221,7 @@ let rec size_type t = match t with
 	| Tnull -> 4 (* ou 0 ?*)
 	| Tpointeur _ -> 4
 	| Tclass s -> failwith "Taille de type classe non implémentée.\n" (* aller chercher taille dans une table *) 
-
+	| Fonc -> 0
 
 let rec extract_var v = match v.v with
 	| Ident s -> s
@@ -320,7 +321,7 @@ let typqident q env lvl = match q.v with
 			let tid = Smap.find s env in
 				TQident tid
 		      with Not_found -> if Hashtbl.mem table_f s then
-						TQident { rep = s ; typ = Tvoid ;  lvl = lvl ; offset = 0 ; byref = false }
+						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
 				 else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
 		end
   | Qmeth (st, s) -> failwith "Non implémenté\n"
