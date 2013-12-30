@@ -279,8 +279,8 @@ let rec typvar v env lvl t =
 			let tid = Smap.find s env in
 				if tid.lvl = lvl then
 					erreur v.loc ("Impossible de redéfinir " ^ s ^ ", car cet identifiant est déjà défini à ce niveau.")
-				else { c = (TIdent { rep = s; typ = t ; lvl = lvl; offset = 0 ; byref = b (* le changer *) }) ; typ = tid.typ } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
-		     with Not_found -> erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")
+				else { c = (TIdent { rep = s; typ = t ; lvl = lvl; offset = 0 (* le changer *); byref = b  }) ; typ = t } 
+		     with Not_found -> {c =  (TIdent { rep = s; typ = t ; lvl = lvl; offset = 0 (* le changer *); byref = b }) ; typ = t } (*erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")*)
 		     end
 		| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
 		| Po va -> let tva = auxvar va b t in
@@ -299,8 +299,7 @@ let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
 				if is_bf tt then
 				let (tv, envir) = typvar v env 1 tt in
-				let tid = extract_tvar tv in
-					if (is_num tid.typ) || (tid.byref) then
+					if (is_num tv.typ) || (tvar_by_ref tv) then
 						(TArg( (typtypedef t), tv)), envir
 					else erreur a.loc "Les paramètres d'une fonctions doivent être numériques, ou passées par référence.\n"
 
