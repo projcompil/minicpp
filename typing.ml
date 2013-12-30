@@ -259,6 +259,10 @@ let tqvar_by_ref tqva = match tqva.c with
 	| TQad _ -> true
 	| _ -> false
 
+let type_of_tqident tq = match tq with
+	| TQident i -> i.typ
+	| _ -> Fonc
+
 (* ******************************************************************************* *)
 
 
@@ -396,7 +400,7 @@ let rec typexpr expr env lvl = match expr.v with
   			with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une classe.\n" end
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
-  | Eqident q -> failwith "Expression non encore implémentée.\n" (* à faire !!!! *)
+  | Eqident q -> let tq = typqident q env lvl in { c = TEqident tq ; typ = (type_of_tqident tq)}
   | Epointeur e -> if is_left_value e env then
 			let te = typexpr e env lvl in begin match te.typ with 
 				| Tpointeur t -> {c = TEpointeur te ; typ = t }
