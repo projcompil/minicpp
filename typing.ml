@@ -16,7 +16,7 @@ type typ =
 type 'a atype = { c:'a ; typ:typ }
 
 
-type ident = { rep:string; typ:typ ; lvl:int ; offset : int ;  byref:bool} 
+type ident = { rep:string; mutable (* oui c'est moche *) typ:typ ; lvl:int ; offset : int ;  byref:bool} 
 
 type tsupers =  TSuper of  typ list
 
@@ -291,8 +291,11 @@ let rec typvar v env lvl t =
 
 	in let tv = auxvar v false t in
 		let idtv = extract_tvar tv in
-		let envir = Smap.add (idtv.rep) idtv env in
-			(tv, envir)
+			idtv.typ <- tv.typ; (* hack assez moche, mais cela fera l'affaire pour l'instant *)
+			let envir = Smap.add (idtv.rep) idtv env in
+				(tv, envir)
+
+(** sûrement un problème sur cette fonction, on ajoute un ident de type t, mais comment savoir de quelle type il sera ? *)
 
 
 let typarg a env = match a.v with
