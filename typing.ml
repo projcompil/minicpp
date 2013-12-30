@@ -553,7 +553,7 @@ let rec typinst i env lvl = match i.v with
 			    	let tv, envir = (typvar v env lvl tt) in
 					(TIdecl(tt, tv)), envir
 				else erreur i.loc "Déclaration d'une variable de type non bien formé.œ\n"
-	| Ideclinit (tdef, v, e) -> let tt = typtypedef tdef in
+	| Ideclinit (tdef, v, e) -> (* vérifier si v est une référence, que e est une valeur gauche *) 				let tt = typtypedef tdef in
 					if is_bf tt then
                             	    		let tv, envir = (typvar v env lvl tt) in
 						let te = typexpr e env lvl in
