@@ -34,7 +34,7 @@ type targ = TArg of typ * tvar
 
 type tqident =
   | TQident of  string * typ (* retour éventuel à ident * typ /// string * typ *)
-  | TStatic of string * ident 
+  | TQmeth of string * ident 
 
 
 type tqvar =
@@ -202,7 +202,7 @@ let rec is_bf t = match t with
 let rec is_left_value e (env:environnement) = match e.v with
 	| Eqident ex -> begin match ex.v with
 				| Qident s -> Smap.mem s env
-				| Static _ -> false	
+				| Qmeth _ -> false	
 			end  
 	| Epointeur _ | Esderef _ | Eattr _ -> true
 	| Epar ex -> is_left_value ex env
@@ -280,7 +280,7 @@ let typqident q env = match q.v with
 				TQident (s, tq)
 		      with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
 		end
-  | Static (st, s) -> failwith "Non implémenté\n"
+  | Qmeth (st, s) -> failwith "Non implémenté\n"
 
 module Sset = Set.Make(String)
 

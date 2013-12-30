@@ -177,7 +177,7 @@ qident:
 
 dqident:
 | x = IDENT { Qident x }
-| x = TIDENT ; COLON ; COLON ; y = IDENT {  Static (x,y) }
+| x = TIDENT ; COLON ; COLON ; y = IDENT {  Qmeth (x,y) }
 ;
 
 

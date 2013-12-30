@@ -32,7 +32,7 @@ type qident = dqident pos
 
 and dqident =
   | Qident of string
-  | Static of string * string
+  | Qmeth of string * string
 
 type qvar = dqvar pos
 
