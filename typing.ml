@@ -230,6 +230,9 @@ let rec extract_qvar qv = match qv.v with
 	| Qvar q -> q
 	| Qpo qva | Qad qva -> extract_qvar qva
 
+let rec extract_tvar tv = match tv.c with
+	| TIdent i -> i
+	| TPo tva | TAd tva-> extract_tvar tva
 
 let add_meth c m l =
 	Hashtbl.add (Hashtbl.find table_c_meth c) m l
@@ -246,6 +249,10 @@ let find_meth c m =
 let rec tvar_by_ref tva = match tva.c with
 	| TIdent id -> id.byref
 	| TPo tva | TAd tva -> tvar_by_ref tva
+
+let tqvar_by_ref tqva = match tqva.c with
+	| TQad _ -> true
+	| _ -> false
 
 (* ******************************************************************************* *)
 
@@ -282,12 +289,16 @@ let rec typvar v env lvl =
 		| Ad va -> let tva = auxvar va true in
 				{ c = (TAd tva) ; typ = tva.typ }
 
-	in auxvar v false
+	in let tv = auxvar v false in
+		let idtv = extract_tvar tv in
+		let envir = Smap.add (idtv.rep) idtv env in
+			(tv, envir)
 
 let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
 				if is_bf tt then
-					TArg( (typtypedef t), (typvar v env 1))
+				let (tv, envir) = typvar v env 1 in
+					(TArg( (typtypedef t), tv)), envir
 				else erreur a.loc "Le type de l'argument n'est pas bien formé.\n"
 
 
@@ -316,11 +327,11 @@ let find_duplicate liste =
 
 
 let rec typqvar v env = match v.v with
-	| Qvar q -> failwith "Non implémenté\n"
+	| Qvar q -> TQvar (typqident q env)
 	| Qpo { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible de déclarer un pointeur vers une référence.\n"
-	| Qpo qv -> failwith "Non implémenté\n" 
+	| Qpo qv -> TQpo (typqvar qv env)
 	| Qad { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible d'utiliser une référence de référence.\n"
-	| Qad qv -> failwith "Non implémenté\n"
+	| Qad qv -> TQad (typqvar qv env)
 
 
 (* vérifier les doublons *)
