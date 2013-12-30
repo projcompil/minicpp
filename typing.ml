@@ -420,7 +420,14 @@ let rec typexpr expr env lvl = match expr.v with
 						erreur expr.loc "Le type de la première expression dans l'assignation n'est pas un type numérique.\n"
 				else erreur expr.loc "Le type de la deuxième expression dans l'assignation n'est pas un sous-type du type de la première.\n"
 		    else erreur expr.loc "L'expression n'est pas une valeur gauche.\n"
-  | Efcall (e, l)->failwith "Expression non encore implémentée.\n"
+  | Efcall (e, l)-> let te = typexpr e env lvl in begin
+			let tl = List.map (fun x -> typexpr x env lvl) l in
+			match te.c with
+				| TEqident (TQident i) -> failwith "non implemented"
+				| TEqident (TQmeth(_)) -> failwith "Non implémenté.\n" 
+				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
+		end
+
   | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
   | Elincr e-> if is_left_value e env then
                         let te = typexpr e env lvl in begin match te.typ with 
