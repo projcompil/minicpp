@@ -412,8 +412,14 @@ let rec auxdecl_v l env lvl t = match l with
 
 let rec typdecl_v dv env lvl = match dv.v with
 	| Declv(t, l) -> let tt = typtypedef t in
-			   let (tl, envir) = (auxdecl_v l env lvl tt) in
-				(TDeclv(tt, tl)), envir (*failwith "Non implémenté\n" (* let tt = typtypedef t in
+			   if is_bf tt then
+			   	let (tl, envir) = (auxdecl_v l env lvl tt) in
+					(TDeclv(tt, tl)), envir
+			
+			   else erreur dv.loc "Le type de cette déclaration n'est pas bien formé.\n"
+ (*failwith "Non implémenté\n" (* let tt = typtypedef t in
+
+
 				let rec auxdv l env = match l with
 					| [] ->
 				auxdv l env*)
@@ -626,7 +632,7 @@ let typdecl d env = match d.v with
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
         | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env in
 				let tbl = typbloc bl envir 1 in
-					(TDb (tp, tbl)), env_hb (* problème ici *) 
+					(TDb (tp, tbl)), env_hb 
 
 (*
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
