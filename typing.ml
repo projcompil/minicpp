@@ -16,7 +16,7 @@ type typ =
 type 'a atype = { c:'a ; typ:typ }
 
 
-type ident = { rep:string; typ:typ ; lvl:int ;(* byref:bool*)} 
+type ident = { rep:string; typ:typ ; lvl:int ;(*offset = int ;  byref:bool*)} 
 
 type tsupers =  TSuper of  typ list
 

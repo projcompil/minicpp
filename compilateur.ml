@@ -63,11 +63,10 @@ let code_expr_str lvl (*env*) e = match e with
 	| TEstring s -> let lab = "_chaine" ^ (string_of_int !nstring) in let () = incr nstring in
 			{ text = (la a0 alab lab) ++ (li v0 4) ++ (syscall) ; data = (label lab) ++ (asciiz s) }
 
-(*	| (TIdent { rep = s; typ = t ; lvl = l ; offset = ofs }) ->   begin 
+(*	| (TIdent { rep = s; typ = t ; lvl = l ; offset = ofs }) -> 
 		assert (l <= lvl);
-   		 move t1, fp; 
-   		iter (lvl - l) lw t1  8(t1); 
-   		(*lw a0 {ofs}($t1)*) end 
+   		(move t1 fp) ++ 
+   		iter (lvl - l) ++ (lw t1  (8,t1)); 
 *)
 let rec iter n code = if n=0 then nop 
 		      else 
