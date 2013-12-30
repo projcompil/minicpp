@@ -164,6 +164,8 @@ let chtypereturn = "@typereturn"
 (* '*************************)
 
 
+let erreur loc s =
+	raise (Error(loc, s))
 
 (* renvoie true si c est une super-classe d'un des éléments de l, ou d'une super-classe de l, false sinon*)
 let rec remonte c l = match l with
@@ -209,7 +211,8 @@ let rec is_left_value e (env:environnement) = match e.v with
 	| _ -> false  (* y en a-t-ul d'autres ? *)
 
 let not_left loc =
-	raise (Error (loc, "L'expression n'est pas une valeur gauche.\n"))
+(*	erreurloc, "L'expression n'est pas une valeur gauche.\n"))*)
+	erreur loc "L'expression n'est pas une valeur gauche.\n"
 
 
 let rec size_type t = match t with
@@ -246,7 +249,7 @@ let typsupers sup =
 		| [] -> []
 		| s::l -> if Hashtbl.mem table_c s then
 				(Tclass s)::(aux l)
-			  else raise (Error (sup.loc, "Le nom " ^ s ^ " n'est pas le nom d'une classe déjà définie plus haut\n"))
+			  else erreur sup.loc ("Le nom " ^ s ^ " n'est pas le nom d'une classe déjà définie plus haut\n")
 	in match sup.v with Super l -> TSuper (aux l)
 
 
@@ -255,12 +258,12 @@ let rec typvar v env lvl = match v.v with
 	| Ident s -> begin try
 			let t = Smap.find s env in
 			{ c = (TIdent { rep = s; typ = t ; lvl = lvl }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
-		     with Not_found -> raise (Error(v.loc, "L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n"))
+		     with Not_found -> erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")
 		     end
-	| Po { v = Ad va ; loc = loc } -> raise (Error (v.loc, "Impossible de de prendre un type de pointeur vers une référence.\n"))
+	| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
 	| Po va -> let tva = typvar va env lvl in
 			{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
-	| Ad { v = Ad va ; loc = loc } -> raise (Error (v.loc, "Impossible de de prendre une référence de référence.\n"))
+	| Ad { v = Ad va ; loc = loc } -> erreur v.loc "Impossible de de prendre une référence de référence.\n"
 	| Ad va -> let tva = typvar va env lvl in
 			{ c = (TAd tva) ; typ = tva.typ }
 
@@ -269,7 +272,7 @@ let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
 				if is_bf tt then
 					TArg( (typtypedef t), (typvar v env 1))
-				else raise (Error (a.loc, "Le type de l'argument n'est pas bien formé.\n"))
+				else erreur a.loc "Le type de l'argument n'est pas bien formé.\n"
 
 
 
@@ -278,7 +281,7 @@ let typqident q env = match q.v with
   | Qident s -> begin try
 			let tq = Smap.find s env in
 				TQident (s, tq)
-		      with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
+		      with Not_found -> erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
 		end
   | Qmeth (st, s) -> failwith "Non implémenté\n"
 
@@ -298,7 +301,9 @@ let find_duplicate liste =
 
 let rec typqvar v env = match v.v with
 	| Qvar q -> failwith "Non implémenté\n"
+	| Qpo { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible de déclarer un pointeur vers une référence.\n"
 	| Qpo qv -> failwith "Non implémenté\n" 
+	| Qad { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible d'utiliser une référence de référence.\n"
 	| Qad qv -> failwith "Non implémenté\n"
 
 
@@ -337,16 +342,16 @@ let rec typexpr expr env lvl = match expr.v with
 			let t = Smap.find "this" env in 
   				begin match t with 
   					| Tpointeur (Tclass s) -> { c = TEthis ; typ = t }
-  					| _ -> raise (Error (expr.loc, "this est un pointeur vers un objet\n"))
+  					| _ -> erreur expr.loc "this est un pointeur vers un objet\n"
 				end
-  			with Not_found -> raise (Error (expr.loc, "Utilisation de this en dehors d'une classe.\n")) end	
+  			with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une classe.\n" end
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> failwith "Expression non encore implémentée.\n" (* à faire !!!! *)
   | Epointeur e -> if is_left_value e env then
 			let te = typexpr e env lvl in begin match te.typ with 
 				| Tpointeur t -> {c = TEpointeur te ; typ = t }
-				| _ -> raise (Error (expr.loc, "Déférencement d'une expression qui n'est pas un pointeur.\n"))
+				| _ -> erreur expr.loc "Déférencement d'une expression qui n'est pas un pointeur.\n"
 			end
 		   else not_left expr.loc 
   | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
@@ -359,33 +364,33 @@ let rec typexpr expr env lvl = match expr.v with
 					if is_num te.typ then
 						{ c = TEassign ( te, tf) ; typ = te.typ }
 					else
-						raise (Error (expr.loc, "Le type de la première expression dans l'assignation n'est pas un type numérique.\n"))
-				else raise (Error (expr.loc, "Le type de la deuxième expression dans l'assignation n'est pas un sous-type du type de la première.\n"))
-		    else raise (Error (expr.loc, "L'expression n'est pas une valeur gauche.\n"))
+						erreur expr.loc "Le type de la première expression dans l'assignation n'est pas un type numérique.\n"
+				else erreur expr.loc "Le type de la deuxième expression dans l'assignation n'est pas un sous-type du type de la première.\n"
+		    else erreur expr.loc "L'expression n'est pas une valeur gauche.\n"
   | Efcall (e, l)->failwith "Expression non encore implémentée.\n"
   | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
   | Elincr e-> if is_left_value e env then
                         let te = typexpr e env lvl in begin match te.typ with 
                                 | Tint-> {c = TElincr te ; typ = Tint }
-                                | _ -> raise (Error (expr.loc, "Incrémentation à gauche d'une expression non entière.\n"))
+                                | _ -> erreur expr.loc "Incrémentation à gauche d'une expression non entière.\n"
                         end
 	       else not_left expr.loc
   | Eldecr e -> if is_left_value e env then
                         let te = typexpr e env lvl in begin match te.typ with
                                 | Tint-> {c = TEldecr te ; typ = Tint }
-                                | _ -> raise (Error (expr.loc, "Décrémentation à gauche d'une expression non entière.\n"))
+                                | _ -> erreur expr.loc "Décrémentation à gauche d'une expression non entière.\n"
                         end
                 else not_left expr.loc 
   | Erincr e -> if is_left_value e env then
                         let te = typexpr e env lvl in begin match te.typ with
                                 | Tint-> {c = TErincr te ; typ = Tint }
-                                | _ -> raise (Error (expr.loc, "Incrémentation à droite d'une expression non entière.\n"))
+                                | _ -> erreur expr.loc "Incrémentation à droite d'une expression non entière.\n"
                         end
                 else not_left expr.loc
   | Erdecr e -> if is_left_value e env then
                         let te = typexpr e env lvl in begin match te.typ with
                                 | Tint-> {c = TErdecr te ; typ = Tint }
-                                | _ -> raise (Error (expr.loc, "Décrémentation à droite d'une expression non entière.\n"))
+                                | _ -> erreur expr.loc "Décrémentation à droite d'une expression non entière.\n"
                         end
                 else not_left expr.loc
   | Eaddr e -> if is_left_value e env then
@@ -394,15 +399,15 @@ let rec typexpr expr env lvl = match expr.v with
 	       else not_left expr.loc
   | Enot e -> let te = typexpr e env lvl in begin match te.typ with
 		| Tint -> { c = TEnot te ; typ = Tint }
-		| _ -> raise (Error (expr.loc, "Négation d'une valeur non entière.\n"))
+		| _ -> erreur expr.loc "Négation d'une valeur non entière.\n"
 		end
   | Euminus e -> let te = typexpr e env lvl in begin match te.typ with
                 | Tint -> { c = TEuminus te ; typ = Tint }
-                | _ -> raise (Error (expr.loc, "Signe (moins) d'une valeur non entière.\n"))
+                | _ -> erreur expr.loc "Signe (moins) d'une valeur non entière.\n"
                 end
   | Euplus e-> let te = typexpr e env lvl in begin match te.typ with
                 | Tint -> { c = TEuplus te ; typ = Tint }
-                | _ -> raise (Error (expr.loc, "Signe (plus) d'une valeur non entière.\n"))
+                | _ -> erreur expr.loc "Signe (plus) d'une valeur non entière.\n"
                 end
   | Eop (op, e, f)-> begin match op with
 			| Eq | Neq -> let te = typexpr e env lvl in
@@ -410,16 +415,16 @@ let rec typexpr expr env lvl = match expr.v with
 						let tf = typexpr f env lvl in
 							if te.typ = tf.typ then
 								{ c = TEop(op, te, tf) ; typ = Tint }
-							else raise (Error(expr.loc, "Les deux expressions n'ont pas le même type, il est impossible de les comparer via == ou !=.\n"))
-					else raise (Error(expr.loc, "Le type de l'expression à gauche de l'opérateur de test d'" ^ (if op = Eq then "" else "in") ^ "égalité n'est pas numérique."))
+							else erreur expr.loc "Les deux expressions n'ont pas le même type, il est impossible de les comparer via == ou !=.\n"
+					else erreur expr.loc ("Le type de l'expression à gauche de l'opérateur de test d'" ^ (if op = Eq then "" else "in") ^ "égalité n'est pas numérique.")
 			
 			| _ -> let te = typexpr e env lvl in
 					if te.typ = Tint then
 						let tf = typexpr f env lvl in
 							if tf.typ = Tint then
 								{ c = TEop(op, te, tf) ; typ = Tint }
-							else raise (Error (expr.loc, "Opération sur une valeur non entière. L'expression de droite n'est pas entière\n"))
-					else raise (Error (expr.loc, "Opération sur une valeur non entière. L'expression de gauche n'est pas entière\n"))
+							else erreur expr.loc "Opération sur une valeur non entière. L'expression de droite n'est pas entière\n"
+					else erreur expr.loc "Opération sur une valeur non entière. L'expression de gauche n'est pas entière\n"
 		     end
   | Epar e -> let te = typexpr e env lvl in
 		{ c = TEpar te ; typ = te.typ }
@@ -434,31 +439,31 @@ let rec typinst i env lvl = match i.v with
 				if te.typ = Tint then
 					let (tins,envir) = typinst ins env lvl in
 						(TIf (te, tins)), env
-				else raise (Error (e.loc, "L'expression à l'intérieur du if n'est pas entière.\n"))
+				else erreur e.loc "L'expression à l'intérieur du if n'est pas entière.\n"
 	| Ifelse (e, ins1, ins2) -> let te = typexpr e env lvl in
                                				if te.typ = Tint then
                                         			let (tins1,envir1) = typinst ins1 env lvl and (tins2, envir2) = typinst ins2 env lvl in
                                                 		(TIfelse (te, tins1, tins2)), env
-                                			else raise (Error (e.loc, "L'expression à l'intérieur du if n'est pas entière.\n")) 
+                                			else erreur e.loc "L'expression à l'intérieur du if n'est pas entière.\n"
 	| While (e, ins) -> let te = typexpr e env lvl in
                                 if te.typ = Tint then
                                         let (tins,envir) = typinst ins env lvl in
                                                 (TWhile (te, tins)), env
-                                else raise (Error (e.loc, "L'expression à l'intérieur du while n'est pas entière.\n"))
+                                else erreur e.loc "L'expression à l'intérieur du while n'est pas entière.\n"
 	| For (l1, e, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env lvl) l1 in
 					let te = typexpr e env lvl in
 					if te.typ = Tint then
 						let tl2 = List.map (fun x -> typexpr x env lvl) l2 in
 							let tins, envir = typinst ins env lvl in
 								(TFor (tl1, te, tl2, tins)), env
-					else raise (Error (e.loc, "L'expression de contrôle à l'intérieur du for n'est pas entière.\n"))
+					else erreur e.loc "L'expression de contrôle à l'intérieur du for n'est pas entière.\n"
 	| Afor (l1, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env lvl) l1 in
                     			let tl2 = List.map (fun x -> typexpr x env lvl) l2 in
                         			let tins, envir = typinst ins env lvl in
                                 			(TFor (tl1, {c = TEint 1; typ = Tint } , tl2, tins)), env 
 	| Ibloc b -> (TIbloc (typbloc b env (lvl + 1))), env
 
- 	| Cout le -> if (not !biostream) then raise (Error (i.loc, "Appel de std::cout, mais le fichier n'inclut pas la bibliothèque iostream.\n"))
+ 	| Cout le -> if (not !biostream) then erreur i.loc "Appel de std::cout, mais le fichier n'inclut pas la bibliothèque iostream.\n"
 		     else
 			let rec auxcout l = match l with
 			| [] -> []
@@ -466,20 +471,20 @@ let rec typinst i env lvl = match i.v with
 					| Esexpr e -> let te = typexpr e env lvl in
 							if te.typ = Tint then
 								TEsexpr te
-							else raise (Error (x.loc, "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"))
+							else erreur x.loc "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"
 					| Estring s -> TEstring s)::(auxcout l)
 		     in (TCout (auxcout le)), env
 
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env lvl) in 
 				if is_sub_type te.typ tr then (TReturn te), env 
-				else raise (Error (e.loc, "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction.\n"))
-			with Not_found -> raise (Error (i.loc, "Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n"))
+				else erreur e.loc "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction.\n"
+			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
 		       end
 	| Areturn -> begin try let tr = Smap.find chtypereturn env in 
 				if tr = Tvoid then TAreturn, env
-                                else raise (Error (i.loc, "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"))
-			with Not_found -> raise (Error (i.loc, "Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n"))
+                                else erreur i.loc "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"
+			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
                      end
 
 (* and typinst i env = (typdinst (i.v) env)*)
@@ -517,11 +522,11 @@ let typfichier f =
 		let tf = { tbincludeios = (f.v).bincludeios ;
                                         tdecls= (auxtfichier ((f.v).decls) Smap.empty) } in
 			match (Hashtbl.find_all table_f "main") with
-				| [] -> raise (Error (f.loc, "Il n'y a pas de fonction main déclarée dans le fichier.\n"))
+				| [] -> erreur f.loc "Il n'y a pas de fonction main déclarée dans le fichier.\n"
 				| [ (Tint, []) ]-> tf
-				| [ (_, []) ]-> raise (Error (f.loc, "L'unique fonction main du fichier n'est pas de type int.\n"))
-				| [ (Tint, _) ] -> raise (Error (f.loc, "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé en Mini-C++.\n"))
+				| [ (_, []) ]-> erreur f.loc "L'unique fonction main du fichier n'est pas de type int.\n"
+				| [ (Tint, _) ] -> erreur f.loc "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé en Mini-C++.\n"
 
-				| _ -> raise (Error (f.loc, "Il y a plusieurs fonctions main déclarées au sein du fichier.\n"))
+				| _ -> erreur f.loc "Il y a plusieurs fonctions main déclarées au sein du fichier.\n"
 
 
