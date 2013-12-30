@@ -33,7 +33,7 @@ type targ = TArg of typ * tvar
 
 
 type tqident =
-  | TQident of string * typ (*ident *)(* retour éventuel à ident * typ /// string * typ *)
+  | TQident of ident (* retour éventuel à ident * typ /// string * typ *)
   | TQmeth of string * ident 
 
 
@@ -243,6 +243,10 @@ let add_member c m i =
 let find_meth c m =
         Hashtbl.find (Hashtbl.find table_c_member c) m
 
+let rec tvar_by_ref tva = match tva.c with
+	| TIdent id -> id.byref
+	| TPo tva | TAd tva -> tvar_by_ref tva
+
 (* ******************************************************************************* *)
 
 
@@ -262,21 +266,23 @@ let typsupers sup =
 
 
 
-let rec typvar v env lvl = match v.v with
-	| Ident s -> begin try
+let rec typvar v env lvl = 
+	let rec auxvar v b = match v.v with
+		| Ident s -> begin try
 			let tid = Smap.find s env in
 				if tid.lvl = lvl then
 					erreur v.loc ("Impossible de redéfinir " ^ s ^ ", car cet identifiant est déjà défini à ce niveau.")
-				else { c = (TIdent { rep = s; typ = tid.typ ; lvl = lvl; offset = 0 ; byref = false (* le changer *) }) ; typ = tid.typ } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
+				else { c = (TIdent { rep = s; typ = tid.typ ; lvl = lvl; offset = 0 ; byref = b (* le changer *) }) ; typ = tid.typ } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
 		     with Not_found -> erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")
 		     end
-	| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
-	| Po va -> let tva = typvar va env lvl in
-			{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
-	| Ad { v = Ad va ; loc = loc } -> erreur v.loc "Impossible de de prendre une référence de référence.\n"
-	| Ad va -> let tva = typvar va env lvl in
-			{ c = (TAd tva) ; typ = tva.typ }
+		| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
+		| Po va -> let tva = auxvar va b in
+				{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
+		| Ad { v = Ad va ; loc = loc } -> erreur v.loc "Impossible de de prendre une référence de référence.\n"
+		| Ad va -> let tva = auxvar va true in
+				{ c = (TAd tva) ; typ = tva.typ }
 
+	in auxvar v false
 
 let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
@@ -290,7 +296,7 @@ let typarg a env = match a.v with
 let typqident q env = match q.v with
   | Qident s -> begin try
 			let tid = Smap.find s env in
-				TQident (s, tid.typ)
+				TQident tid
 		      with Not_found -> erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
 		end
   | Qmeth (st, s) -> failwith "Non implémenté\n"
