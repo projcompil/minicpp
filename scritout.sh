@@ -34,12 +34,15 @@ app "/typing/bad" $argu
 
 app "/exec" $argu
 
-# $pathbin $i "/tmp/$i.s"
-# spim "/tmp/$i.s" | tail -n +6 > "/tmp/$i.out"
-# d = diff "/tmp/$i.out" $ioutduprof
-# if [ -z $d ] ; then
-#   echo -e "Réussite de la compilation du fichier $i\\n"
-# else
-#    echo -e "Echec de la compilation du fichier $i\\n"
-#    echo $d
-# fi
+function compi {
+	name="{$1%.*}"
+	$pathbin $i "/tmp/$name.s"
+	spim "/tmp/$name.s" | tail -n +6 > "/tmp/$name.out"
+	d = diff "/tmp/$name.out" "$name.out" 
+	if [ -z "$d" ] ; then
+		echo -e "Réussite de la compilation du fichier $1\\n"
+	else
+		echo -e "Echec de la compilation du fichier $1\\n"
+		echo $d
+	fi
+}
