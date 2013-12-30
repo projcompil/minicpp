@@ -234,6 +234,10 @@ let rec extract_tvar tv = match tv.c with
 	| TIdent i -> i
 	| TPo tva | TAd tva-> extract_tvar tva
 
+let rec extract_tqvar tqv = match tqv with
+	| TQvar q -> q
+	| TQpo tqva | TQad tqva -> extract_tqvar tqva
+
 let add_meth c m l =
 	Hashtbl.add (Hashtbl.find table_c_meth c) m l
 
@@ -311,11 +315,13 @@ let typarg a env = match a.v with
 
 
 (* Faux dans certains cas : valeur retour fonction pour qvar --> rajouter argument si type qvar ou non *)
-let typqident q env = match q.v with
+let typqident q env lvl = match q.v with
   | Qident s -> begin try
 			let tid = Smap.find s env in
 				TQident tid
-		      with Not_found -> erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
+		      with Not_found -> if Hashtbl.mem table_f s then
+						TQident { rep = s ; typ = Tvoid ;  lvl = lvl ; offset = 0 ; byref = false }
+				 else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
 		end
   | Qmeth (st, s) -> failwith "Non implémenté\n"
 
@@ -333,12 +339,12 @@ let find_duplicate liste =
 (* ******************************* Non implémenté ************************* *)
 
 
-let rec typqvar v env = match v.v with
-	| Qvar q -> TQvar (typqident q env)
+let rec typqvar v env lvl= match v.v with
+	| Qvar q -> TQvar (typqident q env lvl)
 	| Qpo { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible de déclarer un pointeur vers une référence.\n"
-	| Qpo qv -> TQpo (typqvar qv env)
+	| Qpo qv -> TQpo (typqvar qv env lvl)
 	| Qad { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible d'utiliser une référence de référence.\n"
-	| Qad qv -> TQad (typqvar qv env)
+	| Qad qv -> TQad (typqvar qv env lvl)
 
 
 (* vérifier les doublons *)
