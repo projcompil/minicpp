@@ -11,6 +11,8 @@ open Ast
 let ntest = ref 0
 let nstring = ref 0
 
+type envchaine = int Smap.t (* ou une table de Hash, cela éviterait de prendre en compte cela partout *)
+
 (* ***************** *)
 
 let rec concatene = function
@@ -45,7 +47,7 @@ let rec code_expr lvl const = match const.c with
 		(code_expr lvl te) ++ (push a0) ++
 		(code_expr lvl tf) ++  (pop t1) ++
 		((associe_opar op) a0 t1 oreg a0)
-	| TEop(op, te, tf) when List.mem op [Or ; And ] -> let lab = "sortietest" ^ (string_of_int !ntest) in let () = incr ntest in
+	| TEop(op, te, tf) when List.mem op [Or ; And ] -> let lab = "_sortietest" ^ (string_of_int !ntest) in let () = incr ntest in
 		(code_expr lvl te) ++ ((if op = Or then beqz else bnez) a0 lab) ++
 		(code_expr lvl tf) ++ (label lab)
         | TEop (op, te, tf) -> 
@@ -56,9 +58,9 @@ let rec code_expr lvl const = match const.c with
 
 
 
-let code_expr_str lvl e = match e with
+let code_expr_str lvl (*env*) e = match e with
 	| TEsexpr te -> { text = (code_expr lvl te) ++ (li v0 1) ; data = nop }
-	| TEstring s -> let lab = "chaine" ^ (string_of_int !nstring) in let () = incr nstring in
+	| TEstring s -> let lab = "_chaine" ^ (string_of_int !nstring) in let () = incr nstring in
 			{ text = (la a0 alab lab) ++ (li v0 4) ++ (syscall) ; data = (label lab) ++ (asciiz s) }
 
 (*	| (TIdent { rep = s; typ = t ; lvl = l ; offset = ofs }) ->   begin 
