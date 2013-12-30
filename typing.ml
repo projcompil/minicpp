@@ -299,8 +299,11 @@ let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
 				if is_bf tt then
 				let (tv, envir) = typvar v env 1 tt in
-					(*if ||(tvar_by_ref tv)*)
-					(TArg( (typtypedef t), tv)), envir
+				let tid = extract_tvar tv in
+					if (is_num tid.typ) || (tid.byref) then
+						(TArg( (typtypedef t), tv)), envir
+					else erreur a.loc "Les paramètres d'une fonctions doivent être numériques, ou passées par référence.\n"
+
 				else erreur a.loc "Le type de l'argument n'est pas bien formé.\n"
 
 
