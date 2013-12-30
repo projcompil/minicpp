@@ -16,7 +16,7 @@ type typ =
 type 'a atype = { c:'a ; typ:typ }
 
 
-type ident = { rep:string; typ:typ ; lvl:int ;(*offset = int ;  byref:bool*)} 
+type ident = { rep:string; typ:typ ; lvl:int ; offset : int ;  byref:bool} 
 
 type tsupers =  TSuper of  typ list
 
@@ -33,7 +33,7 @@ type targ = TArg of typ * tvar
 
 
 type tqident =
-  | TQident of  string * typ (* retour éventuel à ident * typ /// string * typ *)
+  | TQident of string * typ (*ident *)(* retour éventuel à ident * typ /// string * typ *)
   | TQmeth of string * ident 
 
 
@@ -129,7 +129,7 @@ type tfichier =
 (* '*************************)
 module Smap = Map.Make(String)
 
-type environnement = typ Smap.t
+type environnement = (*typ*) ident Smap.t
 
 let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles et de valeurs de retour possibles  pour prendre en compte la surcharge *)
 
@@ -149,7 +149,7 @@ let junk2 = Hashtbl.create 17 ;;
 
 Hashtbl.add junk1 "" ((Tnull,[]):(typ * (targ list))) ;;
 
-Hashtbl.add junk2 "" { rep = "" ; typ = Tvoid ; lvl = 0 ; (*byref = false*)};;
+Hashtbl.add junk2 "" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;
 
 Hashtbl.add table_c_meth "" junk1 ;;
 
@@ -264,8 +264,10 @@ let typsupers sup =
 
 let rec typvar v env lvl = match v.v with
 	| Ident s -> begin try
-			let t = Smap.find s env in
-			{ c = (TIdent { rep = s; typ = t ; lvl = lvl }) ; typ = t } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
+			let tid = Smap.find s env in
+				if tid.lvl = lvl then
+					erreur v.loc ("Impossible de redéfinir " ^ s ^ ", car cet identifiant est déjà défini à ce niveau.")
+				else { c = (TIdent { rep = s; typ = tid.typ ; lvl = lvl; offset = 0 ; byref = false (* le changer *) }) ; typ = tid.typ } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
 		     with Not_found -> erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")
 		     end
 	| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
@@ -287,8 +289,8 @@ let typarg a env = match a.v with
 (* Faux dans certains cas : valeur retour fonction pour qvar --> rajouter argument si type qvar ou non *)
 let typqident q env = match q.v with
   | Qident s -> begin try
-			let tq = Smap.find s env in
-				TQident (s, tq)
+			let tid = Smap.find s env in
+				TQident (s, tid.typ)
 		      with Not_found -> erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
 		end
   | Qmeth (st, s) -> failwith "Non implémenté\n"
@@ -347,9 +349,9 @@ let rec typexpr expr env lvl = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
   | Ethis -> (*failwith "Expression non encore implémentée.\n"*)
 		begin try 
-			let t = Smap.find "this" env in 
-  				begin match t with 
-  					| Tpointeur (Tclass s) -> { c = TEthis ; typ = t }
+			let tid = Smap.find "this" env in 
+  				begin match tid.typ with 
+  					| Tpointeur (Tclass s) -> { c = TEthis ; typ = tid.typ }
   					| _ -> erreur expr.loc "this est un pointeur vers un objet\n"
 				end
   			with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une classe.\n" end
@@ -485,12 +487,12 @@ let rec typinst i env lvl = match i.v with
 
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env lvl) in 
-				if is_sub_type te.typ tr then (TReturn te), env 
+				if is_sub_type te.typ (tr.typ) then (TReturn te), env 
 				else erreur e.loc "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction.\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
 		       end
 	| Areturn -> begin try let tr = Smap.find chtypereturn env in 
-				if tr = Tvoid then TAreturn, env
+				if tr.typ = Tvoid then TAreturn, env
                                 else erreur i.loc "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
                      end
