@@ -17,8 +17,8 @@ function app {
 	echo -e "$1\\n"
 	for i in *.cpp ; do
 		echo "Fichier : $i"
-		$pathbin $2 $i
-		echo ""
+		$pathbin $2 $i #> /dev/null
+		echo -e "$?\\n"
 	done
 	echo -e "\\n\\n"
 }
@@ -26,15 +26,15 @@ function app {
 echo -e "option choisie : $argu \\n"
 
 
-app "/syntax/good" "--parse-only"
+#app "/syntax/good" "--parse-only"
 
-app "/syntax/bad" $argu
+#app "/syntax/bad" $argu
 
-app "/typing/good" $argu
+#app "/typing/good" $argu
 
 app "/typing/bad" $argu
 
-app "/exec" $argu
+#app "/exec" $argu
 
 function compi {
 	name="{$1%.*}"
