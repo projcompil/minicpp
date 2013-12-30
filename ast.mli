@@ -105,9 +105,9 @@ type inst = dinst pos
 and dinst =
   | Nothing
   | Iexpr of expr
-  | Idecls of typedef * var
-  | Idecl of typedef * var * expr
-  | Aidecl of typedef * var * string * (expr list)
+  | Idecl of typedef * var
+  | Ideclinit of typedef * var * expr
+  | Ideclobj of typedef * var * string * (expr list)
   | If of expr * inst
   | Ifelse of expr * inst * inst
   | While of expr * inst

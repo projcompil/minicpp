@@ -223,10 +223,10 @@ vinst: CHEVRON ; e = expr_str { e }
 dinst:
 | SEMICOLON { Nothing }
 | e = expr ; SEMICOLON { Iexpr e }
-| t = typ; v = var ; SEMICOLON { Idecls (t,v) }
-| t = typ; v = var ; ASSIGN; e = expr SEMICOLON { Idecl (t,v,e) }
+| t = typ; v = var ; SEMICOLON { Idecl (t,v) }
+| t = typ; v = var ; ASSIGN; e = expr SEMICOLON { Ideclinit (t,v,e) }
 | t = typ; v = var ; ASSIGN; s = TIDENT ; LPAR; e = separated_list(COMMA, expr) ; RPAR ; SEMICOLON
-{Aidecl (t,v,s,e) }
+{ Ideclobj (t,v,s,e) }
 | IF ; LPAR ; e = expr ; RPAR ; i = inst %prec IFX { If (e,i) }
 | IF ; LPAR ; e = expr ; RPAR ; i = inst ; ELSE ; y = inst 
 {Ifelse (e,i,y) }

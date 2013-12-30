@@ -96,9 +96,9 @@ type texpr_str =
 type tinst =
   | TNothing
   | TIexpr of texpr
-  | TIdecls of typ * tvar
-  | TIdecl of typ * tvar * texpr
-  | TAidecl of typ * tvar * string * (texpr list)
+  | TIdecl of typ * tvar
+  | TIdeclinit of typ * tvar * texpr
+  | TIdeclobj of typ * tvar * string * (texpr list)
   | TIf of texpr * tinst
   | TIfelse of texpr * tinst * tinst
   | TWhile of texpr * tinst
@@ -432,9 +432,9 @@ let rec typexpr expr env lvl = match expr.v with
 let rec typinst i env lvl = match i.v with
 	| Nothing -> TNothing, env
 	| Iexpr e -> TIexpr (typexpr e env lvl), env 
-	| Idecls (tdef, v)-> failwith "non implémenté"
-	| Idecl (tdef, v, e) -> failwith "non implémenté"
-	| Aidecl (tdef, v, s, l)-> failwith "non implémenté"
+	| Idecl (tdef, v)-> failwith "non implémenté"
+	| Ideclinit (tdef, v, e) -> failwith "non implémenté"
+	| Ideclobj (tdef, v, s, l)-> failwith "non implémenté"
  	| If (e, ins)-> let te = typexpr e env lvl in
 				if te.typ = Tint then
 					let (tins,envir) = typinst ins env lvl in
