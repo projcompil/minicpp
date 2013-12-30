@@ -332,13 +332,13 @@ let typarg a env = match a.v with
 
 
 (* Faux dans certains cas : valeur retour fonction pour qvar --> rajouter argument si type qvar ou non *)
-let typqident q env lvl = match q.v with
+let typqident q env lvl bdecl = match q.v with
   | Qident s -> begin try
 			let tid = Smap.find s env in
 				if tid.lvl <= lvl then
 					TQident tid
 				else erreur q.loc  ("L'identifiant " ^ s ^ " : not in scope.")
-		      with Not_found -> if Hashtbl.mem table_f s then
+		      with Not_found -> if bdecl || (Hashtbl.mem table_f s) then
 						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
 				else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
 		end
@@ -358,12 +358,12 @@ let find_duplicate liste =
 (* ******************************* Non implémenté ************************* *)
 
 
-let rec typqvar v env lvl= match v.v with
-	| Qvar q -> TQvar (typqident q env lvl)
+let rec typqvar v env lvl bdecl = match v.v with
+	| Qvar q -> TQvar (typqident q env lvl bdecl)
 	| Qpo { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible de déclarer un pointeur vers une référence.\n"
-	| Qpo qv -> TQpo (typqvar qv env lvl)
+	| Qpo qv -> TQpo (typqvar qv env lvl bdecl)
 	| Qad { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible d'utiliser une référence de référence.\n"
-	| Qad qv -> TQad (typqvar qv env lvl)
+	| Qad qv -> TQad (typqvar qv env lvl bdecl)
 
 
 (* vérifier les doublons *)
@@ -378,7 +378,7 @@ let rec add_args l (*lvl*) env = match l with
 
 let typproto p env = match p.v with
 	| Proto (t, qv, l) -> let tt = typtypedef t in
-				let tqv = typqvar qv env 0 in
+				let tqv = typqvar qv env 0 true in
 				   let (tl, envir) = add_args l env in
 				   let tqid = extract_tqvar tqv in begin
 				   match tqid with
@@ -438,7 +438,7 @@ let rec typexpr expr env lvl = match expr.v with
   			with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une classe.\n" end
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
-  | Eqident q -> let tq = typqident q env lvl in { c = TEqident tq ; typ = (type_of_tqident tq)}
+  | Eqident q -> let tq = typqident q env lvl false in { c = TEqident tq ; typ = (type_of_tqident tq)}
   | Epointeur e -> if is_left_value e env then
 			let te = typexpr e env lvl in begin match te.typ with 
 				| Tpointeur t -> {c = TEpointeur te ; typ = t }
