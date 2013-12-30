@@ -384,7 +384,9 @@ let typproto p env = match p.v with
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
 							else begin
 								Hashtbl.add table_f id.rep (tt, tl) ;
-								(TProto(tt, tqv, tl)), envir
+								(* à complétér*)
+								let renv = Smap.add "@typereturn" {rep = "@typereturn" ; typ = tt ; lvl = 1 ; offset = 0 ; byref = false (* à changer *)} envir in
+								(TProto(tt, tqv, tl)), renv
 							end
 
 
