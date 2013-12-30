@@ -272,32 +272,34 @@ let typsupers sup =
 	in match sup.v with Super l -> TSuper (aux l)
 
 
-
-let rec typvar v env lvl = 
-	let rec auxvar v b = match v.v with
+(* prend le type attendu t et essaie de l'ajouter à l'environnement *)
+let rec typvar v env lvl t = 
+	let rec auxvar v b t = match v.v with
 		| Ident s -> begin try
 			let tid = Smap.find s env in
 				if tid.lvl = lvl then
 					erreur v.loc ("Impossible de redéfinir " ^ s ^ ", car cet identifiant est déjà défini à ce niveau.")
-				else { c = (TIdent { rep = s; typ = tid.typ ; lvl = lvl; offset = 0 ; byref = b (* le changer *) }) ; typ = tid.typ } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
+				else { c = (TIdent { rep = s; typ = t ; lvl = lvl; offset = 0 ; byref = b (* le changer *) }) ; typ = tid.typ } (* a priori non satisfaisant pour lvl : remplacer ident par string ? *)
 		     with Not_found -> erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")
 		     end
 		| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
-		| Po va -> let tva = auxvar va b in
+		| Po va -> let tva = auxvar va b t in
 				{ c =  (TPo tva) ; typ = (Tpointeur (tva.typ)) }
 		| Ad { v = Ad va ; loc = loc } -> erreur v.loc "Impossible de de prendre une référence de référence.\n"
-		| Ad va -> let tva = auxvar va true in
+		| Ad va -> let tva = auxvar va true t in
 				{ c = (TAd tva) ; typ = tva.typ }
 
-	in let tv = auxvar v false in
+	in let tv = auxvar v false t in
 		let idtv = extract_tvar tv in
 		let envir = Smap.add (idtv.rep) idtv env in
 			(tv, envir)
 
+
 let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
 				if is_bf tt then
-				let (tv, envir) = typvar v env 1 in
+				let (tv, envir) = typvar v env 1 tt in
+					(*if ||(tvar_by_ref tv)*)
 					(TArg( (typtypedef t), tv)), envir
 				else erreur a.loc "Le type de l'argument n'est pas bien formé.\n"
 
@@ -335,6 +337,8 @@ let rec typqvar v env = match v.v with
 
 
 (* vérifier les doublons *)
+
+(*let rec add_args****)
 
 let typproto p env = match p.v with
 	| Proto (t, qv, l) -> failwith "Non implémenté\n"
