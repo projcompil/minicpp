@@ -500,8 +500,19 @@ let rec typexpr expr env lvl = match expr.v with
 let rec typinst i env lvl = match i.v with
 	| Nothing -> TNothing, env
 	| Iexpr e -> TIexpr (typexpr e env lvl), env 
-	| Idecl (tdef, v)-> failwith "non implémenté"
-	| Ideclinit (tdef, v, e) -> failwith "non implémenté"
+	| Idecl (tdef, v)-> let tt = typtypedef tdef in
+				if is_bf tt then
+			    	let tv, envir = (typvar v env lvl tt) in
+					(TIdecl(tt, tv)), envir
+				else erreur i.loc "Déclaration d'une variable de type non bien formé.œ\n"
+	| Ideclinit (tdef, v, e) -> let tt = typtypedef tdef in
+					if is_bf tt then
+                            	    		let tv, envir = (typvar v env lvl tt) in
+						let te = typexpr e env lvl in
+							if is_sub_type te.typ tt then
+								(TIdeclinit(tt, tv,te)), envir
+							else erreur e.loc "Cette expression n'est pas d'un type qui est sous-type du type de déclaration de la variable.\n"
+					else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
 	| Ideclobj (tdef, v, s, l)-> failwith "non implémenté"
  	| If (e, ins)-> let te = typexpr e env lvl in
 				if te.typ = Tint then
