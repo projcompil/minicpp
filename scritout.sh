@@ -16,7 +16,9 @@ function app {
 	cd $path/$1
 	echo -e "$1\\n"
 	for i in *.cpp ; do
-		 $pathbin $2 $i
+		echo "Fichier : $i"
+		$pathbin $2 $i
+		echo ""
 	done
 	echo -e "\\n\\n"
 }
