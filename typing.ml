@@ -336,9 +336,9 @@ let typqident q env lvl = match q.v with
   | Qident s -> begin try
 			let tid = Smap.find s env in
 				TQident tid
-		      with Not_found -> if Hashtbl.mem table_f s then
+		      with Not_found -> (*if Hashtbl.mem table_f s then*)
 						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
-				 else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
+				(* else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")*)
 		end
   | Qmeth (st, s) -> failwith "Non implémenté\n"
 
