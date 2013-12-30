@@ -128,11 +128,11 @@ proto:
 | x = position(dproto) { x }
 
 dproto: x = typ ; y = qvar ; LPAR ; z = separated_list(COMMA, argument) ; RPAR 
- { Plong ( x, y, z) }
+ { Proto ( x, y, z) }
  | x = TIDENT ;  LPAR ; z = separated_list(COMMA, argument) ; RPAR 
- { Pshort (x , z)}
+ { Pcons (x , z)}
  | x = TIDENT  ; COLON ; COLON  ; y = TIDENT ; LPAR ; z = separated_list(COMMA, argument) ; RPAR 
-   { Pdouble ( x, y, z) } 
+   { Pconshc ( x, y, z) } 
 ;
 
 typ:

@@ -44,9 +44,9 @@ type tqvar =
 
 
 type tproto =
-  | TPlong of typ * tqvar * (targ list)
-  | TPshort of string * (targ list)
-  | TPdouble of string * string * (targ list)
+  | TProto of typ * tqvar * (targ list)
+  | TPcons of string * (targ list)
+  | TPconshc of string * string * (targ list)
 
 
 type tdecl_v = TDeclv of typ * (tvar list)
@@ -305,9 +305,9 @@ let rec typqvar v env = match v.v with
 (* vérifier les doublons *)
 
 let typproto p env = match p.v with
-	| Plong (t, qv, l) -> failwith "Non implémenté\n"
-	| Pshort (s, l) -> failwith "Non implémenté\n"
-	| Pdouble (s, s2, l) -> failwith "Non implémenté\n"
+	| Proto (t, qv, l) -> failwith "Non implémenté\n"
+	| Pcons (s, l) -> failwith "Non implémenté\n"
+	| Pconshc (s, s2, l) -> failwith "Non implémenté\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
 let rec typdecl_v dv env lvl = match dv.v with

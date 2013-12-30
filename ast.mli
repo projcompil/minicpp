@@ -44,9 +44,9 @@ and dqvar =
 type proto = dproto pos
 
 and dproto =
-  | Plong of typedef * qvar * (arg list)
-  | Pshort of string * (arg list)
-  | Pdouble of string * string * (arg list)
+  | Proto of typedef * qvar * (arg list)
+  | Pcons of string * (arg list)
+  | Pconshc of string * string * (arg list)
 
 type decl_v = ddecl_v pos
 
