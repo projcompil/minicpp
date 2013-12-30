@@ -368,12 +368,20 @@ let typproto p env = match p.v with
 	| Pconshc (s, s2, l) -> failwith "Non implémenté\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
+let rec auxdecl_v l env lvl t = match l with
+	| [] -> [], env
+	| v::l -> let (tv, envir) = typvar v env lvl t in
+                        let (tl, renv) = (auxdecl_v l envir lvl t) in
+                                (tv::tl), renv
+
 let rec typdecl_v dv env lvl = match dv.v with
-	| Declv(t, l) -> failwith "Non implémenté\n" (* let tt = typtypedef t in
+	| Declv(t, l) -> let tt = typtypedef t in
+			   let (tl, envir) = (auxdecl_v l env lvl tt) in
+				(TDeclv(tt, tl)), envir (*failwith "Non implémenté\n" (* let tt = typtypedef t in
 				let rec auxdv l env = match l with
 					| [] ->
 				auxdv l env*)
-				 
+			*)	 
 
 
 
