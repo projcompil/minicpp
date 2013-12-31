@@ -384,8 +384,8 @@ let rec add_args l (*lvl*) env = match l with
 let typproto p env = match p.v with
 	| Proto (t, qv, l) -> let tt = typtypedef t in
 				let tqv = typqvar qv env 0 true in
-				   let (tl, envir) = add_args l env in (*debug mandelbrot : on doit rajouter les arguments après et pas dans enivr*)
-				   let tqid = extract_tqvar tqv in begin
+				   let (tl, envir) = add_args l env in 
+(* ce serait mieux de l'avoir après mais sans duplication de code *)				   let tqid = extract_tqvar tqv in begin
 				   match tqid with
 					| TQident id -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
@@ -462,7 +462,6 @@ let rec typexpr expr env lvl = match expr.v with
   | Esderef (e,s) -> failwith "Expression non encore implémentée.\n"(* let te = typexpr e env lvl in
 			match te.typ with
 				| Tpointeur (TClass s) -> {} *)
-(* debu*lazy1 *)  
 | Eassign (e,f)-> if (is_left_value e env) then
 			let te = typexpr e env lvl and tf = typexpr f env lvl in
 				if is_sub_type tf.typ te.typ then
@@ -555,7 +554,6 @@ let rec typinst i env lvl = match i.v with
 			    	let tv, envir = (typvar v env lvl tt) in
 					(TIdecl(tt, tv)), envir
 				else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
-	(*debug*lazy1*)
 	| Ideclinit (tdef, v, e) -> (* vérifier si v est une référence, que e est une valeur gauche *) 				let tt = typtypedef tdef in
 					if is_bf tt then
                             	    		let tv, envir = (typvar v env lvl tt) in
