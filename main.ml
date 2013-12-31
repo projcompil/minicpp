@@ -95,13 +95,11 @@ let () =
 	   convertit en numéro de ligne *)
 	localisation (fst loc) ;
 	localisation (snd loc) ;
-	print_string s ;
-	eprintf "Erreur dans le typage.\n";
+	eprintf "Erreur dans le typage: %s@.\n" s;
 	exit 1
     | Failure s ->
 	localisation (Lexing.lexeme_start_p buf);
-        eprintf "Erreur du compilateur : message :  ";
-	print_string s ;
+        eprintf "Erreur du compilateur : message :  %s" s;
 	exit 2;
     | _ -> 
         localisation (Lexing.lexeme_start_p buf);
