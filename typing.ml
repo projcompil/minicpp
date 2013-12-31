@@ -255,7 +255,7 @@ let rec tvar_by_ref tva = match tva.c with
 	| TIdent id -> id.byref
 	| TPo tva | TAd tva -> tvar_by_ref tva
 
-let tqvar_by_ref tqva = match tqva.c with
+let tqvar_by_ref tqva = match tqva with
 	| TQad _ -> true
 	| _ -> false
 
@@ -392,7 +392,7 @@ let typproto p env = match p.v with
 							else begin
 								Hashtbl.add table_f id.rep (tt, tl) ;
 								(* à complétér*)
-								let renv = Smap.add (id.rep) { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = false } envir in
+								let renv = Smap.add (id.rep) { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} envir in
 				let brenv = (Smap.add "@typereturn" {rep = "@typereturn" ; typ = tt ; lvl = 1 ; offset = 0 ; byref = false (* à changer *)} renv) in
 								(TProto(tt, tqv, tl)), brenv, renv
 							end
@@ -505,7 +505,7 @@ let rec typexpr expr env lvl = match expr.v with
                 else not_left expr.loc
   | Eaddr e -> if is_left_value e env then
 			let te = typexpr e env lvl in
-				{ c = TEaddr te ; typ = te.typ }
+				{ c = TEaddr te ; typ = Tpointeur(te.typ) }
 	       else not_left expr.loc
   | Enot e -> let te = typexpr e env lvl in begin match te.typ with
 		| Tint -> { c = TEnot te ; typ = Tint }
@@ -606,7 +606,7 @@ let rec typinst i env lvl = match i.v with
 							else erreur x.loc "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"
 					| Estring s -> TEstring s)::(auxcout l)
 		     in (TCout (auxcout le)), env
-
+(* debug*1 traiter le cas où l'on doit renovyer une référence et l'expression n'est pas une valeur gauche*)
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env lvl) in 
 				if is_sub_type te.typ (tr.typ) then (TReturn te), env 

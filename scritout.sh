@@ -30,7 +30,7 @@ echo -e "option choisie : $argu \\n"
 
 #app "/syntax/bad" $argu
 
-#app "/typing/good" $argu
+app "/typing/good" $argu
 
 app "/typing/bad" $argu
 
