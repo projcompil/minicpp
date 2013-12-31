@@ -3,6 +3,9 @@
 path=/home/nm/Documents/tests
 pathbin=/home/nm/Documents/minicpp/minic++
 
+comptc=0
+compt=0
+retour=0
 
 if [ "$1" ==  "p" ]; then
 	argu="--parse-only"
@@ -18,7 +21,12 @@ function app {
 	for i in *.cpp ; do
 		echo "Fichier : $i"
 		$pathbin $2 $i #> /dev/null
-		echo -e "$?\\n"
+		retour=$?
+		echo -e "$retour\\n"
+		if [ "$retour" == "1" ] ; then
+			comptc=$[comptc+1]
+		fi
+		compt=$[compt+1]
 	done
 	echo -e "\\n\\n"
 }
@@ -30,11 +38,13 @@ echo -e "option choisie : $argu \\n"
 
 #app "/syntax/bad" $argu
 
-app "/typing/good" $argu
+#app "/typing/good" $argu
 
 app "/typing/bad" $argu
 
-app "/exec" $argu
+#app "/exec" $argu
+
+echo -e "\\n\\n($comptc, $compt)\\n"
 
 function compi {
 	name="{$1%.*}"
