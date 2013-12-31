@@ -23,7 +23,7 @@ function app {
 		$pathbin $2 $i #> /dev/null
 		retour=$?
 		echo -e "$retour\\n"
-		if [ "$retour" == "1" ] ; then
+		if [ "$retour" == "2" ] ; then
 			comptc=$[comptc+1]
 		fi
 		compt=$[compt+1]
@@ -40,9 +40,9 @@ echo -e "option choisie : $argu \\n"
 
 #app "/typing/good" $argu
 
-app "/typing/bad" $argu
+#app "/typing/bad" $argu
 
-#app "/exec" $argu
+app "/exec" $argu
 
 echo -e "\\n\\n($comptc, $compt)\\n"
 
