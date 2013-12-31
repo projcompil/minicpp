@@ -4,8 +4,10 @@ path=/home/nm/Documents/tests
 pathbin=/home/nm/Documents/minicpp/minic++
 
 comptc=0
+comptni=0
 compt=0
 retour=0
+
 
 if [ "$1" ==  "p" ]; then
 	argu="--parse-only"
@@ -16,6 +18,7 @@ else
 fi
 
 function app {
+	optionv=$3
 	cd $path/$1
 	echo -e "$1\\n"
 	for i in *.cpp ; do
@@ -23,8 +26,10 @@ function app {
 		$pathbin $2 $i #> /dev/null
 		retour=$?
 		echo -e "$retour\\n"
-		if [ "$retour" == "1" ] ; then
+		if [ $retour == $[optionv-1] ] ; then
 			comptc=$[comptc+1]
+		elif [ $retour == 3 ] ; then
+			comptni=$[comptni+1]
 		fi
 		compt=$[compt+1]
 	done
@@ -36,15 +41,15 @@ echo -e "option choisie : $argu \\n"
 
 #app "/syntax/good" "--parse-only"
 
-#app "/syntax/bad" $argu
+#app "/syntax/bad" $argu 2
 
-#app "/typing/good" $argu
+app "/typing/good" $argu 1
 
-app "/typing/bad" $argu
+app "/typing/bad" $argu 2
 
-#app "/exec" $argu
+app "/exec" $argu 1
 
-echo -e "\\n\\n($comptc, $compt)\\n"
+echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implémenté : $comptni)\\n"
 
 function compi {
 	name="{$1%.*}"

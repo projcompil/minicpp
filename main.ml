@@ -30,6 +30,12 @@ let localisation pos =
   let c = pos.pos_cnum - pos.pos_bol + 1 in
   eprintf "File \"%s\", line %d, characters %d-%d:\n" !ifile l (c-1) c
 
+let doublelocal (p,q) =
+  let l1 = p.pos_lnum in
+  let c1 = p.pos_cnum - p.pos_bol + 1 in
+  let l2 = q.pos_lnum in
+  let c2 = q.pos_cnum - q.pos_bol + 1 in
+	eprintf "L'erreur se trouve entre les lignes %d et %d, commence au caractère %d et se finit au caractère %d :\n" l1 l2 c1 c2
 let () = 
   (* Parsing de la ligne de commande *)
   Arg.parse options (set_file ifile) usage;
@@ -94,13 +100,14 @@ let () =
 	(* Erreur syntaxique. On récupère sa position absolue et on la 
 	   convertit en numéro de ligne *)
 	localisation (fst loc) ;
-	localisation (snd loc) ;
-	eprintf "Erreur dans le typage: %s@.\n" s;
+	(*localisation (snd loc) ;*)
+	doublelocal loc ;
+	eprintf "Erreur dans le typage: %s@." s;
 	exit 1
     | Failure s ->
 	localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur : message :  %s" s;
-	exit 2;
+	exit 3;
     | _ -> 
         localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur.\n";
