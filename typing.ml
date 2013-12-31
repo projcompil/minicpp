@@ -393,7 +393,7 @@ let typproto p env = match p.v with
 								(* à complétér*)
 								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	in let renv = Smap.add (id.rep) prov env in
-				let brenv = Smap.add (id.rep) prov (Smap.add "@typereturn" {rep = "@typereturn" ; typ = tt ; lvl = 1 ; offset = 0 ; byref = false (* à changer *)} envir) in
+				let brenv = Smap.add (id.rep) prov (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir) in
 								(TProto(tt, tqv, tl)), brenv, renv
 							end
 
@@ -608,7 +608,12 @@ let rec typinst i env lvl = match i.v with
 (* debug*1 traiter le cas où l'on doit renovyer une référence et l'expression n'est pas une valeur gauche*)
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env lvl) in 
-				if is_sub_type te.typ (tr.typ) then (TReturn te), env 
+				if is_sub_type te.typ (tr.typ) then 
+					if tr.byref then
+						if is_left_value e env then
+							(TReturn te), env
+						else erreur e.loc "L'expression retournée n'est pas une valeur gauche, alors que le prototype de la fonction stipule qu'elle renvoie une référence.\n"
+					else (TReturn te), env 
 				else erreur e.loc "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction.\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
 		       end
