@@ -347,7 +347,7 @@ let typqident q env lvl bdecl = match q.v with
 						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
 				else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
 		end
-  | Qmeth (st, s) -> failwith "Non implémenté\n"
+  | Qmeth (st, s) -> failwith "Non implémenté (méthode d'une classe).\n"
 
 module Sset = Set.Make(String)
 
@@ -360,7 +360,6 @@ let find_duplicate liste =
 	in auxd liste (Sset.empty)
 
 
-(* ******************************* Non implémenté ************************* *)
 
 
 let rec typqvar v env lvl bdecl = match v.v with
@@ -399,10 +398,10 @@ let typproto p env = match p.v with
 							end
 
 
-					| TQmeth(s,id) -> failwith "Non implémenté\n"
+					| TQmeth(s,id) -> failwith "Non implémenté (méthode de classe).\n"
 				end
-	| Pcons (s, l) -> failwith "Non implémenté\n"
-	| Pconshc (s, s2, l) -> failwith "Non implémenté\n"
+	| Pcons (s, l) -> failwith "Non implémenté (prototype constructeur).\n"
+	| Pconshc (s, s2, l) -> failwith "Non implémenté (définition du constructeur).\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
@@ -429,15 +428,14 @@ let rec typdecl_v dv env lvl = match dv.v with
 
 
 let typmembre m env = match m.v with
-	| Mvar dv -> failwith "Non implémenté\n"
-	| Mmeth (b, p) -> failwith "Non implémenté\n" 
+	| Mvar dv -> failwith "Non implémenté (membre non implémenté).\n"
+	| Mmeth (b, p) -> failwith "Non implémenté (prototype méthode non implémenté).\n" 
 
 
 let typdecl_c dc env lvl = match dc.v with
-  | Class (s, sup, l) -> failwith "Non implémenté\n" 
+  | Class (s, sup, l) -> failwith "Non implémenté (déclaration d'une classe)\n" (* ajouter dans l'environnement ? *) 
   
 
-(* ***********************Fin Non implémenté ************************* *)
 
 let rec typexpr expr env lvl = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
@@ -458,8 +456,8 @@ let rec typexpr expr env lvl = match expr.v with
 				| _ -> erreur expr.loc "Déférencement d'une expression qui n'est pas un pointeur.\n"
 			end
 		   else not_left expr.loc 
-  | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
-  | Esderef (e,s) -> failwith "Expression non encore implémentée.\n"(* let te = typexpr e env lvl in
+  | Eattr (e,s)-> failwith "Expression non encore implémentée (attribut d'une expression).\n"
+  | Esderef (e,s) -> failwith "Expression non encore implémentée (sderef).\n"(* let te = typexpr e env lvl in
 			match te.typ with
 				| Tpointeur (TClass s) -> {} *)
 | Eassign (e,f)-> if (is_left_value e env) then
@@ -474,12 +472,12 @@ let rec typexpr expr env lvl = match expr.v with
   | Efcall (e, l)-> let te = typexpr e env lvl in begin
 			let tl = List.map (fun x -> typexpr x env lvl) l in
 			match te.c with
-				| TEqident (TQident i) -> failwith "non implemented"
-				| TEqident (TQmeth(_)) -> failwith "Non implémenté.\n" 
+				| TEqident (TQident i) -> failwith "Non implementé (appel de fonction).\n"
+				| TEqident (TQmeth(_)) -> failwith "Non implémenté (méthode fonction).\n" 
 				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
 		end
 
-  | Enew (nc, l) ->failwith "Expression non encore implémentée.\n"
+  | Enew (nc, l) ->failwith "Expression non encore implémentée (new)\n"
   | Elincr e-> if is_left_value e env then
                         let te = typexpr e env lvl in begin match te.typ with 
                                 | Tint-> {c = TElincr te ; typ = Tint }
@@ -567,7 +565,7 @@ let rec typinst i env lvl = match i.v with
 									else erreur e.loc "Cette expression n'est pas une valeur gauche, mais est pourtant assignée à une référence.\n"
 							else erreur e.loc "Cette expression n'est pas d'un type qui est sous-type du type de déclaration de la variable.\n"
 					else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
-	| Ideclobj (tdef, v, s, l)-> failwith "non implémenté"
+	| Ideclobj (tdef, v, s, l)-> failwith "non implémenté (assignation objet retour constructeur)."
  	| If (e, ins)-> let te = typexpr e env lvl in
 				if te.typ = Tint then
 					let (tins,envir) = typinst ins env lvl in

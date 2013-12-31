@@ -96,16 +96,16 @@ let () =
 	localisation (fst loc) ;
 	localisation (snd loc) ;
 	print_string s ;
-	eprintf "Erreur dans le typage@.";
+	eprintf "Erreur dans le typage.\n";
 	exit 1
     | Failure s ->
 	localisation (Lexing.lexeme_start_p buf);
-        eprintf "Erreur du compilateur.";
+        eprintf "Erreur du compilateur : message :  ";
 	print_string s ;
 	exit 2;
     | _ -> 
         localisation (Lexing.lexeme_start_p buf);
-        eprintf "Erreur du compilateur.";
+        eprintf "Erreur du compilateur.\n";
         exit 2
     (*| Interp.Error s-> 
 	(* Erreur pendant l'interprétation *)
