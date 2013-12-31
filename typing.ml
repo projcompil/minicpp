@@ -384,7 +384,7 @@ let rec add_args l (*lvl*) env = match l with
 let typproto p env = match p.v with
 	| Proto (t, qv, l) -> let tt = typtypedef t in
 				let tqv = typqvar qv env 0 true in
-				   let (tl, envir) = add_args l env in
+				   let (tl, envir) = add_args l env in (*debug mandelbrot : on doit rajouter les arguments après et pas dans enivr*)
 				   let tqid = extract_tqvar tqv in begin
 				   match tqid with
 					| TQident id -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
@@ -392,8 +392,9 @@ let typproto p env = match p.v with
 							else begin
 								Hashtbl.add table_f id.rep (tt, tl) ;
 								(* à complétér*)
-								let renv = Smap.add (id.rep) { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} envir in
-				let brenv = (Smap.add "@typereturn" {rep = "@typereturn" ; typ = tt ; lvl = 1 ; offset = 0 ; byref = false (* à changer *)} renv) in
+								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
+	in let renv = Smap.add (id.rep) prov env in
+				let brenv = Smap.add (id.rep) prov (Smap.add "@typereturn" {rep = "@typereturn" ; typ = tt ; lvl = 1 ; offset = 0 ; byref = false (* à changer *)} envir) in
 								(TProto(tt, tqv, tl)), brenv, renv
 							end
 
