@@ -461,7 +461,8 @@ let rec typexpr expr env lvl = match expr.v with
   | Esderef (e,s) -> failwith "Expression non encore implémentée.\n"(* let te = typexpr e env lvl in
 			match te.typ with
 				| Tpointeur (TClass s) -> {} *)
-  | Eassign (e,f)-> if (is_left_value e env) then
+(* debu*lazy1 *)  
+| Eassign (e,f)-> if (is_left_value e env) then
 			let te = typexpr e env lvl and tf = typexpr f env lvl in
 				if is_sub_type tf.typ te.typ then
 					if is_num te.typ then
@@ -552,12 +553,13 @@ let rec typinst i env lvl = match i.v with
 				if is_bf tt then
 			    	let tv, envir = (typvar v env lvl tt) in
 					(TIdecl(tt, tv)), envir
-				else erreur i.loc "Déclaration d'une variable de type non bien formé.œ\n"
+				else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
+	(*debug*lazy1*)
 	| Ideclinit (tdef, v, e) -> (* vérifier si v est une référence, que e est une valeur gauche *) 				let tt = typtypedef tdef in
 					if is_bf tt then
                             	    		let tv, envir = (typvar v env lvl tt) in
 						let te = typexpr e env lvl in
-							if is_sub_type te.typ tt then
+							if is_sub_type te.typ tv.typ then
 								if not(tvar_by_ref tv) then
 									(TIdeclinit(tt, tv,te)), envir
 								else
