@@ -34,7 +34,7 @@ echo -e "option choisie : $argu \\n"
 
 app "/typing/bad" $argu
 
-#app "/exec" $argu
+app "/exec" $argu
 
 function compi {
 	name="{$1%.*}"

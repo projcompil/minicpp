@@ -394,7 +394,7 @@ let typproto p env = match p.v with
 								(* à complétér*)
 								let renv = Smap.add (id.rep) { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = false } envir in
 				let brenv = (Smap.add "@typereturn" {rep = "@typereturn" ; typ = tt ; lvl = 1 ; offset = 0 ; byref = false (* à changer *)} renv) in
-								(TProto(tt, tqv, tl)), renv, brenv
+								(TProto(tt, tqv, tl)), brenv, renv
 							end
 
 
@@ -558,7 +558,12 @@ let rec typinst i env lvl = match i.v with
                             	    		let tv, envir = (typvar v env lvl tt) in
 						let te = typexpr e env lvl in
 							if is_sub_type te.typ tt then
-								(TIdeclinit(tt, tv,te)), envir
+								if not(tvar_by_ref tv) then
+									(TIdeclinit(tt, tv,te)), envir
+								else
+									if is_left_value e env then
+										(TIdeclinit(tt, tv,te)), envir
+									else erreur e.loc "Cette expression n'est pas une valeur gauche, mais est pourtant assignée à une référence.\n"
 							else erreur e.loc "Cette expression n'est pas d'un type qui est sous-type du type de déclaration de la variable.\n"
 					else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
 	| Ideclobj (tdef, v, s, l)-> failwith "non implémenté"
