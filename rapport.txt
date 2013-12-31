@@ -23,6 +23,12 @@ Le lexer hack consiste simplement en une Hashtbl dans un module séparé, afin d
 
 V/ Typage
 
+On transforme les arbres de syntaxe abstraites en ajoutant les types pour les expressions, ajoutant d'autres informations pour les identifiants.
 
+On utilise de nombreuses tables de hachage pour mémoriser des informations utiles.
 
-VI/
+On stocke dans l'environnement le type de retour des fonctions, en ajoutant la chaîne chtypereturn = "@typereturn" en clé et le type en champ, afin de pouvoir renvoyer une erreur de typage lorsqu'un return de la fonction renvoie un type qui n'est pas un sous-type du type de la fonction.
+
+VI/ Production de code
+
+On a bien fait attention à rendre les opérateurs && et || paresseux (via un saut conditionnel).

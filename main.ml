@@ -4,7 +4,7 @@
 open Format
 open Lexing
 open Typing
-(*open Compilateur*)
+open Compilateur
 (* Option de compilation, pour s'arrêter à l'issue du parser *)
 let parse_only = ref false
 let type_only = ref false
@@ -70,6 +70,7 @@ let () =
 				exit 0;
 			end
 			else begin
+				compile_fichier tarbre f ;
 				print_string "OK.\n";
 				close_in f ;
 				exit 0;

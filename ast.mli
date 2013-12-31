@@ -32,7 +32,7 @@ type qident = dqident pos
 
 and dqident =
   | Qident of string
-  | Static of string * string
+  | Qmeth of string * string
 
 type qvar = dqvar pos
 
@@ -44,9 +44,9 @@ and dqvar =
 type proto = dproto pos
 
 and dproto =
-  | Plong of typedef * qvar * (arg list)
-  | Pshort of string * (arg list)
-  | Pdouble of string * string * (arg list)
+  | Proto of typedef * qvar * (arg list)
+  | Pcons of string * (arg list)
+  | Pconshc of string * string * (arg list)
 
 type decl_v = ddecl_v pos
 
@@ -105,9 +105,9 @@ type inst = dinst pos
 and dinst =
   | Nothing
   | Iexpr of expr
-  | Idecls of typedef * var
-  | Idecl of typedef * var * expr
-  | Aidecl of typedef * var * string * (expr list)
+  | Idecl of typedef * var
+  | Ideclinit of typedef * var * expr
+  | Ideclobj of typedef * var * string * (expr list)
   | If of expr * inst
   | Ifelse of expr * inst * inst
   | While of expr * inst
