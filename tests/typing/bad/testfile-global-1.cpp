@@ -1,3 +1,0 @@
-void v;
-int main() { }
-
