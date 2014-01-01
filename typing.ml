@@ -67,7 +67,7 @@ type texpr = tdexpr atype
 and tdexpr  =
   | TEint of int
   | TEthis
-  | TEbool of bool
+  (*| TEbool of bool*)
   | TEnull
   | TEqident of tqident
   | TEpointeur of texpr
