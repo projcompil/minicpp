@@ -134,7 +134,7 @@ type environnement = (*typ*) ident Smap.t
 
 let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles et de valeurs de retour possibles  pour prendre en compte la surcharge *)
 
-Hashtbl.add table_f "" ((false,Tnull,[]):(bool * typ * (targ list))) ;;
+Hashtbl.add table_f "" ((0,false,Tnull,[]):(int * bool * typ * (targ list))) ;;
 
 let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
 
@@ -148,7 +148,7 @@ let table_c_member = (Hashtbl.create 17) ;;
 let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
 let junk2 = Hashtbl.create 17 ;;
 
-Hashtbl.add junk1 "" ((false, Tnull, []):(bool * typ * (targ list))) ;;
+Hashtbl.add junk1 "" ((0, false, Tnull, []):(int * bool * typ * (targ list))) ;;
 
 Hashtbl.add junk2 "" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;
 
@@ -254,6 +254,15 @@ let rec extract_tqvar tqv = match tqv with
 	| TQvar q -> q
 	| TQpo tqva | TQad tqva -> extract_tqvar tqva
 
+let add_f f t b l =
+	let lf = Hashtbl.find_all table_f f in
+		Hashtbl.add table_f f ((begin
+		match lf with
+                	| [] -> 0
+			| (i, _, _, _)::l -> (i+1)
+		end
+		), b, t, l)
+
 let add_meth c m l =
 	Hashtbl.add (Hashtbl.find table_c_meth c) m l
 
@@ -288,7 +297,7 @@ let rec egal_sign l1 l2 =
 
 let rec f_is_in_list l lsf = match lsf with
 	| [] -> false
-	| (b, tt, lg)::lsf -> (egal_sign l lg) || (f_is_in_list l lsf)
+	| (i,b, tt, lg)::lsf -> (egal_sign l lg) || (f_is_in_list l lsf)
 
 
 let rec fit_types l la = match (l, la) with
@@ -298,12 +307,12 @@ let rec fit_types l la = match (l, la) with
 	| (x::l), (TArg(t,v)::la) -> (is_sub_type x (v.typ) (* tt *)) && (fit_types l la)
 
 let scan_lf l lf =
-	let rec auxscan lf i = match lf with
+	let rec auxscan lf = match lf with
 		| [] -> None
-		| (b, tt,la)::lf -> if fit_types l la then
-				Some(la, i, tt, b)
-			    else auxscan lf (i+1)
-	in auxscan lf 0
+		| (ni, b, tt,la)::lf -> if fit_types l la then
+				Some(la, ni, tt, b)
+			    else auxscan lf
+	in auxscan lf
 
 (* ******************************************************************************* *)
 
@@ -419,7 +428,7 @@ let typproto p env = match p.v with
 					| TQident id -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
 							else begin
-								Hashtbl.add table_f id.rep ((tqvar_by_ref tqv), tt, tl) ;
+								add_f id.rep tt (tqvar_by_ref tqv) tl ;
 								(* à complétér*)
 								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	in let renv = Smap.add (id.rep) prov env in
@@ -702,9 +711,9 @@ let typfichier f =
                                         tdecls= (auxtfichier ((f.v).decls) Smap.empty) } in
 			match (Hashtbl.find_all table_f "main") with
 				| [] -> erreur f.loc "Il n'y a pas de fonction main déclarée dans le fichier.\n"
-				| [ (_,Tint, []) ]-> tf
-				| [ (_, _, []) ]-> erreur f.loc "L'unique fonction main du fichier n'est pas de type int.\n"
-				| [ (_ ,Tint, _) ] -> erreur f.loc "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé en Mini-C++.\n"
+				| [ (_,_,Tint, []) ]-> tf
+				| [ (_,_, _, []) ]-> erreur f.loc "L'unique fonction main du fichier n'est pas de type int.\n"
+				| [ (_,_ ,Tint, _) ] -> erreur f.loc "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé en Mini-C++.\n"
 
 				| _ -> erreur f.loc "Il y a plusieurs fonctions main déclarées au sein du fichier.\n"
 
