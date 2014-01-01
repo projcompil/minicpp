@@ -380,14 +380,14 @@ let typqident q env lvl bdecl = match q.v with
 				if not bdecl then
 					if tid.lvl <= lvl then
 						TQident tid
-					else erreur q.loc  ("L'identifiant " ^ s ^ " : not in scope.")
+					else erreur q.loc  ("L'identifiant " ^ s ^ "  n'est pas à porté.\n")
 				else
 					if tid.lvl <> lvl then
 						TQident tid
 					else erreur q.loc ("Impossible de redéfinir l'identifiant " ^ s ^"qui a déjà été défini au même niveau.\n")
 		      with Not_found -> if bdecl || (Hashtbl.mem table_f s) then
 						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
-				else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
+				else erreur q.loc ("L'identifiant " ^ s ^ " n'est pas à porté.\n")
 		end
   | Qmeth (st, s) -> failwith "Non implémenté (méthode d'une classe).\n"
 
