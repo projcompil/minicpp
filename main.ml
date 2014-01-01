@@ -3,8 +3,6 @@
 
 open Format
 open Lexing
-open Typing
-open Compilateur
 (* Option de compilation, pour s'arrêter à l'issue du parser *)
 let parse_only = ref false
 let type_only = ref false
@@ -20,7 +18,9 @@ let options =
   ["--parse-only", Arg.Set parse_only, 
    "  Pour ne faire uniquement que la phase d'analyse syntaxique" ; 
    "--type-only", Arg.Set type_only ,
-   "  Pour ne faire que les phases d'analyse syntaxique et de typage"]
+   "  Pour ne faire que les phases d'analyse syntaxique et de typage" ;
+   "-o", Arg.String (set_file ofile), 
+   "<file>  Pour indiquer le mom du fichier de sortie"]
 
 let usage = "usage: minic++ [option] file.cpp"
 
@@ -50,6 +50,7 @@ let () =
     exit 1
   end;
 
+  if !ofile="" then ofile := Filename.chop_suffix !ifile ".exp" ^ ".s";
   (* Ouverture du fichier source en lecture *)
   let f = open_in !ifile in
     
@@ -63,25 +64,19 @@ let () =
        La fonction Lexer.token est utilisée par Parser.prog pour obtenir 
        le prochain token. *)
     let p = Parser.fichier Lexer.token buf in
+	close_in f ;
        	(* On s'arrête ici si on ne veut faire que le parsing *)
-   	if !parse_only then begin
-		close_in f ;
-		exit 0;
-	end
-   	else begin
-		let tarbre = Typing.typfichier p in
-   			if !type_only then begin
-				print_string "Typage correct\n";
-				close_in f ;
-				exit 0;
-			end
+   	if !parse_only then 
+		exit 0
+   	else let tarbre = Typing.typfichier p in
+   			if !type_only then
+				(*print_string "Typage correct\n";*)
+				exit 0
 			else begin
-				compile_fichier tarbre !ifile ;
-				print_string "OK.\n";
-				close_in f ;
+				Compilateur.compile_fichier tarbre !ofile ;
+				(*print_string "OK.\n";*)
 				exit 0;
 			end
-	end
        	(*Interp.prog p *)
   with
     | Lexer.Lexing_error c -> 
