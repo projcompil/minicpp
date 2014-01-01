@@ -100,7 +100,7 @@ type tinst =
   | TIdecl of typ * tvar
   | TIdeclinit of typ * tvar * texpr
   | TIdeclobj of typ * tvar * string * (texpr list)
-  | TIf of texpr * tinst
+  (*| TIf of texpr * tinst*)
   | TIfelse of texpr * tinst * tinst
   | TWhile of texpr * tinst
   | TFor of (texpr list) * texpr * (texpr list) * tinst
@@ -612,7 +612,7 @@ let rec typinst i env lvl = match i.v with
  	| If (e, ins)-> let te = typexpr e env lvl in
 				if te.typ = Tint then
 					let (tins,envir) = typinst ins env lvl in
-						(TIf (te, tins)), env
+						(TIfelse (te, tins, TNothing)), env
 				else erreur e.loc "L'expression à l'intérieur du if n'est pas entière.\n"
 	| Ifelse (e, ins1, ins2) -> let te = typexpr e env lvl in
                                				if te.typ = Tint then
