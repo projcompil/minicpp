@@ -254,14 +254,17 @@ let rec extract_tqvar tqv = match tqv with
 	| TQvar q -> q
 	| TQpo tqva | TQad tqva -> extract_tqvar tqva
 
-let add_f f t b l =
+let add_func tab f t b l =
 	let lf = Hashtbl.find_all table_f f in
-		Hashtbl.add table_f f ((begin
-		match lf with
-                	| [] -> 0
-			| (i, _, _, _)::l -> (i+1)
-		end
-		), b, t, l)
+                Hashtbl.add table_f f ((begin
+                match lf with
+                        | [] -> 0
+                        | (i, _, _, _)::l -> (i+1)
+                end
+                ), b, t, l)	
+
+let add_f f t b l =
+	add_func table_f f t b l
 
 let add_meth c m l =
 	Hashtbl.add (Hashtbl.find table_c_meth c) m l
