@@ -33,6 +33,9 @@ let nopp = { text = nop ; data = nop } (* petit raccourci *)
 let rate s =
 	failwith ("Compilation non impléméntée : " ^ s)
 
+let addp a b =
+	{ text = a.text ++ b.text ; data = a.data ++ b.data }
+
 (* ***************** *)
 
 let rec concatene l = List.fold_left (++) nop l (*function
@@ -101,7 +104,7 @@ let rec iter n code = if n=0 then nop
 			(iter (n - 1) code)
 
 
-let code_inst lvl ti = match ti with
+let rec code_inst lvl ti = match ti with
 	| TNothing -> nopp
   	| TIexpr te -> { text = (code_expr lvl te) ; data = nop }
   	| TIdecl (tt, tv) -> rate "" 
@@ -109,7 +112,9 @@ let code_inst lvl ti = match ti with
   	| TIdeclobj (tt, tv, s, tl) -> rate "" 
   	| TIf (te, ti) -> rate ""
   	| TIfelse (te, ti, tj) -> rate ""
-  	| TWhile (te, ti) -> rate ""
+  	| TWhile (te, ti) -> let (lab1, lab2) = next_labd nloop in
+				let ci = code_inst lvl ti in
+				{ text = (code_expr lvl te) ++ (beqz a0 lab2) ++ ci.text ++ (b lab1) ; data = ci.data }
   	| TFor (tl1, e, tl2, ti) -> rate ""
   	| TIbloc tb -> rate ""
   	| TCout tls -> conca (List.map (code_cout_expr_str lvl) tls)
