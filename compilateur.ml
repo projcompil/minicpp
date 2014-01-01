@@ -25,6 +25,14 @@ let next_labd (r, s1, s2) =
 	let a = string_of_int !r in
 		(s1 ^ a), (s2 ^ a)
 
+let get_lab (r,s) =
+	s ^ (string_of_int !r)
+
+let nopp = { text = nop ; data = nop } (* petit raccourci *)
+
+let rate s =
+	failwith ("Compilation non impléméntée : " ^ s)
+
 (* ***************** *)
 
 let rec concatene l = List.fold_left (++) nop l (*function
@@ -33,7 +41,7 @@ let rec concatene l = List.fold_left (++) nop l (*function
   | x::l -> x ++ (concatene l)*)
 
 let rec conca = function
-  | [] -> { text = nop ; data = nop }
+  | [] -> nopp 
   | x::l -> let reste = conca l in
 		{ text = x.text ++ reste.text ; data = x.data ++ reste.data }
 
@@ -75,8 +83,8 @@ let rec code_expr lvl const = match const.c with
 
 
 
-let code_expr_str lvl (*env*) e = match e with
-	| TEsexpr te -> { text = (code_expr lvl te) ++ (li v0 1) ; data = nop }
+let code_cout_expr_str lvl (*env*) e = match e with
+	| TEsexpr te -> { text = (code_expr lvl te) ++ (li v0 1) ++ (syscall) ; data = nop }
 	| TEstring s -> let lab = next_lab nstring in
 				{ text = (la a0 alab lab) ++ (li v0 4) ++ (syscall) ; 
 				data = (label lab) ++ (asciiz s) }
@@ -86,10 +94,31 @@ let code_expr_str lvl (*env*) e = match e with
    		(move t1 fp) ++ 
    		iter (lvl - l) ++ (lw t1  (8,t1)); 
 *)
+
 let rec iter n code = if n=0 then nop 
 		      else 
 			code ++
 			(iter (n - 1) code)
+
+
+let code_inst lvl ti = match ti with
+	| TNothing -> nopp
+  	| TIexpr te -> { text = (code_expr lvl te) ; data = nop }
+  	| TIdecl (tt, tv) -> rate "" 
+  	| TIdeclinit (tt, tv, te) -> rate ""
+  	| TIdeclobj (tt, tv, s, tl) -> rate "" 
+  	| TIf (te, ti) -> rate ""
+  	| TIfelse (te, ti, tj) -> rate ""
+  	| TWhile (te, ti) -> rate ""
+  	| TFor (tl1, e, tl2, ti) -> rate ""
+  	| TIbloc tb -> rate ""
+  	| TCout tls -> conca (List.map (code_cout_expr_str lvl) tls)
+  	| TReturn te -> rate ""
+  	| TAreturn -> rate ""
+
+
+and code_bloc (TBloc tli) = rate ""
+
 
 
 let code_fichier tf =

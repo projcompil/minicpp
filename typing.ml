@@ -104,7 +104,7 @@ type tinst =
   | TIfelse of texpr * tinst * tinst
   | TWhile of texpr * tinst
   | TFor of (texpr list) * texpr * (texpr list) * tinst
-  | TAfor of (texpr list) * (texpr list) * tinst
+  (*| TAfor of (texpr list) * (texpr list) * tinst*)
   | TIbloc of tbloc
   | TCout of texpr_str list
   | TReturn of texpr
