@@ -15,10 +15,15 @@ type envchaine = int Smap.t (* ou une table de Hash, cela éviterait de prendre 
 
 (* ***************** *)
 
-let rec concatene = function
+let rec concatene l = List.fold_left (++) nop l (*function
   | [] -> nop 
   | x::y::[] -> x ++ y
-  | x::l -> x ++ (concatene l)
+  | x::l -> x ++ (concatene l)*)
+
+let rec conca = function
+  | [] -> { text = nop ; data = nop }
+  | x::l -> let reste = conca l in
+		{ text = x.text ++ reste.text ; data = x.data ++ reste.data }
 
 let associe_opar op = match op with
 	| Add -> add
