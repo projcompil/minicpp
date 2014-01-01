@@ -148,7 +148,7 @@ let table_c_member = (Hashtbl.create 17) ;;
 let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
 let junk2 = Hashtbl.create 17 ;;
 
-Hashtbl.add junk1 "" ((Tnull,[]):(typ * (targ list))) ;;
+Hashtbl.add junk1 "" ((false, Tnull, []):(bool * typ * (targ list))) ;;
 
 Hashtbl.add junk2 "" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;
 
@@ -281,7 +281,7 @@ let type_of_tqident tq = match tq with
 
 let rec signaturef l = match l with
 	| [] -> []
-	| (TArg(tt, v))::l -> tt::(signaturef l)
+	| (TArg(tt, v))::l -> (v.typ)::(signaturef l) (* ou remplacer par t:: *)
 
 let rec egal_sign l1 l2 =
 	(signaturef l1) = (signaturef l2) (* on peut faire plus efficace en parcourant les deux listes en même temps *)
@@ -295,7 +295,7 @@ let rec fit_types l la = match (l, la) with
 	| [], [] -> true
 	| [], _ -> false
 	| _, [] -> false
-	| (x::l), (TArg(t,v)::la) -> (is_sub_type x t) && (fit_types l la)
+	| (x::l), (TArg(t,v)::la) -> (is_sub_type x (v.typ) (* tt *)) && (fit_types l la)
 
 let scan_lf l lf =
 	let rec auxscan lf i = match lf with
@@ -480,12 +480,13 @@ let rec typexpr expr env lvl = match expr.v with
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> let tq = typqident q env lvl false in { c = TEqident tq ; typ = (type_of_tqident tq)}
-  | Epointeur e -> if is_left_value e env then
-			let te = typexpr e env lvl in begin match te.typ with 
-				| Tpointeur t -> {c = TEpointeur te ; typ = t }
-				| _ -> erreur expr.loc "Déférencement d'une expression qui n'est pas un pointeur.\n"
-			end
-		   else not_left expr.loc 
+  | Epointeur e -> let te = typexpr e env lvl in 
+			if is_left_tvalue te env then 
+				begin match te.typ with 
+					| Tpointeur t -> {c = TEpointeur te ; typ = t }
+					| _ -> erreur expr.loc "Déférencement d'une expression qui n'est pas un pointeur.\n"
+				end
+		   	else not_left expr.loc 
   | Eattr (e,s)-> failwith "Expression non encore implémentée (attribut d'une expression).\n"
   | Esderef (e,s) -> failwith "Expression non encore implémentée (sderef).\n"(* let te = typexpr e env lvl in
 			match te.typ with
@@ -516,26 +517,30 @@ let rec typexpr expr env lvl = match expr.v with
 		end
 
   | Enew (nc, l) ->failwith "Expression non encore implémentée (new)\n"
-  | Elincr e-> if is_left_value e env then
-                        let te = typexpr e env lvl in begin match te.typ with 
+  | Elincr e-> let te = typexpr e env lvl in 
+		if is_left_tvalue te env then
+			begin match te.typ with 
                                 | Tint-> {c = TElincr te ; typ = Tint }
                                 | _ -> erreur expr.loc "Incrémentation à gauche d'une expression non entière.\n"
                         end
 	       else not_left expr.loc
-  | Eldecr e -> if is_left_value e env then
-                        let te = typexpr e env lvl in begin match te.typ with
+  | Eldecr e -> let te = typexpr e env lvl in
+		if is_left_tvalue te env then
+			begin match te.typ with
                                 | Tint-> {c = TEldecr te ; typ = Tint }
                                 | _ -> erreur expr.loc "Décrémentation à gauche d'une expression non entière.\n"
                         end
                 else not_left expr.loc 
-  | Erincr e -> if is_left_value e env then
-                        let te = typexpr e env lvl in begin match te.typ with
+  | Erincr e -> let te = typexpr e env lvl in
+                if is_left_tvalue te env then
+                        begin match te.typ with
                                 | Tint-> {c = TErincr te ; typ = Tint }
                                 | _ -> erreur expr.loc "Incrémentation à droite d'une expression non entière.\n"
                         end
                 else not_left expr.loc
-  | Erdecr e -> if is_left_value e env then
-                        let te = typexpr e env lvl in begin match te.typ with
+  | Erdecr e -> let te = typexpr e env lvl in
+                if is_left_tvalue te env then
+                        begin match te.typ with
                                 | Tint-> {c = TErdecr te ; typ = Tint }
                                 | _ -> erreur expr.loc "Décrémentation à droite d'une expression non entière.\n"
                         end
