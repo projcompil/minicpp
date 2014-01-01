@@ -11,7 +11,7 @@ open Ast
 let ntest = (ref 0), "_sortielazy"
 let nstring = (ref 0), "_chaine"
 let nif = (ref 0), "_else", "_sortiecond"
-let nloop = (ref 0), "_entreeloop", "_sortieloop"
+let nloop = (ref 0), "_entreeloop", "_testloop"
 
 type envchaine = int Smap.t (* ou une table de Hash, cela éviterait de prendre en compte cela partout *)
 
@@ -65,7 +65,7 @@ let associe_oplog op = match op with
 	| Neq -> sne
 	| _ -> failwith "Opération logique attendue par associe_oplog\n"
 
-let rec code_expr lvl const = match const.c with
+let rec code_expr lvl texpr = match texpr.c with
         | TEint i -> li a0  i
 	| TEop (Mod, te, tf) -> 
 		(code_expr lvl te) ++ (push a0) ++
@@ -82,6 +82,7 @@ let rec code_expr lvl const = match const.c with
 		(code_expr lvl te) ++ (push a0) ++
 		(code_expr lvl tf) ++ (pop t1) ++ 
 		((associe_oplog op) a0 t1 a0)
+	| TEpar te -> code_expr lvl te
 	| _ ->  rate "Compilation de cette partie non encore implémentée.\n"
 
 
@@ -117,10 +118,10 @@ let rec code_inst lvl ti = match ti with
 						{ text = (code_expr lvl te) ++ (bnez a0 lab1) ++ ci.text ++ (b lab2) ++ (label lab1)  ++ cj.text ++ (label lab2) ; data = ci.data ++ cj.data }
   	| TWhile (te, ti) -> let (lab1, lab2) = next_labd nloop in
 				let ci = code_inst lvl ti in
-				{ text = (label lab1) ++ (code_expr lvl te)  ++ (beqz a0 lab2) ++ ci.text ++ (b lab1) ++ (label lab2) ; data = ci.data }
+				{ text = (b lab2) ++ (label lab1) ++ ci.text ++  (label lab2) ++ (code_expr lvl te) ++ (bnez a0 lab1) ; data = ci.data }
   	| TFor (tl1, te, tl2, ti) -> let (lab1, lab2) = next_labd nloop in
                                 	let ci = code_inst lvl ti in
-						{ text = (concatene (List.map (code_expr lvl) tl1)) ++ (label lab1) ++ (code_expr lvl te)  ++ (beqz a0 lab2) ++ ci.text  ++ (concatene (List.map (code_expr lvl) tl2)) ++ (b lab1) ++  (label lab2) ; data = ci.data }
+						{ text = (concatene (List.map (code_expr lvl) tl1)) ++ (b lab2) ++ (label lab1) ++ ci.text ++ (concatene (List.map (code_expr lvl) tl2)) ++  (label lab2) ++ (code_expr lvl te) ++ (bnez a0 lab1) ; data = ci.data }
   	| TIbloc (TBloc tl) -> conca (List.map (code_inst (lvl+1)) tl)
   	| TCout tls -> conca (List.map (code_cout_expr_str lvl) tls)
   	| TReturn te -> rate ""
