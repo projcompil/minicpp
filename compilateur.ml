@@ -10,6 +10,8 @@ open Ast
 
 let ntest = ref 0
 let nstring = ref 0
+let nif = ref 0
+let nloop = ref 0
 
 type envchaine = int Smap.t (* ou une table de Hash, cela éviterait de prendre en compte cela partout *)
 
@@ -79,6 +81,9 @@ let rec iter n code = if n=0 then nop
 			(iter (n - 1) code)
 
 
+let code_fichier tf =
+	failwith "Compilation non implémentée.\n"
 
 let compile_fichier tf f =
-	() (* A faire *)
+	let cf = code_fichier tf in
+		print_in_file f cf
