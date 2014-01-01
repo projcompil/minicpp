@@ -266,8 +266,8 @@ let add_func tab f t b l =
 let add_f f t b l =
 	add_func table_f f t b l
 
-let add_meth c m l =
-	Hashtbl.add (Hashtbl.find table_c_meth c) m l
+let add_meth c m t b l =
+	add_func (Hashtbl.find table_c_meth c) m t b l
 
 let find_meth c m =
 	Hashtbl.find (Hashtbl.find table_c_meth c) m
