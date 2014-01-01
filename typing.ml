@@ -74,7 +74,7 @@ and tdexpr  =
   | TEattr of texpr * ident
   | TEsderef of texpr * ident 
   | TEassign of texpr * texpr
-  | TEfcall of texpr * (texpr list) * int
+  | TEfcall of texpr * (texpr list) * int * bool
   | TEnew of string * (texpr list)
   | TElincr of texpr
   | TEldecr of texpr
@@ -134,7 +134,7 @@ type environnement = (*typ*) ident Smap.t
 
 let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles et de valeurs de retour possibles  pour prendre en compte la surcharge *)
 
-Hashtbl.add table_f "" ((Tnull,[]):(typ * (targ list))) ;;
+Hashtbl.add table_f "" ((false,Tnull,[]):(bool * typ * (targ list))) ;;
 
 let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
 
@@ -203,12 +203,27 @@ let rec is_bf t = match t with
 
 let rec is_left_value e (env:environnement) = match e.v with
 	| Eqident ex -> begin match ex.v with
-				| Qident s -> Smap.mem s env
+				| Qident s -> begin try 
+						let id = Smap.find s env in
+							(id.typ <> Fonc) || id.byref
+					      with Not_found -> false
+					      end
 				| Qmeth _ -> false	
 			end  
 	| Epointeur _ | Esderef _ | Eattr _ -> true
 	| Epar ex -> is_left_value ex env
-	| _ -> false  (* y en a-t-ul d'autres ? *)
+	| _ -> false  (* y en a-t-il d'autres ? *)
+
+
+let rec is_left_tvalue te env = match te.c with
+        | TEqident ex -> begin match ex with
+                                | TQident id -> (id.typ <> Fonc) || (id.byref)
+                                | TQmeth _ -> false
+                        end
+        | TEpointeur _ | TEsderef _ | TEattr _ -> true
+	| TEfcall(_,_,_, b) -> b
+        | TEpar ex -> is_left_tvalue ex env
+        | _ -> false  (* y en a-t-il d'autres ? *)
 
 let not_left loc =
 (*	erreurloc, "L'expression n'est pas une valeur gauche.\n"))*)
@@ -273,7 +288,7 @@ let rec egal_sign l1 l2 =
 
 let rec f_is_in_list l lsf = match lsf with
 	| [] -> false
-	| (tt, lg)::lsf -> (egal_sign l lg) || (f_is_in_list l lsf)
+	| (b, tt, lg)::lsf -> (egal_sign l lg) || (f_is_in_list l lsf)
 
 
 let rec fit_types l la = match (l, la) with
@@ -285,8 +300,8 @@ let rec fit_types l la = match (l, la) with
 let scan_lf l lf =
 	let rec auxscan lf i = match lf with
 		| [] -> None
-		| (tt,la)::lf -> if fit_types l la then
-				Some(la, i, tt)
+		| (b, tt,la)::lf -> if fit_types l la then
+				Some(la, i, tt, b)
 			    else auxscan lf (i+1)
 	in auxscan lf 0
 
@@ -404,7 +419,7 @@ let typproto p env = match p.v with
 					| TQident id -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
 							else begin
-								Hashtbl.add table_f id.rep (tt, tl) ;
+								Hashtbl.add table_f id.rep ((tqvar_by_ref tqv), tt, tl) ;
 								(* à complétér*)
 								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	in let renv = Smap.add (id.rep) prov env in
@@ -475,15 +490,16 @@ let rec typexpr expr env lvl = match expr.v with
   | Esderef (e,s) -> failwith "Expression non encore implémentée (sderef).\n"(* let te = typexpr e env lvl in
 			match te.typ with
 				| Tpointeur (TClass s) -> {} *)
-| Eassign (e,f)-> if (is_left_value e env) then
-			let te = typexpr e env lvl and tf = typexpr f env lvl in
+| Eassign (e,f)-> let te = typexpr e env lvl in 
+			if is_left_tvalue te env then
+				let tf = typexpr f env lvl in
 				if is_sub_type tf.typ te.typ then
 					if is_num te.typ then
 						{ c = TEassign ( te, tf) ; typ = te.typ }
 					else
 						erreur expr.loc "Le type de la première expression dans l'assignation n'est pas un type numérique.\n"
-				else erreur expr.loc "Le type de la deuxième expression dans l'assignation n'est pas un sous-type du type de la première.\n"
-		    else erreur expr.loc "L'expression n'est pas une valeur gauche.\n"
+			else erreur expr.loc "Le type de la deuxième expression dans l'assignation n'est pas un sous-type du type de la première.\n"
+		    else not_left expr.loc 
   | Efcall (e, l)-> let te = typexpr e env lvl in begin
 			let tl = List.map (fun x -> typexpr x env lvl) l in
 			match te.c with
@@ -491,7 +507,7 @@ let rec typexpr expr env lvl = match expr.v with
 								let lf = Hashtbl.find_all table_f (id.rep) in begin
 				match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lf) with (* ne vas pas : il faut prendre le minimum !!! changer scan_lf i debug*)
 					| None -> erreur e.loc "Aucune fonction n'a une signature conforme aux types des arguments avec laquelle elle est appelée.\n"
-					| Some(f,i,tt) -> { c = TEfcall(te, tl, i) ; typ = tt } (* sûrement une erreur ici dans les cas non triviaux debug *)
+					| Some(f,i,tt, b) -> { c = TEfcall(te, tl, i, b) ; typ = tt } (* sûrement une erreur ici dans les cas non triviaux debug *)
 			  end
 				
 							   else erreur e.loc "Cette expression n'est pas une fonction.\n"
@@ -582,7 +598,7 @@ let rec typinst i env lvl = match i.v with
 								if not(tvar_by_ref tv) then
 									(TIdeclinit(tt, tv,te)), envir
 								else
-									if is_left_value e env then
+									if (is_left_tvalue te env) then
 										(TIdeclinit(tt, tv,te)), envir
 									else erreur e.loc "Cette expression n'est pas une valeur gauche, mais est pourtant assignée à une référence.\n"
 							else erreur e.loc "Cette expression n'est pas d'un type qui est sous-type du type de déclaration de la variable.\n"
@@ -681,9 +697,9 @@ let typfichier f =
                                         tdecls= (auxtfichier ((f.v).decls) Smap.empty) } in
 			match (Hashtbl.find_all table_f "main") with
 				| [] -> erreur f.loc "Il n'y a pas de fonction main déclarée dans le fichier.\n"
-				| [ (Tint, []) ]-> tf
-				| [ (_, []) ]-> erreur f.loc "L'unique fonction main du fichier n'est pas de type int.\n"
-				| [ (Tint, _) ] -> erreur f.loc "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé en Mini-C++.\n"
+				| [ (_,Tint, []) ]-> tf
+				| [ (_, _, []) ]-> erreur f.loc "L'unique fonction main du fichier n'est pas de type int.\n"
+				| [ (_ ,Tint, _) ] -> erreur f.loc "L'unique fonction main du fichier possède des arguments dans son prototype, ce qui n'est pas autorisé en Mini-C++.\n"
 
 				| _ -> erreur f.loc "Il y a plusieurs fonctions main déclarées au sein du fichier.\n"
 
