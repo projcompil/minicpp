@@ -545,10 +545,10 @@ let rec typexpr expr env lvl = match expr.v with
                                 | _ -> erreur expr.loc "Décrémentation à droite d'une expression non entière.\n"
                         end
                 else not_left expr.loc
-  | Eaddr e -> if is_left_value e env then
-			let te = typexpr e env lvl in
+  | Eaddr e -> let te = typexpr e env lvl in
+			if is_left_tvalue te env then
 				{ c = TEaddr te ; typ = Tpointeur(te.typ) }
-	       else not_left expr.loc
+	       		else not_left expr.loc
   | Enot e -> let te = typexpr e env lvl in begin match te.typ with
 		| Tint -> { c = TEnot te ; typ = Tint }
 		| _ -> erreur expr.loc "Négation d'une valeur non entière.\n"
@@ -653,7 +653,7 @@ let rec typinst i env lvl = match i.v with
 			let te = (typexpr e env lvl) in 
 				if is_sub_type te.typ (tr.typ) then 
 					if tr.byref then
-						if is_left_value e env then
+						if is_left_tvalue te env then
 							(TReturn te), env
 						else erreur e.loc "L'expression retournée n'est pas une valeur gauche, alors que le prototype de la fonction stipule qu'elle renvoie une référence.\n"
 					else (TReturn te), env 
