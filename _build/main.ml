@@ -4,7 +4,7 @@
 open Format
 open Lexing
 open Typing
-(*open Compilateur*)
+open Compilateur
 (* Option de compilation, pour s'arrêter à l'issue du parser *)
 let parse_only = ref false
 let type_only = ref false
@@ -30,6 +30,12 @@ let localisation pos =
   let c = pos.pos_cnum - pos.pos_bol + 1 in
   eprintf "File \"%s\", line %d, characters %d-%d:\n" !ifile l (c-1) c
 
+let doublelocal (p,q) =
+  let l1 = p.pos_lnum in
+  let c1 = p.pos_cnum - p.pos_bol + 1 in
+  let l2 = q.pos_lnum in
+  let c2 = q.pos_cnum - q.pos_bol + 1 in
+	eprintf "L'erreur se trouve entre les lignes %d et %d, commence au caractère %d et se finit au caractère %d :\n" l1 l2 c1 c2
 let () = 
   (* Parsing de la ligne de commande *)
   Arg.parse options (set_file ifile) usage;
@@ -70,6 +76,7 @@ let () =
 				exit 0;
 			end
 			else begin
+				compile_fichier tarbre f ;
 				print_string "OK.\n";
 				close_in f ;
 				exit 0;
@@ -93,18 +100,17 @@ let () =
 	(* Erreur syntaxique. On récupère sa position absolue et on la 
 	   convertit en numéro de ligne *)
 	localisation (fst loc) ;
-	localisation (snd loc) ;
-	print_string s ;
-	eprintf "Erreur dans le typage@.";
+	(*localisation (snd loc) ;*)
+	doublelocal loc ;
+	eprintf "Erreur dans le typage: %s@." s;
 	exit 1
     | Failure s ->
 	localisation (Lexing.lexeme_start_p buf);
-        eprintf "Erreur du compilateur.";
-	print_string s ;
-	exit 2;
+        eprintf "Erreur du compilateur : message :  %s" s;
+	exit 3;
     | _ -> 
         localisation (Lexing.lexeme_start_p buf);
-        eprintf "Erreur du compilateur.";
+        eprintf "Erreur du compilateur.\n";
         exit 2
     (*| Interp.Error s-> 
 	(* Erreur pendant l'interprétation *)

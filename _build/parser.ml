@@ -1355,7 +1355,7 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_expr__ : _menhir_env -> '
                   let xs = xs0 in
                       ( xs )
                 in
-                (Aidecl (t,v,s,e) ) in
+                ( Ideclobj (t,v,s,e) ) in
                 _menhir_goto_dinst _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
             | _ ->
                 assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -2967,7 +2967,7 @@ and _menhir_goto_dexpr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dexpr
             let (((_menhir_stack, _menhir_s, t, _startpos_t_), _, v, _endpos_v_), _, e, _startpos_e_, _endpos_e_) = _menhir_stack in
             let _startpos = _startpos_t_ in
             let _endpos = _endpos__5_ in
-            let _v : (Ast.dinst) =                                                 ( Idecl (t,v,e) ) in
+            let _v : (Ast.dinst) =                                                 ( Ideclinit (t,v,e) ) in
             _menhir_goto_dinst _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | TIMES ->
             _menhir_run91 _menhir_env (Obj.magic _menhir_stack) _menhir_env._menhir_startp
@@ -4225,7 +4225,7 @@ and _menhir_goto_dvar : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.dvar) 
             let ((_menhir_stack, _menhir_s, t, _startpos_t_), _, v, _endpos_v_) = _menhir_stack in
             let _startpos = _startpos_t_ in
             let _endpos = _endpos__3_ in
-            let _v : (Ast.dinst) =                                ( Idecls (t,v) ) in
+            let _v : (Ast.dinst) =                                ( Idecl (t,v) ) in
             _menhir_goto_dinst _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -4373,7 +4373,7 @@ and _menhir_run39 : _menhir_env -> 'ttv_tail * _menhir_state * (string) * Lexing
             let (((_menhir_stack, _menhir_s, x, _startpos_x_, _endpos_x_), _startpos__2_), _startpos__3_) = _menhir_stack in
             let _startpos = _startpos_x_ in
             let _endpos = _endpos_y_ in
-            let _v : (Ast.dqident) =                                          (  Static (x,y) ) in
+            let _v : (Ast.dqident) =                                          (  Qmeth (x,y) ) in
             _menhir_goto_dqident _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -4499,7 +4499,7 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_argument__ : _menhir_env 
               let xs = xs0 in
                   ( xs )
             in
-             ( Pshort (x , z)) in
+             ( Pcons (x , z)) in
             _menhir_goto_dproto _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -4525,7 +4525,7 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_argument__ : _menhir_env 
               let xs = xs0 in
                   ( xs )
             in
-               ( Pdouble ( x, y, z) ) in
+               ( Pconshc ( x, y, z) ) in
             _menhir_goto_dproto _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));
@@ -4551,7 +4551,7 @@ and _menhir_goto_loption_separated_nonempty_list_COMMA_argument__ : _menhir_env 
               let xs = xs0 in
                   ( xs )
             in
-             ( Plong ( x, y, z) ) in
+             ( Proto ( x, y, z) ) in
             _menhir_goto_dproto _menhir_env _menhir_stack _menhir_s _v _startpos _endpos
         | _ ->
             assert (Pervasives.(<>) _menhir_env._menhir_shifted (-1));

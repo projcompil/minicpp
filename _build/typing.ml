@@ -184,11 +184,11 @@ let rec is_bf t = match t with
 let rec is_left_value e (env:environnement) = match e.v with
 	| Eqident ex -> begin match ex.v with
 				| Qident s -> Smap.mem s env
-				| Static _ -> false	
+				| _ -> false	 (*ast renvoie Qmeth*)
 			end  
 	| Epointeur _ | Esderef _ | Eattr _ -> true
 	| Epar ex -> is_left_value ex env
-	| _ -> false  (* y en a-t-ul d'autres ? *)
+	| _ -> false  (* y en a-t-il d'autres ? *)
 
 let not_left loc =
 	raise (Error (loc, "L'expression n'est pas une valeur gauche.\n"))
@@ -238,8 +238,16 @@ let typqident q env = match q.v with
 			let tq = Smap.find s env in
 				TQident (s, tq)
 		      with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
-		end
-  | Static (st, s) -> failwith "Non implémenté\n"
+		 end
+  | Qmeth (st, s) -> begin  try   let onsenfou = Hashtbl.mem table_c st in (*ast renvoie Qmeth*)
+  			let  cl = Hashtbl.find table_c st in 
+  				begin try
+					let ty = Smap.find s env in 
+						TStatic (st, { rep = s ; typ = ty  ; lvl = 0 }) (* lvl pose problème si on veut faire une fonction générale comme ça*) 
+				with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
+				end 
+			with Not_found -> raise (Error (q.loc, "L'identifiant " ^ st ^ " : n'est pas une classe."))
+			end
 
 module Sset = Set.Make(String)
 
@@ -255,18 +263,13 @@ let find_duplicate liste =
 (* ******************************* Non implémenté ************************* *)
 
 
-let rec typqvar v env = match v.v with
-	| Qvar q -> failwith "Non implémenté\n"
-	| Qpo qv -> failwith "Non implémenté\n" 
-	| Qad qv -> failwith "Non implémenté\n"
-
 
 (* vérifier les doublons *)
 
 let typproto p env = match p.v with
-	| Plong (t, qv, l) -> failwith "Non implémenté\n"
-	| Pshort (s, l) -> failwith "Non implémenté\n"
-	| Pdouble (s, s2, l) -> failwith "Non implémenté\n"
+	| TPlong (t, qv, l) -> failwith "Non implémenté\n"
+	| TPshort (s, l) -> failwith "Non implémenté\n"
+	| TPdouble (s, s2, l) -> failwith "Non implémenté\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
 let typdecl_v dv env = match dv.v with
@@ -284,7 +287,11 @@ let typdecl_c dc env = match dc.v with
   
 
 (* ***********************Fin Non implémenté ************************* *)
-
+let rec typqvar v env = match v.v with
+	| Qvar q -> TQvar (typqident q env) 
+	| Qpo qv -> TQpo (typqvar qv env)
+	| Qad qv -> TQad (typqvar qv env)
+	
 let rec typexpr expr env = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
   | Ethis -> (*failwith "Expression non encore implémentée.\n"*)
@@ -297,7 +304,7 @@ let rec typexpr expr env = match expr.v with
   			with Not_found -> raise (Error (expr.loc, "Utilisation de this en dehors d'une classe.\n")) end	
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
-  | Eqident q -> failwith "Expression non encore implémentée.\n" (* à faire !!!! *)
+  | Eqident q -> { c = TEqident (typqident q env) ; typ = Tint }
   | Epointeur e -> if is_left_value e env then
 			let te = typexpr e env in begin match te.typ with 
 				| Tpointeur t -> {c = TEpointeur te ; typ = t }
@@ -328,7 +335,8 @@ let rec typexpr expr env = match expr.v with
                                 | Tint-> {c = TEldecr te ; typ = Tint }
                                 | _ -> raise (Error (expr.loc, "Décrémentation à gauche d'une expression non entière.\n"))
                         end
-                else not_left expr.loc 
+                else not_left
+                expr.loc 
   | Erincr e -> if is_left_value e env then
                         let te = typexpr e env in begin match te.typ with
                                 | Tint-> {c = TErincr te ; typ = Tint }
@@ -380,9 +388,9 @@ let rec typexpr expr env = match expr.v with
 let rec typinst i env = match i.v with
 	| Nothing -> TNothing, env
 	| Iexpr e -> TIexpr (typexpr e env), env 
-	| Idecls (tdef, v)-> failwith "non implémenté"
+	(*| Idecls (tdef, v)-> failwith "non implémenté"
 	| Idecl (tdef, v, e) -> failwith "non implémenté"
-	| Aidecl (tdef, v, s, l)-> failwith "non implémenté"
+	| Aidecl (tdef, v, s, l)-> failwith "non implémenté"*)
  	| If (e, ins)-> let te = typexpr e env in
 				if te.typ = Tint then
 					let (tins,envir) = typinst ins env in
@@ -449,11 +457,11 @@ and typbloc bl env = (typdbloc (bl.v) env)
 let typdecl d env = match d.v with
 	| Dv dv -> let (tdv, envir) = typdecl_v dv env in ( TDv tdv), envir
         | Dc dc -> failwith "non implémenté\n"
-        | Db (p, bl) -> let (tp, envir) = typproto p env in
+ (*       | Db (p, bl) -> let (tp, envir) = typproto p env in
 				let tbl = typbloc bl envir in
 					(TDb (tp, tbl)), env 
 
-(*
+
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
 				(TDb (TProtovide, r)), envir
 	|

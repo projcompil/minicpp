@@ -128,11 +128,11 @@ proto:
 | x = position(dproto) { x }
 
 dproto: x = typ ; y = qvar ; LPAR ; z = separated_list(COMMA, argument) ; RPAR 
- { Plong ( x, y, z) }
+ { Proto ( x, y, z) }
  | x = TIDENT ;  LPAR ; z = separated_list(COMMA, argument) ; RPAR 
- { Pshort (x , z)}
+ { Pcons (x , z)}
  | x = TIDENT  ; COLON ; COLON  ; y = TIDENT ; LPAR ; z = separated_list(COMMA, argument) ; RPAR 
-   { Pdouble ( x, y, z) } 
+   { Pconshc ( x, y, z) } 
 ;
 
 typ:
@@ -177,7 +177,7 @@ qident:
 
 dqident:
 | x = IDENT { Qident x }
-| x = TIDENT ; COLON ; COLON ; y = IDENT {  Static (x,y) }
+| x = TIDENT ; COLON ; COLON ; y = IDENT {  Qmeth (x,y) }
 ;
 
 
@@ -223,10 +223,10 @@ vinst: CHEVRON ; e = expr_str { e }
 dinst:
 | SEMICOLON { Nothing }
 | e = expr ; SEMICOLON { Iexpr e }
-| t = typ; v = var ; SEMICOLON { Idecls (t,v) }
-| t = typ; v = var ; ASSIGN; e = expr SEMICOLON { Idecl (t,v,e) }
+| t = typ; v = var ; SEMICOLON { Idecl (t,v) }
+| t = typ; v = var ; ASSIGN; e = expr SEMICOLON { Ideclinit (t,v,e) }
 | t = typ; v = var ; ASSIGN; s = TIDENT ; LPAR; e = separated_list(COMMA, expr) ; RPAR ; SEMICOLON
-{Aidecl (t,v,s,e) }
+{ Ideclobj (t,v,s,e) }
 | IF ; LPAR ; e = expr ; RPAR ; i = inst %prec IFX { If (e,i) }
 | IF ; LPAR ; e = expr ; RPAR ; i = inst ; ELSE ; y = inst 
 {Ifelse (e,i,y) }
