@@ -76,7 +76,7 @@ let () =
 				exit 0;
 			end
 			else begin
-				compile_fichier tarbre !ifile ;
+				compile_fichier tarbre f ;
 				print_string "OK.\n";
 				close_in f ;
 				exit 0;

@@ -203,23 +203,16 @@ let rec is_bf t = match t with
 
 let rec is_left_value e (env:environnement) = match e.v with
 	| Eqident ex -> begin match ex.v with
-<<<<<<< HEAD
-				| Qident s -> Smap.mem s env
-				| _ -> false	 (*ast renvoie Qmeth*)
-=======
 				| Qident s -> begin try 
 						let id = Smap.find s env in
 							(id.typ <> Fonc) || id.byref
 					      with Not_found -> false
 					      end
 				| Qmeth _ -> false	
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
 			end  
 	| Epointeur _ | Esderef _ | Eattr _ -> true
 	| Epar ex -> is_left_value ex env
 	| _ -> false  (* y en a-t-il d'autres ? *)
-<<<<<<< HEAD
-=======
 
 
 let rec is_left_tvalue te env = match te.c with
@@ -231,7 +224,6 @@ let rec is_left_tvalue te env = match te.c with
 	| TEfcall(_,_,_, b) -> b
         | TEpar ex -> is_left_tvalue ex env
         | _ -> false  (* y en a-t-il d'autres ? *)
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
 
 let not_left loc =
 (*	erreurloc, "L'expression n'est pas une valeur gauche.\n"))*)
@@ -372,21 +364,6 @@ let typarg a env = match a.v with
 (* Faux dans certains cas : valeur retour fonction pour qvar --> rajouter argument si type qvar ou non *)
 let typqident q env lvl bdecl = match q.v with
   | Qident s -> begin try
-<<<<<<< HEAD
-			let tq = Smap.find s env in
-				TQident (s, tq)
-		      with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
-		 end
-  | Qmeth (st, s) -> begin  try   let onsenfou = Hashtbl.mem table_c st in (*ast renvoie Qmeth*)
-  			let  cl = Hashtbl.find table_c st in 
-  				begin try
-					let ty = Smap.find s env in 
-						TStatic (st, { rep = s ; typ = ty  ; lvl = 0 }) (* lvl pose problème si on veut faire une fonction générale comme ça*) 
-				with Not_found -> raise (Error (q.loc, "L'identifiant " ^ s ^ " : not in scope."))
-				end 
-			with Not_found -> raise (Error (q.loc, "L'identifiant " ^ st ^ " : n'est pas une classe."))
-			end
-=======
 			let tid = Smap.find s env in
 				if not bdecl then
 					if tid.lvl <= lvl then
@@ -401,7 +378,6 @@ let typqident q env lvl bdecl = match q.v with
 				else erreur q.loc ("L'identifiant " ^ s ^ " : not in scope.")
 		end
   | Qmeth (st, s) -> failwith "Non implémenté (méthode d'une classe).\n"
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
 
 module Sset = Set.Make(String)
 
@@ -416,8 +392,6 @@ let find_duplicate liste =
 
 
 
-<<<<<<< HEAD
-=======
 let rec typqvar v env lvl bdecl = match v.v with
 	| Qvar q -> TQvar (typqident q env lvl bdecl)
 	| Qpo { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible de déclarer un pointeur vers une référence.\n"
@@ -425,7 +399,6 @@ let rec typqvar v env lvl bdecl = match v.v with
 	| Qad { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible d'utiliser une référence de référence.\n"
 	| Qad qv -> TQad (typqvar qv env lvl bdecl)
 
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
 
 (* vérifier les doublons *)
 
@@ -438,11 +411,6 @@ let rec add_args l (*lvl*) env = match l with
 				(ta::tl), renv
 
 let typproto p env = match p.v with
-<<<<<<< HEAD
-	| TPlong (t, qv, l) -> failwith "Non implémenté\n"
-	| TPshort (s, l) -> failwith "Non implémenté\n"
-	| TPdouble (s, s2, l) -> failwith "Non implémenté\n"
-=======
 	| Proto (t, qv, l) -> let tt = typtypedef t in
 				let tqv = typqvar qv env 0 true in
 				   let (tl, envir) = add_args l env in 
@@ -464,7 +432,6 @@ let typproto p env = match p.v with
 				end
 	| Pcons (s, l) -> failwith "Non implémenté (prototype constructeur).\n"
 	| Pconshc (s, s2, l) -> failwith "Non implémenté (définition du constructeur).\n"
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
 
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
@@ -499,18 +466,8 @@ let typdecl_c dc env lvl = match dc.v with
   | Class (s, sup, l) -> failwith "Non implémenté (déclaration d'une classe)\n" (* ajouter dans l'environnement ? *) 
   
 
-<<<<<<< HEAD
-(* ***********************Fin Non implémenté ************************* *)
-let rec typqvar v env = match v.v with
-	| Qvar q -> TQvar (typqident q env) 
-	| Qpo qv -> TQpo (typqvar qv env)
-	| Qad qv -> TQad (typqvar qv env)
-	
-let rec typexpr expr env = match expr.v with
-=======
 
 let rec typexpr expr env lvl = match expr.v with
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
   | Eint i -> { c = TEint i ; typ = Tint }
   | Ethis -> (*failwith "Expression non encore implémentée.\n"*)
 		begin try 
@@ -522,19 +479,6 @@ let rec typexpr expr env lvl = match expr.v with
   			with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une classe.\n" end
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
-<<<<<<< HEAD
-  | Eqident q -> { c = TEqident (typqident q env) ; typ = Tint }
-  | Epointeur e -> if is_left_value e env then
-			let te = typexpr e env in begin match te.typ with 
-				| Tpointeur t -> {c = TEpointeur te ; typ = t }
-				| _ -> raise (Error (expr.loc, "Déférencement d'une expression qui n'est pas un pointeur.\n"))
-			end
-		   else not_left expr.loc 
-  | Eattr (e,s)-> failwith "Expression non encore implémentée.\n"
-  | Esderef (e,s) ->failwith "Expression non encore implémentée.\n"
-  | Eassign (e,f)-> if (is_left_value e env) then
-			let te = typexpr e env and tf = typexpr f env in
-=======
   | Eqident q -> let tq = typqident q env lvl false in { c = TEqident tq ; typ = (type_of_tqident tq)}
   | Epointeur e -> let te = typexpr e env lvl in 
 			if is_left_tvalue te env then 
@@ -550,7 +494,6 @@ let rec typexpr expr env lvl = match expr.v with
 | Eassign (e,f)-> let te = typexpr e env lvl in 
 			if is_left_tvalue te env then
 				let tf = typexpr f env lvl in
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
 				if is_sub_type tf.typ te.typ then
 					if is_num te.typ then
 						{ c = TEassign ( te, tf) ; typ = te.typ }
@@ -587,17 +530,10 @@ let rec typexpr expr env lvl = match expr.v with
                                 | Tint-> {c = TEldecr te ; typ = Tint }
                                 | _ -> erreur expr.loc "Décrémentation à gauche d'une expression non entière.\n"
                         end
-<<<<<<< HEAD
-                else not_left
-                expr.loc 
-  | Erincr e -> if is_left_value e env then
-                        let te = typexpr e env in begin match te.typ with
-=======
                 else not_left expr.loc 
   | Erincr e -> let te = typexpr e env lvl in
                 if is_left_tvalue te env then
                         begin match te.typ with
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
                                 | Tint-> {c = TErincr te ; typ = Tint }
                                 | _ -> erreur expr.loc "Incrémentation à droite d'une expression non entière.\n"
                         end
@@ -653,13 +589,6 @@ let rec typexpr expr env lvl = match expr.v with
 
 let rec typinst i env lvl = match i.v with
 	| Nothing -> TNothing, env
-<<<<<<< HEAD
-	| Iexpr e -> TIexpr (typexpr e env), env 
-	(*| Idecls (tdef, v)-> failwith "non implémenté"
-	| Idecl (tdef, v, e) -> failwith "non implémenté"
-	| Aidecl (tdef, v, s, l)-> failwith "non implémenté"*)
- 	| If (e, ins)-> let te = typexpr e env in
-=======
 	| Iexpr e -> TIexpr (typexpr e env lvl), env 
 	| Idecl (tdef, v)-> let tt = typtypedef tdef in
 				if is_bf tt then
@@ -681,7 +610,6 @@ let rec typinst i env lvl = match i.v with
 					else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
 	| Ideclobj (tdef, v, s, l)-> failwith "non implémenté (assignation objet retour constructeur)."
  	| If (e, ins)-> let te = typexpr e env lvl in
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
 				if te.typ = Tint then
 					let (tins,envir) = typinst ins env lvl in
 						(TIf (te, tins)), env
@@ -752,21 +680,13 @@ and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
 
 
 let typdecl d env = match d.v with
-<<<<<<< HEAD
-	| Dv dv -> let (tdv, envir) = typdecl_v dv env in ( TDv tdv), envir
-        | Dc dc -> failwith "non implémenté\n"
- (*       | Db (p, bl) -> let (tp, envir) = typproto p env in
-				let tbl = typbloc bl envir in
-					(TDb (tp, tbl)), env 
-=======
 	| Dv dv -> let (tdv, envir) = typdecl_v dv env 0 in ( TDv tdv), envir
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
         | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env in
 				let tbl = typbloc bl envir 1 in
 					(TDb (tp, tbl)), env_hb 
->>>>>>> 8392c9e44cfe6e5242f6a701b357cf3b9a80e852
 
-
+(*
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
 				(TDb (TProtovide, r)), envir
 	|
