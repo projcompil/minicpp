@@ -74,7 +74,7 @@ and tdexpr  =
   | TEattr of texpr * ident
   | TEsderef of texpr * ident 
   | TEassign of texpr * texpr
-  | TEfcall of texpr * (texpr list)
+  | TEfcall of texpr * (texpr list) * int
   | TEnew of string * (texpr list)
   | TElincr of texpr
   | TEldecr of texpr
@@ -275,6 +275,21 @@ let rec f_is_in_list l lsf = match lsf with
 	| [] -> false
 	| (tt, lg)::lsf -> (egal_sign l lg) || (f_is_in_list l lsf)
 
+
+let rec fit_types l la = match (l, la) with
+	| [], [] -> true
+	| [], _ -> false
+	| _, [] -> false
+	| (x::l), (TArg(t,v)::la) -> (is_sub_type x t) && (fit_types l la)
+
+let scan_lf l lf =
+	let rec auxscan lf i = match lf with
+		| [] -> None
+		| (tt,la)::lf -> if fit_types l la then
+				Some(la, i, tt)
+			    else auxscan lf (i+1)
+	in auxscan lf 0
+
 (* ******************************************************************************* *)
 
 
@@ -472,7 +487,14 @@ let rec typexpr expr env lvl = match expr.v with
   | Efcall (e, l)-> let te = typexpr e env lvl in begin
 			let tl = List.map (fun x -> typexpr x env lvl) l in
 			match te.c with
-				| TEqident (TQident i) -> failwith "Non implementé (appel de fonction).\n"
+				| TEqident (TQident id) -> if id.typ = Fonc then
+								let lf = Hashtbl.find_all table_f (id.rep) in begin
+				match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lf) with (* ne vas pas : il faut prendre le minimum !!! changer scan_lf i debug*)
+					| None -> erreur e.loc "Aucune fonction n'a une signature conforme aux types des arguments avec laquelle elle est appelée.\n"
+					| Some(f,i,tt) -> { c = TEfcall(te, tl, i) ; typ = tt } (* sûrement une erreur ici dans les cas non triviaux debug *)
+			  end
+				
+							   else erreur e.loc "Cette expression n'est pas une fonction.\n"
 				| TEqident (TQmeth(_)) -> failwith "Non implémenté (méthode fonction).\n" 
 				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
 		end
