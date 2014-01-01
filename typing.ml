@@ -270,6 +270,12 @@ let add_meth c m t b l =
 	add_func (Hashtbl.find table_c_meth c) m t b l
 
 let find_meth c m =
+	(*
+ (*try*)
+                let table_mc = (Hashtbl.find table_c_meth c) in begin
+                        try
+                        with Not_found -> "L'identfiant " ^ m ^ " n'est pas une méthode de la classe " ^ c ^ ".\n"
+*)
 	Hashtbl.find (Hashtbl.find table_c_meth c) m
 
 let add_member c m i =
@@ -384,7 +390,7 @@ let typqident q env lvl bdecl = match q.v with
 				else
 					if tid.lvl <> lvl then
 						TQident tid
-					else erreur q.loc ("Impossible de redéfinir l'identifiant " ^ s ^"qui a déjà été défini au même niveau.\n")
+					else erreur q.loc ("Impossible de redéfinir l'identifiant " ^ s ^" qui a déjà été défini au même niveau.\n")
 		      with Not_found -> if bdecl || (Hashtbl.mem table_f s) then
 						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
 				else erreur q.loc ("L'identifiant " ^ s ^ " n'est pas à porté.\n")
