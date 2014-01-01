@@ -118,7 +118,7 @@ let rec code_inst lvl ti = match ti with
   	| TFor (tl1, te, tl2, ti) -> let (lab1, lab2) = next_labd nloop in
                                 	let ci = code_inst lvl ti in
 						{ text = (concatene (List.map (code_expr lvl) tl1)) ++ (label lab1) ++ (code_expr lvl te)  ++ (beqz a0 lab2) ++ ci.text  ++ (concatene (List.map (code_expr lvl) tl2)) ++ (b lab1) ++  (label lab2) ; data = ci.data }
-  	| TIbloc tb -> rate ""
+  	| TIbloc (TBloc tl) -> conca (List.map (code_inst (lvl+1)) tl)
   	| TCout tls -> conca (List.map (code_cout_expr_str lvl) tls)
   	| TReturn te -> rate ""
   	| TAreturn -> rate ""
