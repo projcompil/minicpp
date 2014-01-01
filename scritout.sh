@@ -23,8 +23,12 @@ function app {
 	echo -e "$1\\n"
 	for i in *.cpp ; do
 		echo "Fichier : $i"
-		$pathbin $2 $i #> /dev/null
-		retour=$?
+		if [ -z "$2" ] ; then
+			compi $i
+		else	
+			$pathbin $2 $i #> /dev/null
+			retour=$?
+		fi
 		echo -e "$retour\\n"
 		if [ $retour == $[optionv-1] ] ; then
 			comptc=$[comptc+1]
@@ -53,7 +57,8 @@ echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implém
 
 function compi {
 	name="{$1%.*}"
-	$pathbin $i "/tmp/$name.s"
+	$pathbin $i -o "/tmp/$name.s"
+	retour=$?
 	spim "/tmp/$name.s" | tail -n +6 > "/tmp/$name.out"
 	d = diff "/tmp/$name.out" "$name.out" 
 	if [ -z "$d" ] ; then
