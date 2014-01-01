@@ -114,8 +114,10 @@ let rec code_inst lvl ti = match ti with
   	| TIfelse (te, ti, tj) -> rate ""
   	| TWhile (te, ti) -> let (lab1, lab2) = next_labd nloop in
 				let ci = code_inst lvl ti in
-				{ text = (code_expr lvl te) ++ (beqz a0 lab2) ++ ci.text ++ (b lab1) ; data = ci.data }
-  	| TFor (tl1, e, tl2, ti) -> rate ""
+				{ text = (label lab1) ++ (code_expr lvl te)  ++ (beqz a0 lab2) ++ ci.text ++ (b lab1) ++ (label lab2) ; data = ci.data }
+  	| TFor (tl1, te, tl2, ti) -> let (lab1, lab2) = next_labd nloop in
+                                	let ci = code_inst lvl ti in
+						{ text = (concatene (List.map (code_expr lvl) tl1)) ++ (label lab1) ++ (code_expr lvl te)  ++ (beqz a0 lab2) ++ ci.text  ++ (concatene (List.map (code_expr lvl) tl2)) ++ (b lab1) ++  (label lab2) ; data = ci.data }
   	| TIbloc tb -> rate ""
   	| TCout tls -> conca (List.map (code_cout_expr_str lvl) tls)
   	| TReturn te -> rate ""
