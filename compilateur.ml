@@ -82,7 +82,7 @@ let rec code_expr lvl const = match const.c with
 		(code_expr lvl te) ++ (push a0) ++
 		(code_expr lvl tf) ++ (pop t1) ++ 
 		((associe_oplog op) a0 t1 a0)
-	| _ -> failwith "Compilation de cette partie non encore implémentée.\n"
+	| _ ->  rate "Compilation de cette partie non encore implémentée.\n"
 
 
 
@@ -111,7 +111,10 @@ let rec code_inst lvl ti = match ti with
   	| TIdeclinit (tt, tv, te) -> rate ""
   	| TIdeclobj (tt, tv, s, tl) -> rate "" 
   	(*| TIf (te, ti) -> rate ""*)
-  	| TIfelse (te, ti, tj) -> rate ""
+  	| TIfelse (te, ti, tj) -> let (lab1, lab2) = next_labd nif in
+					let ci = code_inst lvl ti in
+					let cj = code_inst lvl tj in
+						{ text = (code_expr lvl te) ++ (bnez a0 lab1) ++ ci.text ++ (b lab2) ++ (label lab1)  ++ cj.text ++ (label lab2) ; data = ci.data ++ cj.data }
   	| TWhile (te, ti) -> let (lab1, lab2) = next_labd nloop in
 				let ci = code_inst lvl ti in
 				{ text = (label lab1) ++ (code_expr lvl te)  ++ (beqz a0 lab2) ++ ci.text ++ (b lab1) ++ (label lab2) ; data = ci.data }
@@ -124,7 +127,6 @@ let rec code_inst lvl ti = match ti with
   	| TAreturn -> rate ""
 
 
-and code_bloc (TBloc tli) = rate ""
 
 
 
