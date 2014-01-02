@@ -145,6 +145,8 @@ let table_c_meth = (Hashtbl.create 17) ;;
 
 let table_c_member = (Hashtbl.create 17) ;;
 
+let table_c_size = (Hashtbl.create 17) ;;
+
 let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
 let junk2 = Hashtbl.create 17 ;;
 
@@ -156,7 +158,7 @@ Hashtbl.add table_c_meth "" junk1 ;;
 
 Hashtbl.add table_c_member "" junk2 ;;
 
-
+Hashtbl.add table_c_size "" 0 ;;
 
 let biostream = ref false
 
@@ -235,7 +237,7 @@ let rec size_type t = match t with
 	| Tint -> 4
 	| Tnull -> 4 (* ou 0 ?*)
 	| Tpointeur _ -> 4
-	| Tclass s -> failwith "Taille de type classe non implémentée.\n" (* aller chercher taille dans une table *) 
+	| Tclass s -> Hashtbl.find table_c_size s 
 	| Fonc -> 0
 
 let rec extract_var v = match v.v with
@@ -470,13 +472,6 @@ let rec typdecl_v dv env lvl = match dv.v with
 					(TDeclv(tt, tl)), envir
 			
 			   else erreur dv.loc "Le type de cette déclaration n'est pas bien formé.\n"
- (*failwith "Non implémenté\n" (* let tt = typtypedef t in
-
-
-				let rec auxdv l env = match l with
-					| [] ->
-				auxdv l env*)
-			*)	 
 
 
 
@@ -492,14 +487,13 @@ let typdecl_c dc env lvl = match dc.v with
 
 let rec typexpr expr env lvl = match expr.v with
   | Eint i -> { c = TEint i ; typ = Tint }
-  | Ethis -> (*failwith "Expression non encore implémentée.\n"*)
-		begin try 
-			let tid = Smap.find "this" env in 
-  				begin match tid.typ with 
-  					| Tpointeur (Tclass s) -> { c = TEthis ; typ = tid.typ }
-  					| _ -> erreur expr.loc "this est un pointeur vers un objet\n"
-				end
-  			with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une classe.\n" end
+  | Ethis -> begin try 
+		let tid = Smap.find "this" env in 
+  			begin match tid.typ with 
+  				| Tpointeur (Tclass s) -> { c = TEthis ; typ = tid.typ }
+  				| _ -> erreur expr.loc "this est un pointeur vers un objet\n"
+			end
+  			with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une méthode.\n" end
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> let tq = typqident q env lvl false in { c = TEqident tq ; typ = (type_of_tqident tq)}
