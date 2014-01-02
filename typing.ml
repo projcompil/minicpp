@@ -493,7 +493,7 @@ let typdecl_c dc env lvl = match dc.v with
 
 				(* ajouter tailles, membres et méthodes *)
 
-(*failwith "Non implémenté (déclaration d'une classe)\n" (* ajouter dans l'environnement ? *) *)
+(*failwith "Non implé()menté (déclaration d'une classe)\n" (* ajouter dans l'environnement ? *) *)
   
 
 
@@ -517,7 +517,7 @@ let rec typexpr expr env lvl = match expr.v with
 				end
 		   	else not_left expr.loc 
   | Eattr (e,s)-> failwith "Expression non encore implémentée (attribut d'une expression).\n"
-  | Esderef (e,s) -> failwith "Expression non encore implémentée (sderef).\n"(* let te = typexpr e env lvl in
+  | Esderef (e,s) -> typexpr { v = Eattr({v = Epointeur(e)  ;loc = e.loc},s) ; loc = expr.loc } env lvl (*failwith "Expression non encore implémentée (sderef).\ni"*)(* let te = typexpr e env lvl in
 			match te.typ with
 				| Tpointeur (TClass s) -> {} *)
 | Eassign (e,f)-> let te = typexpr e env lvl in 
