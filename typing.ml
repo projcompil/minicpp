@@ -189,6 +189,8 @@ let rec is_sub_type t1 t2 = match (t1, t2) with
 	| (Tclass a), (Tclass b) -> is_sub_class a b
 	| _ -> false
 
+let is_sub_targ (TArg(t1, v1)) (TArg(t2, v2)) =
+	is_sub_type t1 t2
 
 let is_num t = match t with
 	| Tnull | Tint | Tpointeur _ -> true
@@ -319,13 +321,27 @@ let rec fit_types l la = match (l, la) with
 	| _, [] -> false
 	| (x::l), (TArg(t,v)::la) -> (is_sub_type x (v.typ) (* tt *)) && (fit_types l la)
 
-let scan_lf l lf =
-	let rec auxscan lf = match lf with
-		| [] -> None
+(* prendre le minimum dans l'ensemble *)
+
+let rec include_sign f g = match (f,g) with
+	| [], [] -> true
+	| [], _ | _, [] -> false
+	| tax::f, tay::g -> (is_sub_targ tax tay) && (include_sign f g)
+
+let min_sign f g =
+	if include_sign f g then f else g
+
+let scan_lf l lf = match lf with
+	| [] -> None
+	| (__,_,_,min)::rlf ->
+	let rec auxscan lf min min_res = match lf with
+		| [] -> min_res
 		| (ni, b, tt,la)::lf -> if fit_types l la then
-				Some(la, ni, tt, b)
-			    else auxscan lf
-	in auxscan lf
+						if include_sign la min then 
+							auxscan lf la (Some(la, ni, tt, b))
+						else auxscan lf min min_res
+			    		else auxscan lf min min_res
+	in auxscan lf min None
 
 
 module Sset = Set.Make(String)
@@ -539,7 +555,7 @@ let rec typexpr expr env lvl = match expr.v with
 				| TEqident (TQident id) -> if id.typ = Fonc then
 								let lf = Hashtbl.find_all table_f (id.rep) in begin
 				match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lf) with (* ne vas pas : il faut prendre le minimum !!! changer scan_lf i debug*)
-					| None -> erreur e.loc "Aucune fonction n'a une signature conforme aux types des arguments avec laquelle elle est appelée.\n"
+					| None -> erreur e.loc "Aucune fonction n'a une signature conforme aux types des arguments avec laquelle elle est appelée, ou bien l'ensemble de ces fonctions n'a pas de minimum pour l'inclusion de profils.\n"
 					| Some(f,i,tt, b) -> { c = TEfcall(te, tl, i, b) ; typ = tt } (* sûrement une erreur ici dans les cas non triviaux debug *)
 			  end
 				
