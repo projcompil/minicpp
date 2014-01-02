@@ -106,8 +106,12 @@ supers:
 | x = position(dsupers) { x }
 ;
 
+ddsupers:
+| PUBLIC ; s = TIDENT { s }
+;
+
 dsupers:
-|COLON; PUBLIC; z = separated_nonempty_list(COMMA, TIDENT) { Super z } 
+|COLON;  z = separated_nonempty_list(COMMA, ddsupers) { Super z } 
 ;
 
 

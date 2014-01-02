@@ -43,7 +43,7 @@ function app {
 echo -e "option choisie : $argu \\n"
 
 
-#app "/syntax/good" "--parse-only"
+#app "/syntax/good" "--parse-only" 1
 
 #app "/syntax/bad" $argu 2
 
