@@ -323,6 +323,17 @@ let scan_lf l lf =
 			    else auxscan lf
 	in auxscan lf
 
+
+module Sset = Set.Make(String)
+
+let find_duplicate liste =
+	let rec auxd l ens  = match l with
+		| [] -> None
+		| x::l -> if Sset.mem x ens then
+				(Some x)
+			else auxd l (Sset.add x ens)
+	in auxd liste (Sset.empty)
+
 (* ******************************************************************************* *)
 
 
@@ -338,8 +349,11 @@ let typsupers sup =
 		| s::l -> if Hashtbl.mem table_c s then
 				(Tclass s)::(aux l)
 			  else erreur sup.loc ("Le nom " ^ s ^ " n'est pas le nom d'une classe déjà définie plus haut\n")
-	in match sup.v with Super l -> TSuper (aux l)
-
+	in match sup.v with Super l -> 
+		begin match find_duplicate l with
+			| None -> TSuper (aux l)
+			| Some(x) -> erreur sup.loc ("La liste des superclasses contient des doublons, dont celui-ci : " ^ x ^ ".\n")
+		end
 
 (* prend le type attendu t et essaie de l'ajouter à l'environnement *)
 let rec typvar v env lvl t = 
@@ -397,15 +411,6 @@ let typqident q env lvl bdecl = match q.v with
 		end
   | Qmeth (st, s) -> failwith "Non implémenté (méthode d'une classe).\n"
 
-module Sset = Set.Make(String)
-
-let find_duplicate liste =
-	let rec auxd l ens  = match l with
-		| [] -> (false, None)
-		| x::l -> if Sset.mem x ens then
-				(true, (Some x))
-			else auxd l (Sset.add x ens)
-	in auxd liste (Sset.empty)
 
 
 
