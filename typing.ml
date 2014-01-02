@@ -475,7 +475,7 @@ let rec typdecl_v dv env lvl = match dv.v with
 
 
 
-let typmembre m env = match m.v with
+let typmembre env lvl m = match m.v with
 	| Mvar dv -> failwith "Non implémenté (membre non implémenté).\n"
 	| Mmeth (b, p) -> failwith "Non implémenté (prototype méthode non implémenté).\n" 
 
@@ -483,14 +483,15 @@ let typmembre m env = match m.v with
 let typdecl_c dc env lvl = match dc.v with
   | Class (s, sup, l) -> if Hashtbl.mem table_c s then
 				erreur dc.loc ("La classe " ^ s ^" a déjà été déclarée.\n")
-			 else begin
+			 else 
 				let (TSuper tl) = typsupers sup in
-					List.iter (Hashtbl.add table_c s) (s::(List.map (function (Tclass ch) -> ch) tl)) ;
-					failwith "Non implémenté (déclaration d'une classe)\n" ;
+					List.iter (Hashtbl.add table_c s) (s::(List.map (function | (Tclass ch) -> ch | _ -> failwith "Heisenbug.\n") tl)) ;
+					let lm = (List.map (typmembre env lvl) l) in
+						(TClass(s, (TSuper tl), lm)), env	
 
+(* peut-être récupérer un environnement et le retourner *)
 
 				(* ajouter tailles, membres et méthodes *)
-			 end
 
 (*failwith "Non implémenté (déclaration d'une classe)\n" (* ajouter dans l'environnement ? *) *)
   
