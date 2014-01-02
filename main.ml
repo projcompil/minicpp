@@ -35,7 +35,9 @@ let doublelocal (p,q) =
   let c1 = p.pos_cnum - p.pos_bol + 1 in
   let l2 = q.pos_lnum in
   let c2 = q.pos_cnum - q.pos_bol + 1 in
-	eprintf "L'erreur se trouve entre les lignes %d et %d, commence au caractère %d et se finit au caractère %d :\n" l1 l2 c1 c2
+	if l1 = l2 then
+		eprintf "L'erreur se trouve à la ligne %d, commence au caractère %d et se finit au caractère %d :\n" l1 c1 c2	
+	else eprintf "L'erreur se trouve entre les lignes %d et %d, commence au caractère %d et se finit au caractère %d :\n" l1 l2 c1 c2
 let () = 
   (* Parsing de la ligne de commande *)
   Arg.parse options (set_file ifile) usage;

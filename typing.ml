@@ -404,7 +404,7 @@ let typqident q env lvl bdecl = match q.v with
 				if not bdecl then
 					if tid.lvl <= lvl then
 						TQident tid
-					else erreur q.loc  ("L'identifiant " ^ s ^ "  n'est pas à porté.\n")
+					else erreur q.loc  ("L'identifiant " ^ s ^ "  n'est pas à portée.\n")
 				else
 					if tid.lvl <> lvl then
 						TQident tid
@@ -467,7 +467,7 @@ let rec auxdecl_v l env lvl t = match l with
                         let (tl, renv) = (auxdecl_v l envir lvl t) in
                                 (tv::tl), renv
 
-let rec typdecl_v dv env lvl = match dv.v with
+let rec typdecl_v env lvl dv = match dv.v with
 	| Declv(t, l) -> let tt = typtypedef t in
 			   if is_bf tt then
 			   	let (tl, envir) = (auxdecl_v l env lvl tt) in
@@ -712,7 +712,7 @@ and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
 
 
 let typdecl d env = match d.v with
-	| Dv dv -> let (tdv, envir) = typdecl_v dv env 0 in ( TDv tdv), envir
+	| Dv dv -> let (tdv, envir) = typdecl_v env 0 dv in ( TDv tdv), envir
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
         | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env in
 				let tbl = typbloc bl envir 1 in
