@@ -48,6 +48,7 @@ Thumbs.db
 # swap files #
 ##############
 *.swp
+*.swo
 
 # _build de ocamlbuild #
 ########################

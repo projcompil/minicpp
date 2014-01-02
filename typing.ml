@@ -12,7 +12,7 @@ type typ =
     | Tpointeur of typ
     | Tclass of string
     | Fonc
-
+    | Tclassdecl
 
 type 'a atype = { c:'a ; typ:typ }
 
@@ -236,12 +236,11 @@ let not_left loc =
 
 
 let rec size_type t = match t with
-	| Tvoid -> 0
 	| Tint -> 4
 	| Tnull -> 4 (* ou 0 ?*)
 	| Tpointeur _ -> 4
 	| Tclass s -> Hashtbl.find table_c_size s 
-	| Fonc -> 0
+	| Tvoid | Fonc | Tclassdecl -> 0
 
 let rec extract_var v = match v.v with
 	| Ident s -> s
@@ -490,7 +489,8 @@ let typdecl_c dc env lvl = match dc.v with
 				let (TSuper tl) = typsupers sup in
 					List.iter (Hashtbl.add table_c s) (s::(List.map (function | (Tclass ch) -> ch | _ -> failwith "Heisenbug.\n") tl)) ;
 					let lm = (List.map (typmembre env lvl) l) in
-						(TClass(s, (TSuper tl), lm)), env	
+						let renv = Smap.add s {rep = s ; typ = Tclassdecl ; lvl = 0 ; offset = 0 ; byref = false } env in
+						(TClass(s, (TSuper tl), lm)), renv	
 
 (* peut-être récupérer un environnement et le retourner *)
 
