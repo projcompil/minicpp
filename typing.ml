@@ -134,11 +134,11 @@ type environnement = (*typ*) ident Smap.t
 
 let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles et de valeurs de retour possibles  pour prendre en compte la surcharge *)
 
-Hashtbl.add table_f "" ((0,false,Tnull,[]):(int * bool * typ * (targ list))) ;;
+Hashtbl.add table_f "@@@" ((0,false,Tnull,[]):(int * bool * typ * (targ list))) ;;
 
 let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
 
-Hashtbl.add table_c "" "";;
+Hashtbl.add table_c "@@" "@@";;
 
 
 let table_c_meth = (Hashtbl.create 17) ;;
@@ -150,15 +150,19 @@ let table_c_size = (Hashtbl.create 17) ;;
 let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
 let junk2 = Hashtbl.create 17 ;;
 
-Hashtbl.add junk1 "" ((0, false, Tnull, []):(int * bool * typ * (targ list))) ;;
+Hashtbl.add junk1 "@@@@" ((0, false, Tnull, []):(int * bool * typ * (targ list))) ;;
 
-Hashtbl.add junk2 "" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;
+Hashtbl.add junk2 "@@@@" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;
 
 Hashtbl.add table_c_meth "" junk1 ;;
 
 Hashtbl.add table_c_member "" junk2 ;;
 
 Hashtbl.add table_c_size "" 0 ;;
+
+let table_c_env = Hashtbl.create 17 ;;
+
+Hashtbl.add table_c_env "@@" "" ;;
 
 let biostream = ref false
 
@@ -263,10 +267,10 @@ let rec extract_tqvar tqv = match tqv with
 let add_func tab f t b l =
 	let lf = Hashtbl.find_all table_f f in
                 Hashtbl.add table_f f ((begin
-                match lf with
-                        | [] -> 0
-                        | (i, _, _, _)::l -> (i+1)
-                end
+	                match lf with
+        	                | [] -> 0
+        	                | (i, _, _, _)::l -> (i+1)
+        	        end
                 ), b, t, l)	
 
 let add_f f t b l =
@@ -524,7 +528,7 @@ let rec typexpr expr env lvl = match expr.v with
   				| Tpointeur (Tclass s) -> { c = TEthis ; typ = tid.typ }
   				| _ -> erreur expr.loc "this est un pointeur vers un objet\n"
 			end
-  			with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une méthode.\n" end
+		with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une méthode.\n" end
   | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
   | Enull-> { c = TEnull ; typ = Tnull }
   | Eqident q -> let tq = typqident q env lvl false in { c = TEqident tq ; typ = (type_of_tqident tq)}

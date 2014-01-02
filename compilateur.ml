@@ -53,6 +53,7 @@ let associe_opar op = match op with
 	| Sub -> sub
 	| Mul -> mul
 	| Div -> div
+	| Mod -> rem
 	| _ -> failwith "Opération arithmétique attendue par associe_opar\n"
 let associe_oplog op = match op with
 	| And -> and_
@@ -65,12 +66,14 @@ let associe_oplog op = match op with
 	| Neq -> sne
 	| _ -> failwith "Opération logique attendue par associe_oplog\n"
 
+
+
 let rec code_expr lvl texpr = match texpr.c with
         | TEint i -> li a0  i
-	| TEop (Mod, te, tf) -> 
+	(*| TEop (Mod, te, tf) -> 
 		(code_expr lvl te) ++ (push a0) ++
 		(code_expr lvl tf) ++ (pop t1)++
-		(div t2 t1 oreg a0)++(mul t2 t2 oreg a0) ++ (sub a0 t1 oreg t2) 
+		(div t2 t1 oreg a0)++(mul t2 t2 oreg a0) ++ (sub a0 t1 oreg t2) *)
 	| TEop(op, te, tf) when List.mem op [Add ; Sub ; Mul ; Div] -> 
 		(code_expr lvl te) ++ (push a0) ++
 		(code_expr lvl tf) ++  (pop t1) ++
@@ -83,6 +86,10 @@ let rec code_expr lvl texpr = match texpr.c with
 		(code_expr lvl tf) ++ (pop t1) ++ 
 		((associe_oplog op) a0 t1 a0)
 	| TEpar te -> code_expr lvl te
+	| TEnot te -> (code_expr lvl te) ++ (li t1 0) ++ (or_ a0 a0 t1) ++ (not_ a0 a0) 
+	| TEnull -> li a0 0
+	| TEuminus te -> (code_expr lvl te) ++ (neg a0 a0)
+	| TEuplus te -> (code_expr lvl te)
 	| _ ->  rate "Compilation de cette partie non encore implémentée.\n"
 
 
