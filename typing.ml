@@ -481,7 +481,18 @@ let typmembre m env = match m.v with
 
 
 let typdecl_c dc env lvl = match dc.v with
-  | Class (s, sup, l) -> failwith "Non implémenté (déclaration d'une classe)\n" (* ajouter dans l'environnement ? *) 
+  | Class (s, sup, l) -> if Hashtbl.mem table_c s then
+				erreur dc.loc ("La classe " ^ s ^" a déjà été déclarée.\n")
+			 else begin
+				let (TSuper tl) = typsupers sup in
+					List.iter (Hashtbl.add table_c s) (s::(List.map (function (Tclass ch) -> ch) tl)) ;
+					failwith "Non implémenté (déclaration d'une classe)\n" ;
+
+
+				(* ajouter tailles, membres et méthodes *)
+			 end
+
+(*failwith "Non implémenté (déclaration d'une classe)\n" (* ajouter dans l'environnement ? *) *)
   
 
 
