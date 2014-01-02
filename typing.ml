@@ -202,6 +202,9 @@ let rec is_bf t = match t with
 	| Tclass s -> Hashtbl.mem table_c s
 	| _ -> false
 
+let is_pointeur = function
+	| Tpointeur _ | Tnull -> true
+	| _ -> false
 
 let rec is_left_value e (env:environnement) = match e.v with
 	| Eqident ex -> begin match ex.v with
@@ -517,7 +520,7 @@ let rec typexpr expr env lvl = match expr.v with
 				end
 		   	else not_left expr.loc 
   | Eattr (e,s)-> failwith "Expression non encore implémentée (attribut d'une expression).\n"
-  | Esderef (e,s) -> typexpr { v = Eattr({v = Epointeur(e)  ;loc = e.loc},s) ; loc = expr.loc } env lvl (*failwith "Expression non encore implémentée (sderef).\ni"*)(* let te = typexpr e env lvl in
+  | Esderef (e,s) -> typexpr { v = Eattr({v = Epointeur(e)  ;loc = e.loc},s) ; loc = expr.loc } env lvl (* let te = typexpr e env lvl in
 			match te.typ with
 				| Tpointeur (TClass s) -> {} *)
 | Eassign (e,f)-> let te = typexpr e env lvl in 
@@ -594,7 +597,7 @@ let rec typexpr expr env lvl = match expr.v with
 			| Eq | Neq -> let te = typexpr e env lvl in
 					if is_num te.typ then
 						let tf = typexpr f env lvl in
-							if te.typ = tf.typ then
+							if te.typ = tf.typ || (te.typ = Tnull && (is_pointeur tf.typ) || (tf.typ = Tnull && (is_pointeur te.typ))) then
 								{ c = TEop(op, te, tf) ; typ = Tint }
 							else erreur expr.loc "Les deux expressions n'ont pas le même type, il est impossible de les comparer via == ou !=.\n"
 					else erreur expr.loc ("Le type de l'expression à gauche de l'opérateur de test d'" ^ (if op = Eq then "" else "in") ^ "égalité n'est pas numérique.")
