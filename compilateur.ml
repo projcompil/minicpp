@@ -143,14 +143,15 @@ let rec code_inst lvl ti = match ti with
 and code_bloc lvl (TBloc tl) = conca (List.map (code_inst (lvl+1)) tl)
 
 let code_proto tp = match tp with
-	| TProto(Tint, (TQvar(TQident(ti))), []) when ti.rep = "main" -> { text = (label "main") ; data = nop }
 	| _ -> rate "Pas d'autres fonctions que main.\n"
 
+(* ne pas gérer le main dans code_proto *)
 
 let code_decl td = match td with
 	| TDv tdv -> rate ""
 	| TDc tdc -> rate ""
-	| TDb (tp, tb) -> addp (addp (code_proto tp) (code_bloc 0 tb)) { text = (li v0 10) ++ (syscall); data = nop }
+	| TDb ( (TProto(Tint, (TQvar(TQident(ti))), [])), tb) when ti.rep = "main" -> addp (addp { text = (label "main") ; data = nop } (code_bloc 0 tb)) { text = (li v0 10) ++ (syscall); data = nop }
+	| TDb (tp, tb) -> addp (code_proto tp) (code_bloc 0 tb)
 
 let code_fichier tf =
 	let rec auxc_fichier l = match l with
