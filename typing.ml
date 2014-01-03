@@ -142,16 +142,19 @@ let (table_c : hashstring) = (Hashtbl.create 17) ;; (* on enregistre ici les cla
 (*Hashtbl.add table_c "@@" "@@";;*)
 
 
-let table_c_meth = (Hashtbl.create 17) ;;
+type tdemeths =( string,  (int * (bool*bool) * typ * (targ list))) Hashtbl.t
+let ( table_c_meth : (string, tdemeths) Hashtbl.t ) = (Hashtbl.create 17) ;;
 
-let table_c_member = (Hashtbl.create 17) ;;
+type tdemems = (string, ident) Hashtbl.t
+let (table_c_member : (string, tdemems) Hashtbl.t ) = (Hashtbl.create 17) ;;
 
 let ( table_c_size : (string, int) Hashtbl.t )= (Hashtbl.create 17) 
+
 
 let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
 let junk2 = Hashtbl.create 17 ;;
 
-Hashtbl.add junk1 "@@@@" ((0, false, Tnull, []):(int * bool * typ * (targ list))) ;;
+Hashtbl.add junk1 "@@@@" ((0, ((* retourne une référence *) false, (*virtual*) false), Tnull, []):(int * (bool*bool) * typ * (targ list))) ;;
 
 Hashtbl.add junk2 "@@@@" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;
 
@@ -168,6 +171,7 @@ let biostream = ref false
 
 let chtypereturn = "@typereturn"
 
+let chcons = "@constructor"
 (* '*************************)
 
 
@@ -276,8 +280,11 @@ let add_func tab f t b l =
 let add_f f t b l =
 	add_func table_f f t b l
 
-let add_meth c m t b l =
+let add_meth c m t b (* attention !! couple de booléens !!! *) l =
 	add_func (Hashtbl.find table_c_meth c) m t b l
+
+let is_meth c m =
+	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m 
 
 let find_meth c m =
 	(*
@@ -497,7 +504,7 @@ let rec typdecl_v env lvl dv = match dv.v with
 
 
 
-let typmembre env lvl m = match m.v with
+let typmembre s env lvl m  = match m.v with
 	| Mvar dv -> failwith "Non implémenté (membre non implémenté).\n"
 	| Mmeth (b, p) -> failwith "Non implémenté (prototype méthode non implémenté).\n" 
 
@@ -508,9 +515,18 @@ let typdecl_c dc env lvl = match dc.v with
 			 else 
 				let (TSuper tl) = typsupers sup in
 					List.iter (Hashtbl.add table_c s) (s::(List.map (function | (Tclass ch) -> ch | _ -> failwith "Heisenbug.\n") tl)) ;
-					let lm = (List.map (typmembre env lvl) l) in
+					let (new_tmethod : tdemeths) = Hashtbl.create 10 and (new_tmember : tdemems) = Hashtbl.create 10 in
+					Hashtbl.add table_c_meth s new_tmethod ;
+					Hashtbl.add table_c_member s new_tmember;
+					let lm = (List.map (typmembre s env lvl) l) in
 						let renv = Smap.add s {rep = s ; typ = Tclassdecl ; lvl = 0 ; offset = 0 ; byref = false } env in
-						(TClass(s, (TSuper tl), lm)), renv	
+						if is_meth s (chcons ^ s) then
+							(TClass(s, (TSuper tl), lm)), renv
+						else begin
+							(* ajouter constructeur *)
+							(TClass(s, (TSuper tl), lm)), renv	
+						end
+					(*with Not_found -> 	*)
 
 (* peut-être récupérer un environnement et le retourner *)
 
