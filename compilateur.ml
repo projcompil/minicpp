@@ -32,6 +32,8 @@ let get_lab (r,s) =
 
 let nopp = { text = nop ; data = nop } (* petit raccourci *)
 
+let convp e = { text = e ; data = nop }
+
 let rate s =
 	failwith ("Compilation non impléméntée : " ^ s)
 
@@ -50,6 +52,13 @@ let rec conca l = List.fold_left addp nopp l
   | x::l -> let reste = conca l in
 		{ text = x.text ++ reste.text ; data = x.data ++ reste.data }
 *)
+
+let rec iter n code = if n=0 then nop 
+		      else 
+			code ++
+			(iter (n - 1) code)
+
+
 
 let associe_opar op = match op with
 	| Add -> add
@@ -93,6 +102,11 @@ let rec code_expr lvl texpr = match texpr.c with
 	| TEnull -> li a0 0
 	| TEuminus te -> (code_expr lvl te) ++ (neg a0 a0)
 	| TEuplus te -> (code_expr lvl te)
+	| TEfcall(te, tl, i, b) -> begin match te.c with
+					| TEqident(TQident id) -> (List.fold_left (fun code e -> code ++ (code_expr lvl e) ++ (push a0)) nop tl) ++ (move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++ (push t1) ++ (jal (id.rep ^ (string_of_int i))) ++ (popn (1+ List.length tl))
+					| TEqident(_) -> rate ""
+					| _ -> failwith "Heisenbug 2.\n"
+				   end
 	| _ ->  rate "Compilation de cette partie non encore implémentée.\n"
 
 
@@ -113,10 +127,6 @@ let code_cout_expr_str lvl (*env*) e = match e with
    		iter (lvl - l) ++ (lw t1  (8,t1)); 
 *)
 
-let rec iter n code = if n=0 then nop 
-		      else 
-			code ++
-			(iter (n - 1) code)
 
 
 let rec code_inst lvl ti = match ti with
