@@ -151,14 +151,15 @@ let code_proto tp = match tp with
 let code_decl td = match td with
 	| TDv tdv -> rate ""
 	| TDc tdc -> rate ""
-	| TDb ( (TProto(Tint, (TQvar(TQident(ti))), [])), tb) when ti.rep = "main" -> addp (addp { text = (label "main") ; data = nop } (code_bloc 0 tb)) { text = (li v0 10) ++ (syscall); data = nop }
+	| TDb ( (TProto(Tint, (TQvar(TQident(ti))), [])), tb) when ti.rep = "main" -> conca [ { text = (label "main") ; data = nop } ; (code_bloc 0 tb) ; { text = (li v0 10) ++ (syscall); data = nop } ]
 	| TDb (tp, tb) -> addp (code_proto tp) (code_bloc 0 tb)
 
 let code_fichier tf =
-	let rec auxc_fichier l = match l with
+	List.fold_left (fun x td -> addp x (code_decl td)) nopp tf.tdecls
+	(*let rec auxc_fichier l = match l with
 		| [] -> nopp
 		| td::l -> addp (code_decl td) (auxc_fichier l)
-	in auxc_fichier tf.tdecls
+	in auxc_fichier tf.tdecls*)
 	(*failwith "Compilation non implémentée.\n"*)
 
 
