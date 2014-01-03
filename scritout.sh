@@ -42,14 +42,21 @@ function app {
 
 echo -e "option choisie : $argu \\n"
 
+if [ "$argu" == "--parse-only" ] ; then
+	app "/syntax/good" "--parse-only" 1
 
-#app "/syntax/good" "--parse-only" 1
+	app "/syntax/bad" $argu 2
 
-#app "/syntax/bad" $argu 2
+	app "/typing/good" $argu 1
 
-app "/typing/good" $argu 1
+	app "/typing/bad" $argu 1
 
-app "/typing/bad" $argu 2
+elif [ "$argu" == "--type-only" ] ; then
+	app "/typing/good" $argu 1
+
+        app "/typing/bad" $argu 2
+
+fi
 
 app "/exec" $argu 1
 
@@ -59,7 +66,7 @@ function compi {
 	name="{$1%.*}"
 	$pathbin $i -o "/tmp/$name.s"
 	retour=$?
-	spim "/tmp/$name.s" | tail -n +6 > "/tmp/$name.out"
+	spim -f "/tmp/$name.s" | tail -n +6 > "/tmp/$name.out"
 	d = diff "/tmp/$name.out" "$name.out" 
 	if [ -z "$d" ] ; then
 		echo -e "Réussite de la compilation du fichier $1\\n"
