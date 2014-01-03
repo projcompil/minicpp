@@ -86,7 +86,7 @@ let rec code_expr lvl texpr = match texpr.c with
 		(code_expr lvl tf) ++ (pop t1) ++ 
 		((associe_oplog op) a0 t1 a0)
 	| TEpar te -> code_expr lvl te
-	| TEnot te -> (code_expr lvl te) ++ (li t1 0) ++ (or_ a0 a0 t1) ++ (not_ a0 a0) 
+	| TEnot te -> (code_expr lvl te) ++ (or_ a0 a0 zero) ++ (not_ a0 a0) 
 	| TEnull -> li a0 0
 	| TEuminus te -> (code_expr lvl te) ++ (neg a0 a0)
 	| TEuplus te -> (code_expr lvl te)
