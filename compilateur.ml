@@ -144,7 +144,7 @@ let code_proto tp = match tp with
 let code_decl td = match td with
 	| TDv tdv -> rate ""
 	| TDc tdc -> rate ""
-	| TDb (tp, tb) -> addp (code_proto tp) (code_bloc 0 tb)
+	| TDb (tp, tb) -> addp (addp (code_proto tp) (code_bloc 0 tb)) { text = (li v0 10) ++ (syscall); data = nop }
 
 let code_fichier tf =
 	let rec auxc_fichier l = match l with
