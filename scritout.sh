@@ -2,7 +2,7 @@
 
 path=/home/nm/Documents/tests
 pathbin=/home/nm/Documents/minicpp/minic++
-pathstore=/home/nm/Documents/ftempo/
+pathstore=/tmp/
 comptc=0
 comptni=0
 compt=0
@@ -50,7 +50,7 @@ function app {
 		fi
 		retour=$?
 		echo -e "$retour\\n"
-		if [ $retour == $[optionv-1] ] ; then
+		if [ $retour == $[$optionv-1] ] ; then
 			comptc=$[comptc+1]
 		elif [ $retour == 3 ] ; then
 			comptni=$[comptni+1]
@@ -78,7 +78,7 @@ elif [ "$argu" == "--type-only" ] ; then
 
 fi
 
-app "/exec" $argu 1
+app "/exec" "$argu" 1
 
 echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implémenté : $comptni)\\n"
 
