@@ -265,8 +265,8 @@ let rec extract_tqvar tqv = match tqv with
 	| TQpo tqva | TQad tqva -> extract_tqvar tqva
 
 let add_func tab f t b l =
-	let lf = Hashtbl.find_all table_f f in
-                Hashtbl.add table_f f ((begin
+	let lf = Hashtbl.find_all tab f in
+                Hashtbl.add tab f ((begin
 	                match lf with
         	                | [] -> 0
         	                | (i, _, _, _)::l -> (i+1)
@@ -457,7 +457,7 @@ let rec add_args l (*lvl*) env = match l with
 			let (tl, renv) = (add_args l envir) in
 				(ta::tl), renv
 
-let typproto p env = match p.v with
+let typproto p env in_class = match p.v with
 	| Proto (t, qv, l) -> let tt = typtypedef t in
 				let tqv = typqvar qv env 0 true in
 				   let (tl, envir) = add_args l env in 
@@ -734,7 +734,7 @@ and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
 let typdecl d env = match d.v with
 	| Dv dv -> let (tdv, envir) = typdecl_v env 0 dv in ( TDv tdv), envir
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
-        | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env in
+        | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env false in
 				let tbl = typbloc bl envir 1 in
 					(TDb (tp, tbl)), env_hb 
 
