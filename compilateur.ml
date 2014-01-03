@@ -129,17 +129,30 @@ let rec code_inst lvl ti = match ti with
   	| TFor (tl1, te, tl2, ti) -> let (lab1, lab2) = next_labd nloop in
                                 	let ci = code_inst lvl ti in
 						{ text = (concatene (List.map (code_expr lvl) tl1)) ++ (b lab2) ++ (label lab1) ++ ci.text ++ (concatene (List.map (code_expr lvl) tl2)) ++  (label lab2) ++ (code_expr lvl te) ++ (bnez a0 lab1) ; data = ci.data }
-  	| TIbloc (TBloc tl) -> conca (List.map (code_inst (lvl+1)) tl)
+  	| TIbloc tb -> code_bloc lvl tb
   	| TCout tls -> conca (List.map (code_cout_expr_str lvl) tls)
   	| TReturn te -> rate ""
   	| TAreturn -> rate ""
 
+and code_bloc lvl (TBloc tl) = conca (List.map (code_inst (lvl+1)) tl)
+
+let code_proto tp = match tp with
+	| TProto(Tint, (TQvar(TQident(ti))), []) when ti.rep = "main" -> { text = (label "main") ; data = nop }
+	| _ -> rate "Pas d'autres fonctions que main.\n"
 
 
-
+let code_decl td = match td with
+	| TDv tdv -> rate ""
+	| TDc tdc -> rate ""
+	| TDb (tp, tb) -> addp (code_proto tp) (code_bloc 0 tb)
 
 let code_fichier tf =
-	failwith "Compilation non implémentée.\n"
+	let rec auxc_fichier l = match l with
+		| [] -> nopp
+		| td::l -> addp (code_decl td) (auxc_fichier l)
+	in auxc_fichier tf.tdecls
+	(*failwith "Compilation non implémentée.\n"*)
+
 
 let compile_fichier tf f =
 	let cf = code_fichier tf in

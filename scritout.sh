@@ -27,8 +27,8 @@ function app {
 			compi $i
 		else	
 			$pathbin $2 $i #> /dev/null
-			retour=$?
 		fi
+		retour=$?
 		echo -e "$retour\\n"
 		if [ $retour == $[optionv-1] ] ; then
 			comptc=$[comptc+1]
@@ -65,13 +65,15 @@ echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implém
 function compi {
 	name="{$1%.*}"
 	$pathbin $i -o "/tmp/$name.s"
-	retour=$?
+	#retour=$?
 	spim -f "/tmp/$name.s" | tail -n +6 > "/tmp/$name.out"
 	d = diff "/tmp/$name.out" "$name.out" 
 	if [ -z "$d" ] ; then
 		echo -e "Réussite de la compilation du fichier $1\\n"
+		exit 0
 	else
 		echo -e "Echec de la compilation du fichier $1\\n"
 		echo $d
+		exit 1
 	fi
 }
