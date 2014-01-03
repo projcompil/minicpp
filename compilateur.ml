@@ -76,7 +76,7 @@ let rec code_expr lvl texpr = match texpr.c with
 		(code_expr lvl te) ++ (push a0) ++
 		(code_expr lvl tf) ++ (pop t1)++
 		(div t2 t1 oreg a0)++(mul t2 t2 oreg a0) ++ (sub a0 t1 oreg t2) *)
-	| TEop(op, te, tf) when List.mem op [Add ; Sub ; Mul ; Div] -> 
+	| TEop(op, te, tf) when List.mem op [Add ; Sub ; Mul ; Div ; Mod ] -> 
 		(code_expr lvl te) ++ (push a0) ++
 		(code_expr lvl tf) ++  (pop t1) ++
 		((associe_opar op) a0 t1 oreg a0)
