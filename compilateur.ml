@@ -45,10 +45,11 @@ let rec concatene l = List.fold_left (++) nop l (*function
   | x::y::[] -> x ++ y
   | x::l -> x ++ (concatene l)*)
 
-let rec conca = function
-  | [] -> nopp 
+let rec conca l = List.fold_left addp nopp l
+(*  | [] -> nopp 
   | x::l -> let reste = conca l in
 		{ text = x.text ++ reste.text ; data = x.data ++ reste.data }
+*)
 
 let associe_opar op = match op with
 	| Add -> add
