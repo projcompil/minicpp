@@ -136,9 +136,10 @@ let table_f = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les
 
 Hashtbl.add table_f "@@@" ((0,false,Tnull,[]):(int * bool * typ * (targ list))) ;;
 
-let table_c = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
+type hashstring = (string, string) Hashtbl.t
+let (table_c : hashstring) = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
 
-Hashtbl.add table_c "@@" "@@";;
+(*Hashtbl.add table_c "@@" "@@";;*)
 
 
 let table_c_meth = (Hashtbl.create 17) ;;

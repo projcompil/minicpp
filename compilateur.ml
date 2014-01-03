@@ -13,6 +13,8 @@ let nstring = (ref 0), "_chaine"
 let nif = (ref 0), "_else", "_sortiecond"
 let nloop = (ref 0), "_entreeloop", "_testloop"
 
+let (table_chaine : hashstring) = Hashtbl.create 50
+
 type envchaine = int Smap.t (* ou une table de Hash, cela éviterait de prendre en compte cela partout *)
 
 
@@ -96,7 +98,11 @@ let rec code_expr lvl texpr = match texpr.c with
 
 let code_cout_expr_str lvl (*env*) e = match e with
 	| TEsexpr te -> { text = (code_expr lvl te) ++ (li v0 1) ++ (syscall) ; data = nop }
-	| TEstring s -> let lab = next_lab nstring in
+	| TEstring s -> if Hashtbl.mem table_chaine s then 
+				let lab = Hashtbl.find table_chaine s in
+					{ text = (la a0 alab lab) ++ (li v0 4) ++ (syscall) ; data = nop }
+			else let lab = next_lab nstring in 
+				Hashtbl.add table_chaine s lab ;
 				{ text = (la a0 alab lab) ++ (li v0 4) ++ (syscall) ; 
 				data = (label lab) ++ (asciiz s) }
 
