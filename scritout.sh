@@ -2,7 +2,7 @@
 
 path=/home/nm/Documents/tests
 pathbin=/home/nm/Documents/minicpp/minic++
-
+pathstore=/home/nm/Documents/ftempo/
 comptc=0
 comptni=0
 compt=0
@@ -17,13 +17,33 @@ else
 	argu=""
 fi
 
+function compi {
+	name=$(basename "$1")
+	name="${name%.*}"
+	$pathbin $i -o "$pathstore$name.s"
+	if [ $? == 0 ] ; then
+		spim -f "$pathstore$name.s" | tail -n +6 > "$pathstore$name.out"
+		d="$(diff "$pathstore$name.out" "$name.out")"
+		if [ -z "$d" ] ; then
+			echo -e "Réussite de la compilation du fichier $1\\n"
+			return 0
+		else
+			echo -e "Echec de la compilation du fichier $1\\n"
+			echo $d
+			return 1
+		fi
+	else
+		return 3
+	fi
+}
+
 function app {
 	optionv=$3
 	cd $path/$1
 	echo -e "$1\\n"
 	for i in *.cpp ; do
 		echo "Fichier : $i"
-		if [ -z "$2" ] ; then
+		if [ -z "$argu" ] ; then
 			compi $i
 		else	
 			$pathbin $2 $i #> /dev/null
@@ -62,18 +82,3 @@ app "/exec" $argu 1
 
 echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implémenté : $comptni)\\n"
 
-function compi {
-	name="{$1%.*}"
-	$pathbin $i -o "/tmp/$name.s"
-	#retour=$?
-	spim -f "/tmp/$name.s" | tail -n +6 > "/tmp/$name.out"
-	d = diff "/tmp/$name.out" "$name.out" 
-	if [ -z "$d" ] ; then
-		echo -e "Réussite de la compilation du fichier $1\\n"
-		exit 0
-	else
-		echo -e "Echec de la compilation du fichier $1\\n"
-		echo $d
-		exit 1
-	fi
-}
