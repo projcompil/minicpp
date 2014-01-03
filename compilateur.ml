@@ -107,6 +107,16 @@ let rec code_expr lvl texpr = match texpr.c with
 					| TEqident(_) -> rate ""
 					| _ -> failwith "Heisenbug 2.\n"
 				   end
+	| TEqident (TQident tid) -> (* il faut corriger les offset dans typage.ml *)
+			assert (tid.lvl <= lvl) ;
+			(move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++ (if tid.byref then add a0 t0 oi tid.offset else lw a0 areg (tid.offset, t1)) ++ (if tid.byref then lw a0 areg (0, a0) else nop)
+	| TEassign({ c = TEqident (TQident tid) ; typ = _  }, tf) -> 
+			(code_expr lvl tf) ++
+			(move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++
+			(if tid.byref then lw t1 areg (tid.offset, t1)
+			 else add t1 t1 oi tid.offset) ++
+			(sw a0 areg (0, t1))				
+(* pour l'instant uniquement les variables et non les membres d'objets *)
 	| _ ->  rate "Compilation de cette partie non encore implémentée.\n"
 
 
@@ -154,12 +164,13 @@ let rec code_inst lvl ti = match ti with
 and code_bloc lvl (TBloc tl) = conca (List.map (code_inst (lvl+1)) tl)
 
 let code_proto tp = match tp with
+	| TProto(tt, tqv, tla) -> rate ""
 	| _ -> rate "Pas d'autres fonctions que main.\n"
 
 (* ne pas gérer le main dans code_proto *)
 
 let code_decl td = match td with
-	| TDv tdv -> rate ""
+	| TDv tdv -> nopp (* peut-êttre à changer pour la PµOO *)
 	| TDc tdc -> rate ""
 	| TDb ( (TProto(Tint, (TQvar(TQident(ti))), [])), tb) when ti.rep = "main" -> conca [ { text = (label "main") ; data = nop } ; (code_bloc 0 tb) ; { text = (li v0 10) ++ (syscall); data = nop } ]
 	| TDb (tp, tb) -> addp (code_proto tp) (code_bloc 0 tb)
