@@ -122,7 +122,7 @@ let rec code_inst lvl ti = match ti with
   	| TIfelse (te, ti, tj) -> let (lab1, lab2) = next_labd nif in
 					let ci = code_inst lvl ti in
 					let cj = code_inst lvl tj in
-						{ text = (code_expr lvl te) ++ (bnez a0 lab1) ++ ci.text ++ (b lab2) ++ (label lab1)  ++ cj.text ++ (label lab2) ; data = ci.data ++ cj.data }
+						{ text = (code_expr lvl te) ++ (beqz a0 lab1) ++ ci.text ++ (b lab2) ++ (label lab1)  ++ cj.text ++ (label lab2) ; data = ci.data ++ cj.data }
   	| TWhile (te, ti) -> let (lab1, lab2) = next_labd nloop in
 				let ci = code_inst lvl ti in
 				{ text = (b lab2) ++ (label lab1) ++ ci.text ++  (label lab2) ++ (code_expr lvl te) ++ (bnez a0 lab1) ; data = ci.data }
