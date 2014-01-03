@@ -79,7 +79,7 @@ let rec code_expr lvl texpr = match texpr.c with
 		(code_expr lvl tf) ++  (pop t1) ++
 		((associe_opar op) a0 t1 oreg a0)
 	| TEop(op, te, tf) when List.mem op [Or ; And ] -> let lab = next_lab ntest in
-		(code_expr lvl te) ++ ((if op = Or then beqz else bnez) a0 lab) ++
+		(code_expr lvl te) ++ ((if op = Or then bnez else beqz) a0 lab) ++
 		(code_expr lvl tf) ++ (label lab)
         | TEop (op, te, tf) -> 
 		(code_expr lvl te) ++ (push a0) ++
