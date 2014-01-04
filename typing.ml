@@ -536,9 +536,18 @@ let typproto p env in_class = match p.v with
 		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
 		failwith "proovv"
 	end
-					| (TQmeth(s,id)), (Some nc) -> failwith "Non implémenté (méthode de classe2)."
+					| (TQmeth(s,id)), (Some (nc, bvir)) -> failwith "Non implémenté (méthode de classe2)."
 				end
-	| Pcons (s, l) -> failwith "Non implémenté (prototype constructeur).\n"
+	| Pcons (s, l) -> let tl, renv = add_args l env in
+				if f_is_in_list tl (find_all_meth s (chcons ^ s)) then
+					erreur p.loc "Un constructeur de même signature a déjà été déclarée.\n"				       
+				else begin add_meth s (chcons ^ s) (Tclass s) (false, (match in_class with | None -> failwith "Heisenbug 3.\n"
+								     | Some (nc, bvir) -> bvir) ) tl ;
+					(*let prov = { rep = (chcons ^ s) ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = false}
+        in let renv = Smap.add (ch ) prov env in*)
+					(TPcons(s, tl)), env, env
+				end
+ (*failwith "Non implémenté (prototype co0nstructeur).\n"*)
 	| Pconshc (s, s2, l) -> assert (in_class = None); failwith "Non implémenté (définition du constructeur).\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
