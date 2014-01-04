@@ -57,7 +57,7 @@ function app {
 			comptni=$[comptni+1]
 		
 		else
-			echo "$i" >> "$pathstore$nomferreurs"
+			echo "$path$1/$i" >> "$pathstore$nomferreurs"
 		fi
 		compt=$[compt+1]
 	done
@@ -88,3 +88,4 @@ echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implém
 
 echo -e "Les fichiers provoquant des erreurs sont :\\n"
 cat "$pathstore$nomferreurs"
+rm "$pathstore$nomferreurs"
