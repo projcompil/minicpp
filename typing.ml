@@ -252,7 +252,7 @@ let find_meth c m =
 *)
 	Hashtbl.find (Hashtbl.find table_c_meth c) m
 
-let find_meth_list c m =
+let find_all_meth c m =
 	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
 
 let is_member_sr c m =
@@ -506,8 +506,8 @@ let typproto p env in_class = match p.v with
 				let tqv = typqvar qv env 0 true in
 				   let (tl, envir) = add_args l env in 
 (* ce serait mieux de l'avoir après mais sans duplication de code *)				   let tqid = extract_tqvar tqv in begin
-				   match tqid with
-					| TQident id -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
+				   match (tqid, in_class) with
+					| (TQident id), None -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
 							else begin
 								add_f id.rep tt (tqvar_by_ref tqv) tl ;
@@ -519,7 +519,13 @@ let typproto p env in_class = match p.v with
 							end
 
 
-					| TQmeth(s,id) -> failwith "Non implémenté (méthode de classe).\n"
+					| (TQmeth(s,id)), None -> failwith "Non implémenté (méthode de classe).\n"
+					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
+	else begin
+		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
+		failwith "proovv"
+	end
+					| (TQmeth(s,id)), (Some nc) -> failwith "Non implémenté (méthode de classe2)."
 				end
 	| Pcons (s, l) -> failwith "Non implémenté (prototype constructeur).\n"
 	| Pconshc (s, s2, l) -> failwith "Non implémenté (définition du constructeur).\n"
@@ -550,7 +556,8 @@ let typmembre s (* classe du membre *) env lvl m  = match m.v with
 			with (Member_dejavu nm) -> erreur m.loc ("Le membre " ^ nm ^ " est déjà déclarée dans cette classe (ou est un doublon dans cette déclaratioon.\n")
 			end
 			(*failwith "Non implé()menté (membre non implé()menté).\n"*)
-	| Mmeth (b, p) -> failwith "Non implémenté (prototype méthode non implémenté).\n" 
+	| Mmeth (b, p) -> let (tp, benvir ,envir) = typproto p env (Some (s, b)) in
+				TMmeth(b, tp), envir (* vérifier qu'il n'y a pas deux méthodes de même signatures *) (*let failwith "Non implémenté (prototype méthode non implé()menté).\n" *)
 
 
 let typdecl_c dc env lvl = match dc.v with
@@ -650,7 +657,7 @@ let rec typexpr expr env lvl = match expr.v with
 
   | Enew (nc, l) -> if Hashtbl.mem table_c nc then
 			let tl = List.map (fun x -> (typexpr x env lvl)) l in
-				 let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_meth_list nc (chcons ^ nc)) in begin
+				 let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_all_meth nc (chcons ^ nc)) in begin
                                                         match optcons with
                                                                 | None -> erreur expr.loc "Aucun constructeur de la classe ne correspond au profil d'appel dans cette invocation de new.\n"
                                                                 | Some(la, ni, ttt, _) -> { c = (TEnew(nc, tl, ni)) ; typ = Tpointeur (Tclass nc) }
@@ -758,7 +765,7 @@ let rec typinst i env lvl = match i.v with
 						erreur v.loc "Cette variable n'a pas le même type que celui de l'objet retourné par le constructeur.\n"
 				else
 				     let tl = List.map (fun x -> typexpr x env lvl) l in
-						let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_meth_list s chcons) in begin
+						let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_all_meth s chcons) in begin
 							match optcons with
 								| None -> erreur i.loc "Aucun constructeur de la classe ne correspond au profil d'appel dans cette instruction.\n"
 								| Some(la, ni, ttt, _) -> TIdeclobj(tt, tv, s, tl, ni), envir (*failwith "(assignation objet retour constructeur) non implé( )menté"*)
@@ -837,7 +844,7 @@ and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
 let typdecl d env = match d.v with
 	| Dv dv -> let (tdv, envir) = typdecl_v env 0 dv in ( TDv tdv), envir
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
-        | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env false in
+        | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env None in
 				let tbl = typbloc bl envir 1 in
 					(TDb (tp, tbl)), env_hb 
 
