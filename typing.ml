@@ -571,7 +571,8 @@ let rec typexpr expr env lvl = match expr.v with
 							let tidm = find_member nc s in
 								{ c = TEattr (te, tidm) ; typ = tidm.typ }
 					       else if is_meth nc s then
-							failwith "erreur prov"
+							let tidm = find_meth nc s in
+								failwith "Méthode non encore implémentée.\n" (* il faut sûrement rajouter des constructeurs de type, pour prendre en compte les méthodes, et leurs applications !! *)(*{ c = TEattr (te, tidm) ; typ = tidm.typ }*)
 						else erreur expr.loc (s ^ " n'est pas un membre de la classe " ^ nc)
 				| _ -> erreur e.loc "Cette expression ne représente pas un objet, on ne peut donc utiliser l'opérateur . pour accéder à un de ses membres.\n"
 			end
