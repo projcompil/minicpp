@@ -5,6 +5,8 @@ open Ast
 
 exception Error of loc * string
 
+exception Member_dejavu of string
+
 type typ =
     | Tnull
     | Tint
@@ -302,7 +304,10 @@ let is_member c m =
 	Hashtbl.mem ((Hashtbl.find table_c_member c)) m 
 
 let add_member c m i =
-	Hashtbl.add (Hashtbl.find table_c_member c) m i
+	let tc = (Hashtbl.find table_c_member c) in
+		if Hashtbl.mem tc m then
+			raise (Member_dejavu m)
+		else Hashtbl.add tc m i
 
 let find_member_list c m =
         Hashtbl.find_all (Hashtbl.find table_c_member c) m
@@ -514,8 +519,15 @@ let rec typdecl_v env lvl dv = match dv.v with
 
 
 
-let typmembre s env lvl m  = match m.v with
-	| Mvar dv -> failwith "Non implémenté (membre non implémenté).\n"
+let typmembre s (* classe du membre *) env lvl m  = match m.v with
+	| Mvar dv -> let ((TDeclv(tt, tl)), envir) = typdecl_v env lvl dv in
+			let tlid = List.map (fun x -> (extract_tvar x)) tl in
+		     	 begin try
+				List.iter (fun x -> (add_member s x.rep x)) tlid;
+				(TMvar (TDeclv(tt, tl))), envir	
+			with (Member_dejavu nm) -> erreur m.loc ("Le membre " ^ nm ^ " est déjà déclarée dans cette classe (ou est un doublon dans cette déclaratioon.\n")
+			end
+			(*failwith "Non implé()menté (membre non implémenté).\n"*)
 	| Mmeth (b, p) -> failwith "Non implémenté (prototype méthode non implémenté).\n" 
 
 
@@ -528,7 +540,13 @@ let typdecl_c dc env lvl = match dc.v with
 					let (new_tmethod : tdemeths) = Hashtbl.create 10 and (new_tmember : tdemems) = Hashtbl.create 10 in
 					Hashtbl.add table_c_meth s new_tmethod ;
 					Hashtbl.add table_c_member s new_tmember;
-					let lm = (List.map (typmembre s env lvl) l) in
+					let rec auxdeclc envi l = match l with
+						| [] -> [], envi
+						| x::l -> let tx, envir = typmembre s envi lvl x in
+								let reste, renvir = auxdeclc envir l in
+									(tx::reste), renvir
+					in
+					let (lm, envir) = auxdeclc env l in
 						let renv = Smap.add s {rep = s ; typ = Tclassdecl ; lvl = 0 ; offset = 0 ; byref = false } env in
 						if is_meth s (chcons ^ s) then
 							(TClass(s, (TSuper tl), lm)), renv
@@ -697,7 +715,7 @@ let rec typinst i env lvl = match i.v with
 					if is_bf tt then
                             	    		let tv, envir = (typvar v env lvl tt) in
 						let te = typexpr e env lvl in
-							if (is_sub_type te.typ tv.typ) || (te.typ = Tnull && (is_pointeur ((extract_tvar tv).typ) ))then
+							if (is_sub_type te.typ tv.typ) then
 								if not(tvar_by_ref tv) then
 									(TIdeclinit(tt, tv,te)), envir
 								else
