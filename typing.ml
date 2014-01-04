@@ -218,57 +218,9 @@ let is_pointeur = function
 	| Tpointeur _ | Tnull -> true
 	| _ -> false
 
-let rec is_left_value e (env:environnement) = match e.v with
-	| Eqident ex -> begin match ex.v with
-				| Qident s -> begin try 
-						let id = Smap.find s env in
-							(id.typ <> Fonc) || id.byref
-					      with Not_found -> false
-					      end
-				| Qmeth _ -> false	
-			end  
-	| Epointeur _ | Esderef _ | Eattr _ -> true
-	| Epar ex -> is_left_value ex env
-	| _ -> false  (* y en a-t-il d'autres ? *)
 
+(**********)
 
-let rec is_left_tvalue te env = match te.c with
-        | TEqident ex -> begin match ex with
-                                | TQident id -> (id.typ <> Fonc) || (id.byref)
-                                | TQmeth _ -> false
-                        end
-        | TEpointeur _ | TEsderef _ | TEattr _ -> true
-	| TEfcall(_,_,_, b) -> b
-        | TEpar ex -> is_left_tvalue ex env
-        | _ -> false  (* y en a-t-il d'autres ? *)
-
-let not_left loc =
-(*	erreurloc, "L'expression n'est pas une valeur gauche.\n"))*)
-	erreur loc "L'expression n'est pas une valeur gauche.\n"
-
-
-let rec size_type t = match t with
-	| Tint -> 4
-	| Tnull -> 4 (* ou 0 ?*)
-	| Tpointeur _ -> 4
-	| Tclass s -> Hashtbl.find table_c_size s 
-	| Tvoid | Fonc | Tclassdecl -> 0
-
-let rec extract_var v = match v.v with
-	| Ident s -> s
-	| Po va | Ad va-> extract_var va
-
-let rec extract_qvar qv = match qv.v with
-	| Qvar q -> q
-	| Qpo qva | Qad qva -> extract_qvar qva
-
-let rec extract_tvar tv = match tv.c with
-	| TIdent i -> i
-	| TPo tva | TAd tva-> extract_tvar tva
-
-let rec extract_tqvar tqv = match tqv with
-	| TQvar q -> q
-	| TQpo tqva | TQad tqva -> extract_tqvar tqva
 
 let add_func tab f t b l =
 	let lf = Hashtbl.find_all tab f in
@@ -321,6 +273,70 @@ let find_member_list c m =
 
 let find_member c m =
         Hashtbl.find (Hashtbl.find table_c_member c) m
+
+let get_envc c =
+	Hashtbl.find table_c_env c 
+
+
+
+
+(*******)
+
+
+let rec is_left_value e (env:environnement) = match e.v with
+	| Eqident ex -> begin match ex.v with
+				| Qident s -> begin try 
+						let id = Smap.find s env in
+							(id.typ <> Fonc) || id.byref
+					      with Not_found -> false
+					      end
+				| Qmeth _ -> false	
+			end  
+	| Epointeur _ | Esderef _ | Eattr _ -> true
+	| Epar ex -> is_left_value ex env
+	| _ -> false  (* y en a-t-il d'autres ? *)
+
+
+let rec is_left_tvalue te env = match te.c with
+        | TEqident ex -> begin match ex with
+                                | TQident id -> (id.typ <> Fonc) || (id.byref)
+                                | TQmeth _ -> false
+                        end
+        | TEpointeur _ -> true
+	| TEattr ({ c = te ; typ = (Tclass nc) }, s) | TEsderef ({ c = te ; typ = (Tpointeur (Tclass nc)) }, s) -> is_member nc s.rep
+	| TEfcall(_,_,_, b) -> b
+        | TEpar ex -> is_left_tvalue ex env
+        | _ -> false  (* y en a-t-il d'autres ? *)
+
+let not_left loc =
+(*	erreurloc, "L'expression n'est pas une valeur gauche.\n"))*)
+	erreur loc "L'expression n'est pas une valeur gauche.\n"
+
+
+let rec size_type t = match t with
+	| Tint -> 4
+	| Tnull -> 4 (* ou 0 ?*)
+	| Tpointeur _ -> 4
+	| Tclass s -> Hashtbl.find table_c_size s 
+	| Tvoid | Fonc | Tclassdecl -> 0
+
+let rec extract_var v = match v.v with
+	| Ident s -> s
+	| Po va | Ad va-> extract_var va
+
+let rec extract_qvar qv = match qv.v with
+	| Qvar q -> q
+	| Qpo qva | Qad qva -> extract_qvar qva
+
+let rec extract_tvar tv = match tv.c with
+	| TIdent i -> i
+	| TPo tva | TAd tva-> extract_tvar tva
+
+let rec extract_tqvar tqv = match tqv with
+	| TQvar q -> q
+	| TQpo tqva | TQad tqva -> extract_tqvar tqva
+
+
 
 let rec tvar_by_ref tva = match tva.c with
 	| TIdent id -> id.byref
@@ -554,10 +570,11 @@ let typdecl_c dc env lvl = match dc.v with
 					in
 					let (lm, envir) = auxdeclc env l in
 						let renv = Smap.add s {rep = s ; typ = Tclassdecl ; lvl = 0 ; offset = 0 ; byref = false } env in
+						Hashtbl.add table_c_env s envir ;
 						if is_meth s (chcons ^ s) then
 							(TClass(s, (TSuper tl), lm)), renv
 						else begin
-							add_meth s (chcons ^ s) (Tclass s) (false, false) []; (* ajouter constructeur !!!!!!!!!!!!  *)
+							add_meth s (chcons ^ s) (Tclass s) (false, false) []; 
 							(TClass(s, (TSuper tl), lm)), renv	
 						end
 					(*with Not_found -> 	*)
@@ -627,6 +644,7 @@ let rec typexpr expr env lvl = match expr.v with
 				
 							   else erreur e.loc "Cette expression n'est pas une fonction.\n"
 				| TEqident (TQmeth(_)) -> failwith "Non implémenté (méthode fonction).\n" 
+	(* rajouter accès méthodes *)
 				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
 		end
 

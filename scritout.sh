@@ -18,6 +18,8 @@ else
 	argu=""
 fi
 
+echo "" > "$pathstore$nomferreurs"
+
 function compi {
 	name=$(basename "$1")
 	name="${name%.*}"
@@ -86,6 +88,6 @@ app "/exec" "$argu" 1
 
 echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implémenté : $comptni)\\n"
 
-echo -e "Les fichiers provoquant des erreurs sont :\\n"
+echo "Les fichiers provoquant des erreurs sont :"
 cat "$pathstore$nomferreurs"
-rm "$pathstore$nomferreurs"
+#rm "$pathstore$nomferreurs"
