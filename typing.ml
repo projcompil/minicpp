@@ -295,20 +295,21 @@ let find_meth c m =
 *)
 	Hashtbl.find (Hashtbl.find table_c_meth c) m
 
-let is_meth c m =
-	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m 
+let find_meth_list c m =
+	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
+
+let is_member c m =
+	Hashtbl.mem ((Hashtbl.find table_c_member c)) m 
 
 let add_member c m i =
 	Hashtbl.add (Hashtbl.find table_c_member c) m i
 
-let find_meth_list c m =
-        Hashtbl.find_all (Hashtbl.find table_c_meth c) m
+let find_member_list c m =
+        Hashtbl.find_all (Hashtbl.find table_c_member c) m
 
-let find_meth_list c m =
-	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
 
-let find_meth c m =
-        Hashtbl.find (Hashtbl.find table_c_meth c) m
+let find_member c m =
+        Hashtbl.find (Hashtbl.find table_c_member c) m
 
 let rec tvar_by_ref tva = match tva.c with
 	| TIdent id -> id.byref
@@ -566,7 +567,12 @@ let rec typexpr expr env lvl = match expr.v with
 		   	else not_left expr.loc 
   | Eattr (e,s)-> let te = typexpr e env lvl in
 			begin match te.typ with 
-				| Tclass s -> failwith "erreur prov"
+				| Tclass nc -> if is_member nc s then 
+							let tidm = find_member nc s in
+								{ c = TEattr (te, tidm) ; typ = tidm.typ }
+					       else if is_meth nc s then
+							failwith "erreur prov"
+						else erreur expr.loc (s ^ " n'est pas un membre de la classe " ^ nc)
 				| _ -> erreur e.loc "Cette expression ne représente pas un objet, on ne peut donc utiliser l'opérateur . pour accéder à un de ses membres.\n"
 			end
 
