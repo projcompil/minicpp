@@ -101,10 +101,14 @@ let () =
 	doublelocal loc ;
 	eprintf "Erreur dans le typage: %s@." s;
 	exit 1
+    | Typing.Not_implementedt s | Compilateur.Not_implementedc s ->
+	localisation (Lexing.lexeme_start_p buf);
+	eprintf "Erreur du compilateur (caractéristique non implémentée) :  %s" s;
+	exit 3
     | Failure s ->
 	localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur : message :  %s" s;
-	exit 3;
+	exit 2;
     | _ -> 
         localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur.\n";

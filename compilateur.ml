@@ -4,7 +4,9 @@ open Ast
  (* Ici commence l'assemblage \Production de code\*) 
  (*Une expression entière*)
 
-
+exception Not_implementedc of string
+let ratec s =
+	raise (Not_implementedc("Compilation non impléméntée : " ^ s))
 
 (* numéro des label *)
 
@@ -34,8 +36,6 @@ let nopp = { text = nop ; data = nop } (* petit raccourci *)
 
 let convp e = { text = e ; data = nop }
 
-let rate s =
-	failwith ("Compilation non impléméntée : " ^ s)
 
 let addp a b =
 	{ text = a.text ++ b.text ; data = a.data ++ b.data }
@@ -104,7 +104,7 @@ let rec code_expr lvl texpr = match texpr.c with
 	| TEuplus te -> (code_expr lvl te)
 	| TEfcall(te, tl, i, b) -> begin match te.c with
 					| TEqident(TQident id) -> (List.fold_left (fun code e -> code ++ (code_expr lvl e) ++ (push a0)) nop tl) ++ (move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++ (push t1) ++ (jal (id.rep ^ (string_of_int i))) ++ (popn (1+ List.length tl))
-					| TEqident(_) -> rate ""
+					| TEqident(_) -> ratec ""
 					| _ -> failwith "Heisenbug 2.\n"
 				   end
 	| TEqident (TQident tid) -> (* il faut corriger les offset dans typage.ml *)
@@ -117,7 +117,7 @@ let rec code_expr lvl texpr = match texpr.c with
 			 else add t1 t1 oi tid.offset) ++
 			(sw a0 areg (0, t1))				
 (* pour l'instant uniquement les variables et non les membres d'objets *)
-	| _ ->  rate "Compilation de cette partie non encore implémentée.\n"
+	| _ ->  ratec "Compilation de cette partie non encore implémentée.\n"
 
 
 
@@ -142,10 +142,10 @@ let code_cout_expr_str lvl (*env*) e = match e with
 let rec code_inst lvl ti = match ti with
 	| TNothing -> nopp
   	| TIexpr te -> { text = (code_expr lvl te) ; data = nop }
-  	| TIdecl (tt, tv) -> rate "" 
-  	| TIdeclinit (tt, tv, te) -> rate ""
-  	| TIdeclobj (tt, tv, s, tl, ni) -> rate "" 
-  	(*| TIf (te, ti) -> rate ""*)
+  	| TIdecl (tt, tv) -> ratec "" 
+  	| TIdeclinit (tt, tv, te) -> ratec ""
+  	| TIdeclobj (tt, tv, s, tl, ni) -> ratec "" 
+  	(*| TIf (te, ti) -> ratec ""*)
   	| TIfelse (te, ti, tj) -> let (lab1, lab2) = next_labd nif in
 					let ci = code_inst lvl ti in
 					let cj = code_inst lvl tj in
@@ -158,20 +158,20 @@ let rec code_inst lvl ti = match ti with
 						{ text = (concatene (List.map (code_expr lvl) tl1)) ++ (b lab2) ++ (label lab1) ++ ci.text ++ (concatene (List.map (code_expr lvl) tl2)) ++  (label lab2) ++ (code_expr lvl te) ++ (bnez a0 lab1) ; data = ci.data }
   	| TIbloc tb -> code_bloc lvl tb
   	| TCout tls -> conca (List.map (code_cout_expr_str lvl) tls)
-  	| TReturn te -> rate ""
-  	| TAreturn -> rate ""
+  	| TReturn te -> ratec ""
+  	| TAreturn -> ratec ""
 
 and code_bloc lvl (TBloc tl) = conca (List.map (code_inst (lvl+1)) tl)
 
 let code_proto tp = match tp with
-	| TProto(tt, tqv, tla) -> rate ""
-	| _ -> rate "Pas d'autres fonctions que main.\n"
+	| TProto(tt, tqv, tla) -> ratec ""
+	| _ -> ratec "Pas d'autres fonctions que main.\n"
 
 (* ne pas gérer le main dans code_proto *)
 
 let code_decl td = match td with
 	| TDv tdv -> nopp (* peut-êttre à changer pour la PµOO *)
-	| TDc tdc -> rate ""
+	| TDc tdc -> ratec ""
 	| TDb ( (TProto(Tint, (TQvar(TQident(ti))), [])), tb) when ti.rep = "main" -> conca [ { text = (label "main") ; data = nop } ; (code_bloc 0 tb) ; { text = (li v0 10) ++ (syscall); data = nop } ]
 	| TDb (tp, tb) -> addp (code_proto tp) (code_bloc 0 tb)
 

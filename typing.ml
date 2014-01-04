@@ -7,6 +7,12 @@ exception Error of loc * string
 
 exception Member_dejavu of string
 
+exception Not_implementedt of string
+
+exception Class_not_found of string
+let ratet s =
+	raise (Not_implementedt("Typage de cette caractéristique non implémenté : " ^ s))
+
 type typ =
     | Tnull
     | Tint
@@ -192,6 +198,7 @@ let rec is_sub_class c1 c2 =
 		try
 			(remonte c2 (Hashtbl.find_all table_c c1))
 		with _ -> failwith ("La classe " ^ c1 ^ " n'est pas définie."))
+			(*raise (Class_not_found("La classe " ^ c1 ^ " n'est pas définie.")))*)
 
 
 let rec is_sub_type t1 t2 = match (t1, t2) with
@@ -488,7 +495,7 @@ let typqident q env lvl bdecl = match q.v with
 				 TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
 			else try
 				let tid = Smap.find "this" env in
-					failwith "Non implémenté (Qmeth)\n"
+					ratet "(Qmeth)\n"
 				with Not_found -> erreur q.loc ("this n'est pas ajouté à l'environnement (bug !!).\n")
 
 		     end (*failwith "Non implé()menté (méthode d'une classe).\n"*)
@@ -537,9 +544,9 @@ let typproto p env in_class = match p.v with
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
 		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
-		failwith "proovv non implémenté"
+		ratet "proovv non implémenté"
 	end
-					| (TQmeth(s,id)), (Some (nc, bvir)) -> failwith "Non implémenté (méthode de classe2)."
+					| (TQmeth(s,id)), (Some (nc, bvir)) -> ratet "(méthode de classe2)."
 				end
 	| Pcons (s, l) -> let tl, renv = add_args l env in
 				if f_is_in_list tl (find_all_meth s (chcons ^ s)) then
@@ -551,7 +558,7 @@ let typproto p env in_class = match p.v with
 					(TPcons(s, tl)), env, env
 				end
  (*failwith "Non implé()menté (prototype co0nstructeur).\n"*)
-	| Pconshc (s, s2, l) -> assert (in_class = None); failwith "Non implémenté (définition du constructeur).\n"
+	| Pconshc (s, s2, l) -> assert (in_class = None); ratet "(définition du constructeur).\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
@@ -588,7 +595,7 @@ let typdecl_c dc env lvl = match dc.v with
 				erreur dc.loc ("La classe " ^ s ^" a déjà été déclarée.\n")
 			 else 
 				let (TSuper tl) = typsupers sup in
-					List.iter (Hashtbl.add table_c s) (s::(List.map (function | (Tclass ch) -> ch | _ -> failwith "Heisenbug.\n") tl)) ;
+					List.iter (Hashtbl.add table_c s) (""::(List.map (function | (Tclass ch) -> ch | _ -> failwith "Heisenbug.\n") tl)) ;
 					let (new_tmethod : tdemeths) = Hashtbl.create 10 and (new_tmember : tdemems) = Hashtbl.create 10 in
 					Hashtbl.add table_c_meth s new_tmethod ;
 					Hashtbl.add table_c_member s new_tmember;
@@ -673,8 +680,8 @@ let rec typexpr expr env lvl = match expr.v with
 			  end
 				
 							   else erreur e.loc "Cette expression n'est pas une fonction.\n"
-				| TEqident (TQmeth(_)) -> failwith "Non implémenté (méthode fonction).\n" 
-				| TEattr(te, id) when id.typ = Fonc -> failwith "Non implémenté (appel méthode fonction).\n"
+				| TEqident (TQmeth(_)) -> ratet "(méthode fonction).\n" 
+				| TEattr(te, id) when id.typ = Fonc -> ratet "(appel méthode fonction).\n"
 	(* rajouter accès méthodes *)
 				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
 		end
@@ -782,7 +789,7 @@ let rec typinst i env lvl = match i.v with
 	| Ideclobj (tdef, v, s, l)-> let tt = typtypedef tdef in
 				     if tt <> (Tclass s) then
 					erreur i.loc "Le type de cette déclaration ne correspond pas à la classe du constructeur appelé.\n"
-				else
+				else (* corriger ici *)
 				     let (tv, envir) = typvar v env lvl tt in
 				     let tvid = extract_tvar tv in
 				         if tvid.typ <> tt then
