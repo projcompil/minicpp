@@ -74,7 +74,7 @@ and tdexpr  =
   | TEqident of tqident
   | TEpointeur of texpr
   | TEattr of texpr * ident
-  | TEsderef of texpr * ident 
+  (*| TEsderef of texpr * ident *)
   | TEassign of texpr * texpr
   | TEfcall of texpr * (texpr list) * int * bool (* numéro fonction appelée et indique si son retour est une référence*)
   | TEmcall of texpr * (texpr list) * string (* nom de la classe de la méthode appelée *) * int * bool
@@ -278,8 +278,9 @@ let find_member c m =
 let get_envc c =
 	Hashtbl.find table_c_env c 
 
-
-
+let ajoute_env c env =
+	let bindings = Smap.bindings (Hashtbl.find table_c_env c) in
+		List.fold_left (fun envi (k, v) -> Smap.add k v envi) env bindings
 
 (*******)
 
@@ -304,7 +305,7 @@ let rec is_left_tvalue te env = match te.c with
                                 | TQmeth _ -> false
                         end
         | TEpointeur _ -> true
-	| TEattr ({ c = te ; typ = (Tclass nc) }, s) | TEsderef ({ c = te ; typ = (Tpointeur (Tclass nc)) }, s) -> is_member nc s.rep
+	| TEattr ({ c = te ; typ = (Tclass nc) }, s) (*| TEsderef ({ c = te ; typ = (Tpointeur (Tclass nc)) }, s) *) -> is_member nc s.rep
 	| TEfcall(_,_,_, b) -> b
 	| TEmcall(_,_,_,_,b) -> b
         | TEpar ex -> is_left_tvalue ex env
@@ -479,7 +480,15 @@ let typqident q env lvl bdecl = match q.v with
 						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
 				else erreur q.loc ("L'identifiant " ^ s ^ " n'est pas à portée.\n")
 		end
-  | Qmeth (st, s) -> failwith "Non implémenté (méthode d'une classe).\n"
+  | Qmeth (st, s) -> begin
+			if bdecl then
+				 TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
+			else try
+				let tid = Smap.find "this" env in
+					failwith "Non implémenté (Qmeth)\n"
+				with Not_found -> erreur q.loc ("this n'est pas ajouté à l'environnement (bug !!).\n")
+
+		     end (*failwith "Non implé()menté (méthode d'une classe).\n"*)
 
 
 
@@ -521,7 +530,7 @@ let typproto p env in_class = match p.v with
 							end
 
 
-					| (TQmeth(s,id)), None -> failwith "Non implémenté (méthode de classe).\n"
+					| (TQmeth(s,id)), None -> failwith "Non implé()menté (méthode de classe).\n"
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
 		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
@@ -530,7 +539,7 @@ let typproto p env in_class = match p.v with
 					| (TQmeth(s,id)), (Some nc) -> failwith "Non implémenté (méthode de classe2)."
 				end
 	| Pcons (s, l) -> failwith "Non implémenté (prototype constructeur).\n"
-	| Pconshc (s, s2, l) -> failwith "Non implémenté (définition du constructeur).\n"
+	| Pconshc (s, s2, l) -> assert (in_class = None); failwith "Non implémenté (définition du constructeur).\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
@@ -559,7 +568,7 @@ let typmembre s (* classe du membre *) env lvl m  = match m.v with
 			end
 			(*failwith "Non implé()menté (membre non implé()menté).\n"*)
 	| Mmeth (b, p) -> let (tp, benvir ,envir) = typproto p env (Some (s, b)) in
-				TMmeth(b, tp), envir (* vérifier qu'il n'y a pas deux méthodes de même signatures *) (*let failwith "Non implémenté (prototype méthode non implé()menté).\n" *)
+				TMmeth(b, tp), envir (* vérifier qu'il n'y a pas deux méthodes de même signatures *) (*let failwith "Non imp()lémenté (prototype méthode non implé()menté).\n" *)
 
 
 let typdecl_c dc env lvl = match dc.v with
@@ -653,6 +662,7 @@ let rec typexpr expr env lvl = match expr.v with
 				
 							   else erreur e.loc "Cette expression n'est pas une fonction.\n"
 				| TEqident (TQmeth(_)) -> failwith "Non implémenté (méthode fonction).\n" 
+				| TEattr(te, id) when id.typ = Fonc -> failwith "Non implémenté (appel méthode fonction).\n"
 	(* rajouter accès méthodes *)
 				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
 		end
