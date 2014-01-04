@@ -74,7 +74,7 @@ and tdexpr  =
   | TEattr of texpr * ident
   | TEsderef of texpr * ident 
   | TEassign of texpr * texpr
-  | TEfcall of texpr * (texpr list) * int * bool
+  | TEfcall of texpr * (texpr list) * int * bool (* numéro fonction appelée et indique si son retour est une référence*)
   | TEnew of string * (texpr list)
   | TElincr of texpr
   | TEldecr of texpr
@@ -99,7 +99,7 @@ type tinst =
   | TIexpr of texpr
   | TIdecl of typ * tvar
   | TIdeclinit of typ * tvar * texpr
-  | TIdeclobj of typ * tvar * string * (texpr list)
+  | TIdeclobj of typ * tvar * string * (texpr list) * int (* numéro du constructeur appelé *)
   (*| TIf of texpr * tinst*)
   | TIfelse of texpr * tinst * tinst
   | TWhile of texpr * tinst
@@ -698,9 +698,9 @@ let rec typinst i env lvl = match i.v with
 						let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_meth_list s chcons) in begin
 							match optcons with
 								| None -> erreur i.loc "Aucun constructeur de la classe ne correspond au profil d'appel dans cette instruction.\n"
-								| Some(_) -> failwith "(assignation objet retour constructeur) non implémenté"
+								| Some(la, ni, ttt, _) -> TIdeclobj(tt, tv, s, tl, ni), envir (*failwith "(assignation objet retour constructeur) non implé( )menté"*)
 		
-						end (*failwith "non implémenté (assignation objet retour constructeur)."*)
+						end 
  	| If (e, ins)-> let te = typexpr e env lvl in
 				if te.typ = Tint then
 					let (tins,envir) = typinst ins env lvl in

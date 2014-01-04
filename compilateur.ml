@@ -144,7 +144,7 @@ let rec code_inst lvl ti = match ti with
   	| TIexpr te -> { text = (code_expr lvl te) ; data = nop }
   	| TIdecl (tt, tv) -> rate "" 
   	| TIdeclinit (tt, tv, te) -> rate ""
-  	| TIdeclobj (tt, tv, s, tl) -> rate "" 
+  	| TIdeclobj (tt, tv, s, tl, ni) -> rate "" 
   	(*| TIf (te, ti) -> rate ""*)
   	| TIfelse (te, ti, tj) -> let (lab1, lab2) = next_labd nif in
 					let ci = code_inst lvl ti in
