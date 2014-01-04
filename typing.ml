@@ -502,7 +502,9 @@ let typqident q env lvl bdecl = match q.v with
 				 TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
 			else try
 				let tid = Smap.find "this" env in
-					ratet "(Qmeth)\n"
+					if is_sub_type tid.typ (Tpointeur (Tclass st)) then 
+						ratet "(Qmeth)\n"
+					else erreur q.loc ("this n'est pas d'un type sous-type de " ^ st ^"\n")
 				with Not_found -> erreur q.loc ("this n'est pas ajouté à l'environnement (bug !!).\n")
 
 		     end (*failwith "Non implé()menté (méthode d'une classe).\n"*)
@@ -547,7 +549,7 @@ let typproto p env in_class = match p.v with
 							end
 
 
-					| (TQmeth(s,id)), None -> failwith "Non implé()menté (méthode de classe).\n"
+					| (TQmeth(s,id)), None ->  ratet "Non implé()menté (méthode de classe).\n"
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
 		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
