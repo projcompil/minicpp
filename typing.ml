@@ -527,7 +527,7 @@ let typmembre s (* classe du membre *) env lvl m  = match m.v with
 				(TMvar (TDeclv(tt, tl))), envir	
 			with (Member_dejavu nm) -> erreur m.loc ("Le membre " ^ nm ^ " est déjà déclarée dans cette classe (ou est un doublon dans cette déclaratioon.\n")
 			end
-			(*failwith "Non implé()menté (membre non implémenté).\n"*)
+			(*failwith "Non implé()menté (membre non implé()menté).\n"*)
 	| Mmeth (b, p) -> failwith "Non implémenté (prototype méthode non implémenté).\n" 
 
 

@@ -3,6 +3,7 @@
 path=/home/nm/Documents/tests
 pathbin=/home/nm/Documents/minicpp/minic++
 pathstore=/tmp/
+nomferreurs=erreurs_recensees
 comptc=0
 comptni=0
 compt=0
@@ -54,6 +55,9 @@ function app {
 			comptc=$[comptc+1]
 		elif [ $retour == 3 ] ; then
 			comptni=$[comptni+1]
+		
+		else
+			echo "$i" >> "$pathstore$nomferreurs"
 		fi
 		compt=$[compt+1]
 	done
@@ -82,3 +86,5 @@ app "/exec" "$argu" 1
 
 echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implémenté : $comptni)\\n"
 
+echo -e "Les fichiers provoquant des erreurs sont :\\n"
+cat "$pathstore$nomferreurs"
