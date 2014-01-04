@@ -684,7 +684,7 @@ let rec typinst i env lvl = match i.v with
 					if is_bf tt then
                             	    		let tv, envir = (typvar v env lvl tt) in
 						let te = typexpr e env lvl in
-							if is_sub_type te.typ tv.typ then
+							if (is_sub_type te.typ tv.typ) || (te.typ = Tnull && (is_pointeur ((extract_tvar tv).typ) ))then
 								if not(tvar_by_ref tv) then
 									(TIdeclinit(tt, tv,te)), envir
 								else
