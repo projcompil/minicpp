@@ -75,7 +75,7 @@ and tdexpr  =
   | TEsderef of texpr * ident 
   | TEassign of texpr * texpr
   | TEfcall of texpr * (texpr list) * int * bool (* numéro fonction appelée et indique si son retour est une référence*)
-  | TEnew of string * (texpr list)
+  | TEnew of string * (texpr list) * int (* numéro du constructeur appelé *)
   | TElincr of texpr
   | TEldecr of texpr
   | TErincr of texpr
@@ -593,7 +593,15 @@ let rec typexpr expr env lvl = match expr.v with
 				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
 		end
 
-  | Enew (nc, l) ->failwith "Expression non encore implémentée (new)\n"
+  | Enew (nc, l) -> if Hashtbl.mem table_c nc then
+			let tl = List.map (fun x -> (typexpr x env lvl)) l in
+				 let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_meth_list nc chcons) in begin
+                                                        match optcons with
+                                                                | None -> erreur expr.loc "Aucun constructeur de la classe ne correspond au profil d'appel dans cette invocation de new.\n"
+                                                                | Some(la, ni, ttt, _) -> { c = (TEnew(nc, tl, ni)) ; typ = Tpointeur (Tclass nc) }
+		end
+		    else erreur expr.loc "L'opérateur new invoque le constructeur d'une classe qui n'existe pas.\n"
+(*failwith "Expression non encore implé( )mentée (new)\n"*)
   | Elincr e-> let te = typexpr e env lvl in 
 		if is_left_tvalue te env then
 			begin match te.typ with 
