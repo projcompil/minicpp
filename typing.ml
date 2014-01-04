@@ -521,7 +521,7 @@ let rec typdecl_v env lvl dv = match dv.v with
 
 let typmembre s (* classe du membre *) env lvl m  = match m.v with
 	| Mvar dv -> let ((TDeclv(tt, tl)), envir) = typdecl_v env lvl dv in
-			let tlid = List.map (fun x -> (extract_tvar x)) tl in
+			let tlid = List.map (fun x -> let tid = (extract_tvar x) in if tid.typ = (Tclass s) then erreur m.loc "Ce champ a un type incomplet (utiliser un pointeur pour déclarer des champs du même type que la classe dans cette-même classe).\n" else tid) tl in
 		     	 begin try
 				List.iter (fun x -> (add_member s x.rep x)) tlid;
 				(TMvar (TDeclv(tt, tl))), envir	
