@@ -77,6 +77,7 @@ and tdexpr  =
   | TEsderef of texpr * ident 
   | TEassign of texpr * texpr
   | TEfcall of texpr * (texpr list) * int * bool (* numéro fonction appelée et indique si son retour est une référence*)
+  | TEmcall of texpr * (texpr list) * string (* nom de la classe de la méthode appelée *) * int * bool
   | TEnew of string * (texpr list) * int (* numéro du constructeur appelé *)
   | TElincr of texpr
   | TEldecr of texpr
@@ -305,6 +306,7 @@ let rec is_left_tvalue te env = match te.c with
         | TEpointeur _ -> true
 	| TEattr ({ c = te ; typ = (Tclass nc) }, s) | TEsderef ({ c = te ; typ = (Tpointeur (Tclass nc)) }, s) -> is_member nc s.rep
 	| TEfcall(_,_,_, b) -> b
+	| TEmcall(_,_,_,_,b) -> b
         | TEpar ex -> is_left_tvalue ex env
         | _ -> false  (* y en a-t-il d'autres ? *)
 
@@ -619,8 +621,8 @@ let rec typexpr expr env lvl = match expr.v with
 							let tidm = find_member nc s in
 								{ c = TEattr (te, tidm) ; typ = tidm.typ }
 					       else if is_meth nc s then
-							let tidm = find_meth nc s in
-								failwith "Méthode non encore implémentée.\n" (* il faut sûrement rajouter des constructeurs de type, pour prendre en compte les méthodes, et leurs applications !! *)(*{ c = TEattr (te, tidm) ; typ = tidm.typ }*)
+							(*let tidm = find_meth nc s in*)
+								{ c = TEattr (te,  {rep = s ; typ = Fonc ; lvl = lvl ; offset = 0 ; byref = false }) ; typ = Fonc } (*failwith "Méthode non encore implé()mentée.\n"*) (* il faut sûrement rajouter des constructeurs de type, pour prendre en compte les méthodes, et leurs applications !! *)(*{ c = TEattr (te, tidm) ; typ = tidm.typ }*)
 						else erreur expr.loc (s ^ " n'est pas un membre de la classe " ^ nc)
 				| _ -> erreur e.loc "Cette expression ne représente pas un objet, on ne peut donc utiliser l'opérateur . pour accéder à un de ses membres.\n"
 			end
