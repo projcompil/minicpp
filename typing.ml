@@ -11,7 +11,7 @@ exception Not_implementedt of string
 
 exception Class_not_found of string
 let ratet s =
-	raise (Not_implementedt("Typage de cette caractéristique non implémenté : " ^ s))
+	raise (Not_implementedt("Typage de cette caractéristique non implémenté : " ^ s ^ "\n"))
 
 type typ =
     | Tnull
@@ -230,6 +230,7 @@ let classe_de = function
 	| Tclass s -> s
 	| _ -> failwith "Erreur : l'expression n'est pas un objet.\n"
 
+
 (**********)
 
 
@@ -358,6 +359,12 @@ let rec tvar_by_ref tva = match tva.c with
 let tqvar_by_ref tqva = match tqva with
 	| TQad _ -> true
 	| _ -> false
+
+
+let is_qualified_qvar qv =
+	match (extract_qvar qv).v with
+		| Qident _ -> false
+		| Qmeth _ -> true
 
 let type_of_tqident tq = match tq with
 	| TQident i -> i.typ
@@ -585,7 +592,9 @@ let typmembre s (* classe du membre *) env lvl m  = match m.v with
 				(TMvar (TDeclv(tt, tl))), envir	
 			with (Member_dejavu nm) -> erreur m.loc ("Le membre " ^ nm ^ " est déjà déclarée dans cette classe (ou est un doublon dans cette déclaratioon.\n")
 			end
+
 			(*failwith "Non implé()menté (membre non implé()menté).\n"*)
+	| Mmeth(_, { v = Proto(_, qv, _) ; loc = _ }) when (is_qualified_qvar qv) -> erreur m.loc "Extra-qualification du prototype de la méthode au sein de la déclaration d'une classe.\n"
 	| Mmeth (b, p) -> let (tp, benvir ,envir) = typproto p env (Some (s, b)) in
 				TMmeth(b, tp), envir (* vérifier qu'il n'y a pas deux méthodes de même signatures *) (*let failwith "Non imp()lémenté (prototype méthode non implé()menté).\n" *)
 
