@@ -295,11 +295,20 @@ let find_meth c m =
 *)
 	Hashtbl.find (Hashtbl.find table_c_meth c) m
 
+let is_meth c m =
+	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m 
+
 let add_member c m i =
 	Hashtbl.add (Hashtbl.find table_c_member c) m i
 
+let find_meth_list c m =
+        Hashtbl.find_all (Hashtbl.find table_c_meth c) m
+
+let find_meth_list c m =
+	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
+
 let find_meth c m =
-        Hashtbl.find (Hashtbl.find table_c_member c) m
+        Hashtbl.find (Hashtbl.find table_c_meth c) m
 
 let rec tvar_by_ref tva = match tva.c with
 	| TIdent id -> id.byref
@@ -676,7 +685,22 @@ let rec typinst i env lvl = match i.v with
 									else erreur e.loc "Cette expression n'est pas une valeur gauche, mais est pourtant assignée à une référence.\n"
 							else erreur e.loc "Cette expression n'est pas d'un type qui est sous-type du type de déclaration de la variable.\n"
 					else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
-	| Ideclobj (tdef, v, s, l)-> failwith "non implémenté (assignation objet retour constructeur)."
+	| Ideclobj (tdef, v, s, l)-> let tt = typtypedef tdef in
+				     if tt <> (Tclass s) then
+					erreur i.loc "Le type de cette déclaration ne correspond pas à la classe du constructeur appelé.\n"
+				else
+				     let (tv, envir) = typvar v env lvl tt in
+				     let tvid = extract_tvar tv in
+				         if tvid.typ <> tt then
+						erreur v.loc "Cette variable n'a pas le même type que celui de l'objet retourné par le constructeur.\n"
+				else
+				     let tl = List.map (fun x -> typexpr x env lvl) l in
+						let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_meth_list s chcons) in begin
+							match optcons with
+								| None -> erreur i.loc "Aucun constructeur de la classe ne correspond au profil d'appel dans cette instruction.\n"
+								| Some(_) -> failwith "(assignation objet retour constructeur) non implémenté"
+		
+						end (*failwith "non implémenté (assignation objet retour constructeur)."*)
  	| If (e, ins)-> let te = typexpr e env lvl in
 				if te.typ = Tint then
 					let (tins,envir) = typinst ins env lvl in
