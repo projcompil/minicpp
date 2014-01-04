@@ -4,6 +4,7 @@ path=/home/nm/Documents/tests
 pathbin=/home/nm/Documents/minicpp/minic++
 pathstore=/tmp/
 nomferreurs=erreurs_recensees
+nomfnotimplem=notimplemented
 comptc=0
 comptni=0
 compt=0
@@ -19,6 +20,7 @@ else
 fi
 
 echo "" > "$pathstore$nomferreurs"
+echo "" > "$pathstore$nomfnotimplem"
 
 function compi {
 	name=$(basename "$1")
@@ -57,7 +59,7 @@ function app {
 			comptc=$[comptc+1]
 		elif [ $retour == 3 ] ; then
 			comptni=$[comptni+1]
-		
+			echo "$path$1/$i" >> "$pathstore$nomfnotimplem"
 		else
 			echo "$path$1/$i" >> "$pathstore$nomferreurs"
 		fi
@@ -86,8 +88,14 @@ fi
 
 app "/exec" "$argu" 1
 
+
+echo "Les fichiers contenant des caractéristiques non implémentés sont : "
+cat "$pathstore$nomfnotimplem"
+
+
+
 echo -e "\\n\\n(réussites = $comptc, échecs = $[compt-comptc] dont non implémenté : $comptni)\\n"
 
-echo "Les fichiers provoquant des erreurs sont :"
+echo -e "\\n\\nLes fichiers provoquant des erreurs sont :"
 cat "$pathstore$nomferreurs"
 #rm "$pathstore$nomferreurs"

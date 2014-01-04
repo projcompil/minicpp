@@ -219,6 +219,9 @@ let is_pointeur = function
 	| Tpointeur _ | Tnull -> true
 	| _ -> false
 
+let classe_de = function
+	| Tclass s -> s
+	| _ -> failwith "Erreur : l'expression n'est pas un objet.\n"
 
 (**********)
 
@@ -534,7 +537,7 @@ let typproto p env in_class = match p.v with
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
 		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
-		failwith "proovv"
+		failwith "proovv non implémenté"
 	end
 					| (TQmeth(s,id)), (Some (nc, bvir)) -> failwith "Non implémenté (méthode de classe2)."
 				end
@@ -547,7 +550,7 @@ let typproto p env in_class = match p.v with
         in let renv = Smap.add (ch ) prov env in*)
 					(TPcons(s, tl)), env, env
 				end
- (*failwith "Non implémenté (prototype co0nstructeur).\n"*)
+ (*failwith "Non implé()menté (prototype co0nstructeur).\n"*)
 	| Pconshc (s, s2, l) -> assert (in_class = None); failwith "Non implémenté (définition du constructeur).\n"
 
 (* Retourner l'environnement, vérifier les doublons *)
