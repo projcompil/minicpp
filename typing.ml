@@ -564,7 +564,13 @@ let rec typexpr expr env lvl = match expr.v with
 					| _ -> erreur expr.loc "Déférencement d'une expression qui n'est pas un pointeur.\n"
 				end
 		   	else not_left expr.loc 
-  | Eattr (e,s)-> failwith "Expression non encore implémentée (attribut d'une expression).\n"
+  | Eattr (e,s)-> let te = typexpr e env lvl in
+			begin match te.typ with 
+				| Tclass s -> failwith "erreur prov"
+				| _ -> erreur e.loc "Cette expression ne représente pas un objet, on ne peut donc utiliser l'opérateur . pour accéder à un de ses membres.\n"
+			end
+
+(*failwith "Expression non encore implémeni()tée (attribut d'une expression).\n"*)
   | Esderef (e,s) -> typexpr { v = Eattr({v = Epointeur(e)  ;loc = e.loc},s) ; loc = expr.loc } env lvl (* let te = typexpr e env lvl in
 			match te.typ with
 				| Tpointeur (TClass s) -> {} *)
