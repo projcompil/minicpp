@@ -153,17 +153,17 @@ let (table_c_member : (string, tdemems) Hashtbl.t ) = (Hashtbl.create 17) ;;
 let ( table_c_size : (string, int) Hashtbl.t )= (Hashtbl.create 17) 
 
 
-let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
-let junk2 = Hashtbl.create 17 ;;
+(*let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
+let junk2 = Hashtbl.create 17 ;;*)
 
-Hashtbl.add junk1 "@@@@" ((0, ((* retourne une référence *) false, (*virtual*) false), Tnull, []):(int * (bool*bool) * typ * (targ list))) ;;
+(*Hashtbl.add junk1 "@@@@" ((0, ((* retourne une référence *) false, (*virtual*) false), Tnull, []):(int * (bool*bool) * typ * (targ list))) ;;*)
 
-Hashtbl.add junk2 "@@@@" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;
-
+(*Hashtbl.add junk2 "@@@@" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;*)
+(*
 Hashtbl.add table_c_meth "" junk1 ;;
 
 Hashtbl.add table_c_member "" junk2 ;;
-
+*)
 (*Hashtbl.add table_c_size "" 0 ;;*)
 
 let ( table_c_env : (string, environnement) Hashtbl.t ) = Hashtbl.create 17
@@ -285,6 +285,9 @@ let add_f f t b l =
 let add_meth c m t b (* attention !! couple de booléens !!! *) l =
 	add_func (Hashtbl.find table_c_meth c) m t b l
 
+let is_meth_sr c m =
+	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m 
+
 let is_meth c m =
 	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m 
 
@@ -299,6 +302,9 @@ let find_meth c m =
 
 let find_meth_list c m =
 	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
+
+let is_member_sr c m =
+	Hashtbl.mem ((Hashtbl.find table_c_member c)) m 
 
 let is_member c m =
 	Hashtbl.mem ((Hashtbl.find table_c_member c)) m 
@@ -453,7 +459,7 @@ let typqident q env lvl bdecl = match q.v with
 					else erreur q.loc ("Impossible de redéfinir l'identifiant " ^ s ^" qui a déjà été défini au même niveau.\n")
 		      with Not_found -> if bdecl || (Hashtbl.mem table_f s) then
 						TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
-				else erreur q.loc ("L'identifiant " ^ s ^ " n'est pas à porté.\n")
+				else erreur q.loc ("L'identifiant " ^ s ^ " n'est pas à portée.\n")
 		end
   | Qmeth (st, s) -> failwith "Non implémenté (méthode d'une classe).\n"
 
@@ -521,7 +527,7 @@ let rec typdecl_v env lvl dv = match dv.v with
 
 let typmembre s (* classe du membre *) env lvl m  = match m.v with
 	| Mvar dv -> let ((TDeclv(tt, tl)), envir) = typdecl_v env lvl dv in
-			let tlid = List.map (fun x -> let tid = (extract_tvar x) in if tid.typ = (Tclass s) then erreur m.loc "Ce champ a un type incomplet (utiliser un pointeur pour déclarer des champs du même type que la classe dans cette-même classe).\n" else tid) tl in
+			let tlid = List.map (fun x -> let tid = (extract_tvar x) in if tid.typ = (Tclass s) then erreur m.loc ("Ce champ : " ^ tid.rep  ^ "a un type incomplet (utiliser un pointeur pour déclarer des champs du même type que la classe dans cette-même classe).\n") else tid) tl in
 		     	 begin try
 				List.iter (fun x -> (add_member s x.rep x)) tlid;
 				(TMvar (TDeclv(tt, tl))), envir	
@@ -551,7 +557,7 @@ let typdecl_c dc env lvl = match dc.v with
 						if is_meth s (chcons ^ s) then
 							(TClass(s, (TSuper tl), lm)), renv
 						else begin
-							(* ajouter constructeur *)
+							add_meth s (chcons ^ s) (Tclass s) (false, false) []; (* ajouter constructeur !!!!!!!!!!!!  *)
 							(TClass(s, (TSuper tl), lm)), renv	
 						end
 					(*with Not_found -> 	*)
@@ -626,7 +632,7 @@ let rec typexpr expr env lvl = match expr.v with
 
   | Enew (nc, l) -> if Hashtbl.mem table_c nc then
 			let tl = List.map (fun x -> (typexpr x env lvl)) l in
-				 let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_meth_list nc chcons) in begin
+				 let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_meth_list nc (chcons ^ nc)) in begin
                                                         match optcons with
                                                                 | None -> erreur expr.loc "Aucun constructeur de la classe ne correspond au profil d'appel dans cette invocation de new.\n"
                                                                 | Some(la, ni, ttt, _) -> { c = (TEnew(nc, tl, ni)) ; typ = Tpointeur (Tclass nc) }
