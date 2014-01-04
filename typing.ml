@@ -565,8 +565,15 @@ let typproto p env in_class = match p.v with
 					(TPcons(s, tl)), env, env
 				end
  (*failwith "Non implé()menté (prototype co0nstructeur).\n"*)
-	| Pconshc (s, s2, l) -> assert (in_class = None); ratet "(définition du constructeur).\n"
-
+	| Pconshc (s, s2, l) -> assert (in_class = None); 
+				if s <> s2 then
+					erreur p.loc "Ce prototype n'est pas le prototype d'un constructeur.\n"
+				else let (tl, envir) = add_args l env in
+					if not (f_is_in_list tl (find_all_meth s (chcons ^ s))) then
+						erreur p.loc "Aucun constructeur avec cette signature n'a été déclaré au sein de la classe.\n"
+					else
+					ratet "(définition du constructeur).\n"
+	
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
 	| [] -> [], env

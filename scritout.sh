@@ -89,7 +89,7 @@ fi
 app "/exec" "$argu" 1
 
 
-echo "Les fichiers contenant des caractéristiques non implémentés sont : "
+echo "Les fichiers contenant des caractéristiques non implémentées sont : "
 cat "$pathstore$nomfnotimplem"
 
 
