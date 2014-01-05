@@ -246,6 +246,23 @@ let add_func tab f t b l =
 let add_f f t b l =
 	add_func table_f f t b l
 
+let find_all_meth_sr c m =
+	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
+
+
+let find_all_member_sr c m =
+        Hashtbl.find_all (Hashtbl.find table_c_member c) m
+
+let remontegen c m f =
+	let rec auxremonte l = match l with
+		| [] -> []
+		| ""::l -> auxremonte l
+		| l -> (List.flatten (List.map (fun x -> f x m) l)) @ (List.flatten (List.map (fun x -> auxremonte (Hashtbl.find_all table_c x) ) l))
+	in auxremonte [c]
+
+let remontemeth c m = remontegen c m find_all_meth_sr
+let remontemember c m = remontegen c m find_all_member_sr
+
 let add_meth c m t b (* attention !! couple de booléens !!! *) l =
 	add_func (Hashtbl.find table_c_meth c) m t b l
 
@@ -264,6 +281,7 @@ let find_meth c m =
 *)
 	Hashtbl.find (Hashtbl.find table_c_meth c) m
 
+
 let find_all_meth c m =
 	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
 
@@ -279,9 +297,9 @@ let add_member c m i =
 			raise (Member_dejavu m)
 		else Hashtbl.add tc m i
 
-let find_member_list c m =
-        Hashtbl.find_all (Hashtbl.find table_c_member c) m
 
+let find_all_member c m =
+        Hashtbl.find_all (Hashtbl.find table_c_member c) m
 
 let find_member c m =
         Hashtbl.find (Hashtbl.find table_c_member c) m
@@ -788,7 +806,7 @@ let rec typinst i env lvl = match i.v with
 	| Iexpr e -> TIexpr (typexpr e env lvl), env 
 	| Idecl (tdef, v)-> let tt = typtypedef tdef in
 				if is_bf tt then
-			    	let tv, envir = (typvar v env lvl tt) in
+			    	let tv, envir = (typvar v env lvl tt) in (* ajouter application du constructeur s'il y a un constructeur vide et tv est de type Tclass s *)
 					(TIdecl(tt, tv)), envir
 				else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
 	| Ideclinit (tdef, v, e) -> (* vérifier si v est une référence, que e est une valeur gauche *) 				let tt = typtypedef tdef in
