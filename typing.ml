@@ -249,19 +249,29 @@ let add_f f t b l =
 let find_all_meth_sr c m =
 	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
 
+let find_all_meth_sri c m =
+	List.flatten (List.filter (fun y -> y = m) (List.map (fun x -> Hashtbl.find_all table_c_meth x) [ c ]))
 
 let find_all_member_sr c m =
         Hashtbl.find_all (Hashtbl.find table_c_member c) m
 
 let remontegen c m f =
-	let rec auxremonte l = match l with
-		| [] -> []
-		| ""::l -> auxremonte l
-		| l -> (List.flatten (List.map (fun x -> f x m) l)) @ (List.flatten (List.map (fun x -> auxremonte (Hashtbl.find_all table_c x) ) l))
+	let rec auxremonte l = 
+		let rec nettoie l = match l with
+			| [] -> []
+			| ""::l -> nettoie l
+			| x::l when not (Hashtbl.mem table_c_meth x) -> l
+			| l -> l
+		in let ln = nettoie l in
+		(List.flatten (List.map (fun x -> f x m) ln)) @ (List.flatten (List.map (fun x -> auxremonte (Hashtbl.find_all table_c x) ) ln))
 	in auxremonte [c]
 
 let remontemeth c m = remontegen c m find_all_meth_sr
 let remontemember c m = remontegen c m find_all_member_sr
+
+let find_all_meth c m =
+	(*remontemeth c m*)
+	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
 
 let add_meth c m t b (* attention !! couple de booléens !!! *) l =
 	add_func (Hashtbl.find table_c_meth c) m t b l
@@ -270,7 +280,7 @@ let is_meth_sr c m =
 	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m 
 
 let is_meth c m =
-	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m 
+	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m (*List.mem m (find_all_meth c m)*)
 
 let find_meth c m =
 	(*
@@ -282,8 +292,6 @@ let find_meth c m =
 	Hashtbl.find (Hashtbl.find table_c_meth c) m
 
 
-let find_all_meth c m =
-	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
 
 let is_member_sr c m =
 	Hashtbl.mem ((Hashtbl.find table_c_member c)) m 
