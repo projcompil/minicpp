@@ -105,9 +105,9 @@ let () =
 	localisation (Lexing.lexeme_start_p buf);
 	eprintf "Erreur du compilateur (caractéristique non implémentée) :  %s" s;
 	exit 3
-    | Typing.Class_not_found s -> localisation (Lexing.lexeme_start_p buf);
+    (*| Typing.Class_not_found s -> localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur (provisoire) :  %s" s;
-        exit 2
+        exit 2*)
     | Failure s ->
 	localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur : message :  %s" s;
