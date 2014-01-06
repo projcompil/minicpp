@@ -337,16 +337,17 @@ let rec is_left_value e (env:environnement) = match e.v with
 
 
 let rec is_left_tvalue te env = match te.c with
-        | TEqident ex -> begin match ex with
+    | TEqident ex -> begin match ex with
                                 | TQident id -> (id.typ <> Fonc) || (id.byref)
                                 | TQmeth _ -> false
                         end
-        | TEpointeur _ -> true
+    | TEpointeur _ -> true
 	| TEattr ({ c = te ; typ = (Tclass nc) }, s) (*| TEsderef ({ c = te ; typ = (Tpointeur (Tclass nc)) }, s) *) -> is_member nc s.rep
 	| TEfcall(_,_,_, b) -> b
 	| TEmcall(_,_,_,_,b) -> b
-        | TEpar ex -> is_left_tvalue ex env
-        | _ -> false  (* y en a-t-il d'autres ? *)
+    | TElincr _ | TEldecr _ -> true
+    | TEpar ex -> is_left_tvalue ex env
+    | _ -> false  (* y en a-t-il d'autres ? *)
 
 let not_left loc =
 (*	erreurloc, "L'expression n'est pas une valeur gauche.\n"))*)

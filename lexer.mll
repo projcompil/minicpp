@@ -37,6 +37,7 @@ let oct_digit = ['0'-'7']
 let hex_digit =  ['0'-'9' 'a'-'f' 'A'-'F']
 let ident = ( letter | '_' ) ( letter | digit | '_' )*
 let integer = '0' | ['1'-'9'] digit* | '0' oct_digit+ | "0x" hex_digit+
+let octal = '0' oct_digit+
 let space = [' ' '\t']
 let char = [' '-'!' '#'-'[' ']'-'\127'] | "\\" | "\"" | '\n' | '\t' | "\\x" hex_digit hex_digit
 let string = '"' char* '"'
@@ -79,6 +80,7 @@ rule token = parse
   | ";"     { SEMICOLON }
   | "/*"    { comment lexbuf }
   | "//"    { commentendl lexbuf}
+  | octal as s   { INTEGER (int_of_string ("0o" ^ s)) }
   | integer as s { INTEGER (int_of_string s) }
   | eof     { EOF }
   | _ as c  { raise (Lexing_error ("illegal character: " ^ String.make 1 c)) }
