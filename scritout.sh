@@ -9,8 +9,8 @@ comptc=0
 comptni=0
 compt=0
 retour=0
-outil0=spim -f
-outil1=java -jar Mars4_4.jar
+outil0="spim -f"
+outil1="java -jar /home/nm/Documents/minicpp/Mars4_4.jar"
 
 if [ "$1" ==  "p" ]; then
 	argu="--parse-only"
@@ -26,9 +26,9 @@ echo "" > "$pathstore$nomfnotimplem"
 function compi {
 	name=$(basename "$1")
 	name="${name%.*}"
-	$pathbin $i -o "$pathstore$name.s"
+	$pathbin $i -o "$pathstore$name.asm"
 	if [ $? == 0 ] ; then
-		spim -f "$pathstore$name.s" | tail -n +6 > "$pathstore$name.out"
+		$outil0 "$pathstore$name.asm" | tail -n +6 > "$pathstore$name.out"
 		d="$(diff "$pathstore$name.out" "$name.out")"
 		if [ -z "$d" ] ; then
 			echo -e "Réussite de la compilation du fichier $1\\n"
