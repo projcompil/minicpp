@@ -103,16 +103,16 @@ let rec code_expr lvl texpr = match texpr.c with
 	| TEuminus te -> (code_expr lvl te) ++ (neg a0 a0)
 	| TEuplus te -> (code_expr lvl te)
 	| TEfcall(te, tl, i, b) -> begin match te.c with
-					| TEqident(TQident id) -> (List.fold_left (fun code e -> code ++ (code_expr lvl e) ++ (push a0)) nop tl) ++ (move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++ (push t1) ++ (jal (id.rep ^ (string_of_int i))) ++ (popn (1+ List.length tl))
+					| TEqident(TQident id) -> (List.fold_left (fun code e -> code ++ (code_expr lvl e) ++ (push a0)) nop tl) ++ (move t1 fp) ++ (iter (lvl-id.lvl) (lw t1 areg (8, t1))) ++ (push t1) ++ (jal (id.rep ^ (string_of_int i))) ++ (popn (1+ List.length tl))
 					| TEqident(_) -> ratec ""
 					| _ -> failwith "Heisenbug 2.\n"
 				   end
 	| TEqident (TQident tid) -> (* il faut corriger les offset dans typage.ml *)
 			assert (tid.lvl <= lvl) ;
-			(move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++ (if tid.byref then add a0 t0 oi tid.offset else lw a0 areg (tid.offset, t1)) ++ (if tid.byref then lw a0 areg (0, a0) else nop)
+			(move t1 fp) ++ (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++ (if tid.byref then add a0 t0 oi tid.offset else lw a0 areg (tid.offset, t1)) ++ (if tid.byref then lw a0 areg (0, a0) else nop)
 	| TEassign({ c = TEqident (TQident tid) ; typ = _  }, tf) -> 
 			(code_expr lvl tf) ++
-			(move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++
+			(move t1 fp) ++ (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++
 			(if tid.byref then lw t1 areg (tid.offset, t1)
 			 else add t1 t1 oi tid.offset) ++
 			(sw a0 areg (0, t1))				
