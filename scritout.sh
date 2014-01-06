@@ -9,7 +9,8 @@ comptc=0
 comptni=0
 compt=0
 retour=0
-
+outil0=spim -f
+outil1=java -jar Mars4_4.jar
 
 if [ "$1" ==  "p" ]; then
 	argu="--parse-only"
