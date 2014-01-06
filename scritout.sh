@@ -20,6 +20,12 @@ else
 	argu=""
 fi
 
+if [ -z "$1"] ; then
+	outilc=0
+else
+	outilc=1
+fi
+
 echo "" > "$pathstore$nomferreurs"
 echo "" > "$pathstore$nomfnotimplem"
 
@@ -28,7 +34,11 @@ function compi {
 	name="${name%.*}"
 	$pathbin $i -o "$pathstore$name.asm"
 	if [ $? == 0 ] ; then
-		$outil0 "$pathstore$name.asm" | tail -n +6 > "$pathstore$name.out"
+		if [ $2 == 0 ] ; then
+			$outil0 "$pathstore$name.asm" | tail -n +6 > "$pathstore$name.out"
+		else
+			$outil1 "$pathstore$name.asm" | tail -n +3 | head -n -1 > "$pathstore$name.out"	
+		fi
 		d="$(diff "$pathstore$name.out" "$name.out")"
 		if [ -z "$d" ] ; then
 			echo -e "Réussite de la compilation du fichier $1\\n"
@@ -50,7 +60,7 @@ function app {
 	for i in *.cpp ; do
 		echo "Fichier : $i"
 		if [ -z "$argu" ] ; then
-			compi $i
+			compi $i $outilc
 		else	
 			$pathbin $2 $i #> /dev/null
 		fi
