@@ -432,17 +432,19 @@ let rec include_sign f g = match (f,g) with
 let min_sign f g =
 	if include_sign f g then f else g
 
-let scan_lf l lf = match lf with
-	| [] -> None
-	| (__,_,_,min)::rlf ->
+let scan_lf l lf =
 	let rec auxscan lf min min_res = match lf with
 		| [] -> min_res
 		| (ni, b, tt,la)::lf -> if fit_types l la then
-						if include_sign la min then 
-							auxscan lf la (Some(la, ni, tt, b))
-						else auxscan lf min min_res
-			    		else auxscan lf min min_res
-	in auxscan lf min None
+                                    begin match min with
+                                        | None -> auxscan lf (Some la) (Some(la, ni, tt, b))
+                                        | Some(lmin) -> if include_sign la lmin then 
+							                                auxscan lf (Some(la)) (Some(la, ni, tt, b))
+						                                else auxscan lf min min_res
+
+                                    end
+			    		        else auxscan lf min min_res
+	in auxscan lf None None
 
 
 module Sset = Set.Make(String)
