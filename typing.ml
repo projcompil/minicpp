@@ -484,7 +484,7 @@ let rec typvar v env lvl t off =
 				if tid.lvl = lvl then
 					erreur v.loc ("Impossible de redéfinir " ^ s ^ ", car cet identifiant est déjà défini à ce niveau.")
 				else { c = (TIdent { rep = s; typ = t ; lvl = lvl; offset = off (* le changer *); byref = b  }) ; typ = t } 
-		     with Not_found -> {c =  (TIdent { rep = s; typ = t ; lvl = lvl; offset = 0 (* le changer *); byref = b }) ; typ = t } (*erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")*)
+		     with Not_found -> {c =  (TIdent { rep = s; typ = t ; lvl = lvl; offset = off (* le changer *); byref = b }) ; typ = t } (*erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")*)
 		     end
 		| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
 		| Po va -> let tva = auxvar va b t in
