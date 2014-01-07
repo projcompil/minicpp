@@ -172,8 +172,8 @@ let code_proto tp = match tp with
 let code_decl td = match td with
 	| TDv tdv -> nopp (* peut-êttre à changer pour la PµOO *)
 	| TDc tdc -> ratec ""
-	| TDb ( (TProto(Tint, (TQvar(TQident(ti))), [])), tb) when ti.rep = "main" -> conca [ { text = (label "main") ; data = nop } ; (code_bloc 0 tb) ; { text = (li v0 10) ++ (syscall); data = nop } ]
-	| TDb (tp, tb) -> addp (code_proto tp) (code_bloc 0 tb)
+    | TDb ( (TProto(Tint, (TQvar(TQident(ti))), [])), tb, off) when ti.rep = "main" -> conca [ { text = (label "main") ; data = nop } ; {text = (sub sp sp oi (8+off)) ++ (add fp sp oi off) ;  data = nop} ; (code_bloc 0 tb) ; { text = (add sp sp oi off) ++ (li v0 10) ++ (syscall); data = nop } ]
+	| TDb (tp, tb, off) -> addp (code_proto tp) (code_bloc 0 tb)
 
 let code_fichier tf =
 	List.fold_left (fun x td -> addp x (code_decl td)) nopp tf.tdecls

@@ -5,6 +5,7 @@ pathbin=/home/nm/Documents/minicpp/minic++
 pathstore=/tmp/
 nomferreurs=erreurs_recensees
 nomfnotimplem=notimplemented
+nomfreussites=reussites
 comptc=0
 comptni=0
 compt=0
@@ -28,6 +29,7 @@ fi
 
 echo "" > "$pathstore$nomferreurs"
 echo "" > "$pathstore$nomfnotimplem"
+echo "" > "$pathstore$nomfreussites"
 
 function compi {
 	name=$(basename "$1")
@@ -68,6 +70,7 @@ function app {
 		echo -e "$retour\\n"
 		if [ $retour == $[$optionv-1] ] ; then
 			comptc=$[comptc+1]
+			echo  "$path$1/$i" >> "$pathstore$nomfreussites" 
 		elif [ $retour == 3 ] ; then
 			comptni=$[comptni+1]
 			echo "$path$1/$i" >> "$pathstore$nomfnotimplem"

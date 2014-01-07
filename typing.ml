@@ -126,7 +126,7 @@ and tbloc = TBloc of tinst list
 and tdecl =
   | TDv of tdecl_v
   | TDc of tdecl_c
-  | TDb of tproto * tbloc
+  | TDb of tproto * tbloc * int
 
 
 type tfichier =
@@ -932,7 +932,7 @@ let typdecl d env = match d.v with
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
         | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env None in
 				let tbl, off (* bug le rajouter *) = typbloc bl envir 1 0 in
-					(TDb (tp, tbl)), env_hb 
+					(TDb (tp, tbl, off)), env_hb 
 
 (*
  	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
