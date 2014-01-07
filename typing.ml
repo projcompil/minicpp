@@ -358,7 +358,9 @@ let rec size_type t = match t with
 	| Tint -> 4
 	| Tnull -> 4 (* ou 0 ?*)
 	| Tpointeur _ -> 4
-	| Tclass s -> 0 (* Hashtbl.find table_c_size s bug le remettre *)
+	| Tclass s -> begin try Hashtbl.find table_c_size s
+                        with Not_found -> raise (Class_not_found "")
+                  end
 	| Tvoid | Fonc | Tclassdecl -> 0
 
 let rec extract_var v = match v.v with
@@ -608,34 +610,35 @@ let typproto p env in_class = match p.v with
 	
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
-	| [] -> [], env
+	| [] -> [], env, 0
 	| v::l -> let (tv, envir) = typvar v env lvl t 0 (* bug le changer *) in
-                        let (tl, renv) = (auxdecl_v l envir lvl t) in
-                                (tv::tl), renv
+                        let (tl, renv, offs) = (auxdecl_v l envir lvl t) in
+                                (tv::tl), renv, (offs + (size_tvar tv))
 
 let rec typdecl_v env lvl dv = match dv.v with
 	| Declv(t, l) -> let tt = typtypedef t in
 			   if is_bf tt then
-			   	let (tl, envir) = (auxdecl_v l env lvl tt) in
-					(TDeclv(tt, tl)), envir
+			   	let (tl, envir, off) = (auxdecl_v l env lvl tt) in
+					(TDeclv(tt, tl)), envir, off
 			
 			   else erreur dv.loc "Le type de cette déclaration n'est pas bien formé.\n"
 
 
 
 let typmembre s (* classe du membre *) env lvl m  = match m.v with
-	| Mvar dv -> let ((TDeclv(tt, tl)), envir) = typdecl_v env lvl dv in
+	| Mvar dv -> begin try let ((TDeclv(tt, tl)), envir, off) = typdecl_v env lvl dv in
 			let tlid = List.map (fun x -> let tid = (extract_tvar x) in if tid.typ = (Tclass s) then erreur m.loc ("Ce champ : " ^ tid.rep  ^ "a un type incomplet (utiliser un pointeur pour déclarer des champs du même type que la classe dans cette-même classe).\n") else tid) tl in
 		     	 begin try
 				List.iter (fun x -> (add_member s x.rep x)) tlid;
-				(TMvar (TDeclv(tt, tl))), envir	
+				(TMvar (TDeclv(tt, tl))), envir, off
 			with (Member_dejavu nm) -> erreur m.loc ("Le membre " ^ nm ^ " est déjà déclarée dans cette classe (ou est un doublon dans cette déclaratioon.\n")
-			end
-
+			     end
+            with Class_not_found s -> erreur m.loc "Cette déclaration comprend une variable de type une classe non définie, ou encore non totalement définie (utiliser des pointeurs pour obtenir des structures récursives).\n"
+         end
 			(*failwith "Non implé()menté (membre non implé()menté).\n"*)
 	| Mmeth(_, { v = Proto(_, qv, _) ; loc = _ }) when (is_qualified_qvar qv) -> erreur m.loc "Extra-qualification du prototype de la méthode au sein de la déclaration d'une classe.\n"
 	| Mmeth (b, p) -> let (tp, benvir ,envir) = typproto p env (Some (s, b)) in
-				TMmeth(b, tp), envir (* vérifier qu'il n'y a pas deux méthodes de même signatures *) (*let failwith "Non imp()lémenté (prototype méthode non implé()menté).\n" *)
+				TMmeth(b, tp), envir, 0 (* vérifier qu'il n'y a pas deux méthodes de même signatures *) (*let failwith "Non imp()lémenté (prototype méthode non implé()menté).\n" *)
 
 
 let typdecl_c dc env lvl = match dc.v with
@@ -648,14 +651,15 @@ let typdecl_c dc env lvl = match dc.v with
 					Hashtbl.add table_c_meth s new_tmethod ;
 					Hashtbl.add table_c_member s new_tmember;
 					let rec auxdeclc envi l = match l with
-						| [] -> [], envi
-						| x::l -> let tx, envir = typmembre s envi lvl x in
-								let reste, renvir = auxdeclc envir l in
-									(tx::reste), renvir
+						| [] -> [], envi, 0
+						| x::l -> let tx, envir, off = typmembre s envi lvl x in
+								let reste, renvir, offs = auxdeclc envir l in
+									(tx::reste), renvir, (off + offs)
 					in
-					let (lm, envir) = auxdeclc env l in
+					let (lm, envir, off) = auxdeclc env l in
 						let renv = Smap.add s {rep = s ; typ = Tclassdecl ; lvl = 0 ; offset = 0 ; byref = false } env in
 						Hashtbl.add table_c_env s envir ;
+                        Hashtbl.add table_c_size s off;
 						if is_meth s (chcons ^ s) then
 							(TClass(s, (TSuper tl), lm)), renv
 						else begin
@@ -923,7 +927,7 @@ and typbloc bl env lvl off = (typdbloc (bl.v) env lvl off)
 
 
 let typdecl d env = match d.v with
-	| Dv dv -> let (tdv, envir) = typdecl_v env 0 dv in ( TDv tdv), envir
+	| Dv dv -> let (tdv, envir, off) = typdecl_v env 0 dv in ( TDv tdv), envir
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
         | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env None in
 				let tbl, off (* bug le rajouter *) = typbloc bl envir 1 0 in
