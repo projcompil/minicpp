@@ -112,10 +112,10 @@ let () =
 	localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur : message :  %s" s;
 	exit 2;
-    | _ -> 
+   (* | _ -> 
         localisation (Lexing.lexeme_start_p buf);
         eprintf "Erreur du compilateur.\n";
-        exit 2
+        exit 2 *)(* le déconmmenter *)
     (*| Interp.Error s-> 
 	(* Erreur pendant l'interprétation *)
 	eprintf "Erreur : %s@." s;

@@ -142,8 +142,8 @@ let code_cout_expr_str lvl (*env*) e = match e with
 let rec code_inst lvl ti = match ti with
 	| TNothing -> nopp
   	| TIexpr te -> { text = (code_expr lvl te) ; data = nop }
-  	| TIdecl (tt, tv) -> ratec "" 
-  	| TIdeclinit (tt, tv, te) -> ratec ""
+    | TIdecl (tt, tv) -> { text = sub sp sp oi (size_type ((extract_tvar tv).typ )); data = nop} (*Othmane.*)
+    | TIdeclinit (tt, tv, te) -> {text = (code_expr lvl te) ++ (push a0)  ; data = nop}
   	| TIdeclobj (tt, tv, s, tl, ni) -> ratec "" 
   	(*| TIf (te, ti) -> ratec ""*)
   	| TIfelse (te, ti, tj) -> let (lab1, lab2) = next_labd nif in

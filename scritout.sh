@@ -10,7 +10,7 @@ comptni=0
 compt=0
 retour=0
 outil0="spim -f"
-outil1="java -jar /home/nm/Documents/minicpp/Mars4_4.jar"
+outil1="java -jar /home/nm/Documents/Mars4_4.jar"
 
 if [ "$1" ==  "p" ]; then
 	argu="--parse-only"

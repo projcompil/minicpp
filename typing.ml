@@ -358,7 +358,7 @@ let rec size_type t = match t with
 	| Tint -> 4
 	| Tnull -> 4 (* ou 0 ?*)
 	| Tpointeur _ -> 4
-	| Tclass s -> Hashtbl.find table_c_size s 
+	| Tclass s -> 0 (* Hashtbl.find table_c_size s bug le remettre *)
 	| Tvoid | Fonc | Tclassdecl -> 0
 
 let rec extract_var v = match v.v with
@@ -372,6 +372,9 @@ let rec extract_qvar qv = match qv.v with
 let rec extract_tvar tv = match tv.c with
 	| TIdent i -> i
 	| TPo tva | TAd tva-> extract_tvar tva
+
+
+let size_tvar tv = size_type((extract_tvar tv).typ)
 
 let rec extract_tqvar tqv = match tqv with
 	| TQvar q -> q
@@ -471,13 +474,13 @@ let typsupers sup =
 		end
 
 (* prend le type attendu t et essaie de l'ajouter à l'environnement *)
-let rec typvar v env lvl t = 
+let rec typvar v env lvl t off = 
 	let rec auxvar v b t = match v.v with
 		| Ident s -> begin try
 			let tid = Smap.find s env in
 				if tid.lvl = lvl then
 					erreur v.loc ("Impossible de redéfinir " ^ s ^ ", car cet identifiant est déjà défini à ce niveau.")
-				else { c = (TIdent { rep = s; typ = t ; lvl = lvl; offset = 0 (* le changer *); byref = b  }) ; typ = t } 
+				else { c = (TIdent { rep = s; typ = t ; lvl = lvl; offset = off (* le changer *); byref = b  }) ; typ = t } 
 		     with Not_found -> {c =  (TIdent { rep = s; typ = t ; lvl = lvl; offset = 0 (* le changer *); byref = b }) ; typ = t } (*erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")*)
 		     end
 		| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
@@ -499,7 +502,7 @@ let rec typvar v env lvl t =
 let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
 				if is_bf tt then
-				let (tv, envir) = typvar v env 1 tt in
+				let (tv, envir) = typvar v env 1 tt 0 (* bug le changer *) in
 					if (is_num tv.typ) || (tvar_by_ref tv) then
 						(TArg( (typtypedef t), tv)), envir
 					else erreur a.loc "Les paramètres d'une fonctions doivent être numériques, ou passées par référence.\n"
@@ -606,7 +609,7 @@ let typproto p env in_class = match p.v with
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
 	| [] -> [], env
-	| v::l -> let (tv, envir) = typvar v env lvl t in
+	| v::l -> let (tv, envir) = typvar v env lvl t 0 (* bug le changer *) in
                         let (tl, renv) = (auxdecl_v l envir lvl t) in
                                 (tv::tl), renv
 
@@ -810,24 +813,26 @@ let rec typexpr expr env lvl = match expr.v with
 (** instruction **)
 
 
-let rec typinst i env lvl = match i.v with
-	| Nothing -> TNothing, env
-	| Iexpr e -> TIexpr (typexpr e env lvl), env 
+let rec typinst i env lvl off = match i.v with
+	| Nothing -> TNothing, env, off
+	| Iexpr e -> TIexpr (typexpr e env lvl), env, off
 	| Idecl (tdef, v)-> let tt = typtypedef tdef in
 				if is_bf tt then
-			    	let tv, envir = (typvar v env lvl tt) in (* ajouter application du constructeur s'il y a un constructeur vide et tv est de type Tclass s *)
-					(TIdecl(tt, tv)), envir
+			    	let tv, envir = (typvar v env lvl tt off) in (* ajouter application du constructeur s'il y a un constructeur vide et tv est de type Tclass s *)
+					(TIdecl(tt, tv)), envir, (off + (size_tvar tv))
 				else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
 	| Ideclinit (tdef, v, e) -> (* vérifier si v est une référence, que e est une valeur gauche *) 				let tt = typtypedef tdef in
 					if is_bf tt then
-                            	    		let tv, envir = (typvar v env lvl tt) in
+                            	    		let tv, envir = (typvar v env lvl tt off) in
 						let te = typexpr e env lvl in
 							if (is_sub_type te.typ tv.typ) then
 								if not(tvar_by_ref tv) then
-									(TIdeclinit(tt, tv,te)), envir
+									(TIdeclinit(tt, tv,te)), envir, (off + (size_tvar tv))
+ 
 								else
 									if (is_left_tvalue te env) then
-										(TIdeclinit(tt, tv,te)), envir
+										(TIdeclinit(tt, tv,te)), envir, (off + (size_tvar tv))
+
 									else erreur e.loc "Cette expression n'est pas une valeur gauche, mais est pourtant assignée à une référence.\n"
 							else erreur e.loc "Cette expression n'est pas d'un type qui est sous-type du type de déclaration de la variable.\n"
 					else erreur i.loc "Déclaration d'une variable de type non bien formé.\n"
@@ -835,7 +840,7 @@ let rec typinst i env lvl = match i.v with
 				     if tt <> (Tclass s) then
 					erreur i.loc "Le type de cette déclaration ne correspond pas à la classe du constructeur appelé.\n"
 				else (* corriger ici *)
-				     let (tv, envir) = typvar v env lvl tt in
+				     let (tv, envir) = typvar v env lvl tt off in
 				     let tvid = extract_tvar tv in
 				         if tvid.typ <> tt then
 						erreur v.loc "Cette variable n'a pas le même type que celui de l'objet retourné par le constructeur.\n"
@@ -844,36 +849,36 @@ let rec typinst i env lvl = match i.v with
 						let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_all_meth s chcons) in begin
 							match optcons with
 								| None -> erreur i.loc "Aucun constructeur de la classe ne correspond au profil d'appel dans cette instruction.\n"
-								| Some(la, ni, ttt, _) -> TIdeclobj(tt, tv, s, tl, ni), envir (*failwith "(assignation objet retour constructeur) non implé( )menté"*)
+								| Some(la, ni, ttt, _) -> TIdeclobj(tt, tv, s, tl, ni), envir, (off +(size_tvar tv))  (*failwith "(assignation objet retour constructeur) non implé( )menté"*)
 		
 						end 
  	| If (e, ins)-> let te = typexpr e env lvl in
 				if te.typ = Tint then
-					let (tins,envir) = typinst ins env lvl in
-						(TIfelse (te, tins, TNothing)), env
+					let (tins,envir, offs) = typinst ins env lvl off in
+						(TIfelse (te, tins, TNothing)), env, offs
 				else erreur e.loc "L'expression à l'intérieur du if n'est pas entière.\n"
 	| Ifelse (e, ins1, ins2) -> let te = typexpr e env lvl in
                                				if te.typ = Tint then
-                                        			let (tins1,envir1) = typinst ins1 env lvl and (tins2, envir2) = typinst ins2 env lvl in
-                                                		(TIfelse (te, tins1, tins2)), env
+                                        			let (tins1,envir1, offs) = typinst ins1 env lvl off in let  (tins2, envir2, offse) = typinst ins2 env lvl offs in
+                                                		(TIfelse (te, tins1, tins2)), env, offse
                                 			else erreur e.loc "L'expression à l'intérieur du if n'est pas entière.\n"
 	| While (e, ins) -> let te = typexpr e env lvl in
                                 if te.typ = Tint then
-                                        let (tins,envir) = typinst ins env lvl in
-                                                (TWhile (te, tins)), env
+                                        let (tins,envir, offs) = typinst ins env lvl off in
+                                                (TWhile (te, tins)), env, offs
                                 else erreur e.loc "L'expression à l'intérieur du while n'est pas entière.\n"
 	| For (l1, e, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env lvl) l1 in
 					let te = typexpr e env lvl in
 					if te.typ = Tint then
 						let tl2 = List.map (fun x -> typexpr x env lvl) l2 in
-							let tins, envir = typinst ins env lvl in
-								(TFor (tl1, te, tl2, tins)), env
+							let tins, envir, offs = typinst ins env lvl off in
+								(TFor (tl1, te, tl2, tins)), env, offs
 					else erreur e.loc "L'expression de contrôle à l'intérieur du for n'est pas entière.\n"
 	| Afor (l1, l2, ins) -> let tl1 = List.map (fun x -> typexpr x env lvl) l1 in
                     			let tl2 = List.map (fun x -> typexpr x env lvl) l2 in
-                        			let tins, envir = typinst ins env lvl in
-                                			(TFor (tl1, {c = TEint 1; typ = Tint } , tl2, tins)), env 
-	| Ibloc b -> (TIbloc (typbloc b env (lvl + 1))), env
+                        			let tins, envir, offs = typinst ins env lvl off in
+                                			(TFor (tl1, {c = TEint 1; typ = Tint } , tl2, tins)), env, offs
+	| Ibloc b -> let tb, offs = (typbloc b env (lvl + 1) off) in (TIbloc tb), env, offs
 
  	| Cout le -> if (not !biostream) then erreur i.loc "Appel de std::cout, mais le fichier n'inclut pas la bibliothèque iostream.\n"
 		     else
@@ -885,21 +890,21 @@ let rec typinst i env lvl = match i.v with
 								TEsexpr te
 							else erreur x.loc "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"
 					| Estring s -> TEstring s)::(auxcout l)
-		     in (TCout (auxcout le)), env
+		     in (TCout (auxcout le)), env, off
 (* debug*1 traiter le cas où l'on doit renovyer une référence et l'expression n'est pas une valeur gauche*)
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env lvl) in 
 				if is_sub_type te.typ (tr.typ) then 
 					if tr.byref then
 						if is_left_tvalue te env then
-							(TReturn te), env
+							(TReturn te), env, off
 						else erreur e.loc "L'expression retournée n'est pas une valeur gauche, alors que le prototype de la fonction stipule qu'elle renvoie une référence.\n"
-					else (TReturn te), env 
+					else (TReturn te), env, off
 				else erreur e.loc "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction.\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
 		       end
 	| Areturn -> begin try let tr = Smap.find chtypereturn env in 
-				if tr.typ = Tvoid then TAreturn, env
+				if tr.typ = Tvoid then TAreturn, env, off
                                 else erreur i.loc "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
                      end
@@ -908,12 +913,12 @@ let rec typinst i env lvl = match i.v with
 
 
 (* ajouter la prise en charge des niveaux d'imbrication *)
-and typdbloc bl env lvl = match bl with
-	| Bloc [] -> (TBloc [])
-	| Bloc (i::l) -> let (ti, envir) = typinst i env lvl in
-				let (TBloc tl) = typdbloc (Bloc l) envir lvl in
-					TBloc (ti::tl)
-and typbloc bl env lvl = (typdbloc (bl.v) env lvl)
+and typdbloc bl env lvl off = match bl with
+	| Bloc [] -> (TBloc []), off
+	| Bloc (i::l) -> let (ti, envir, offs) = typinst i env lvl off in
+				let (TBloc tl), offr = typdbloc (Bloc l) envir lvl offs in
+					(TBloc (ti::tl)), (offs + offr)
+and typbloc bl env lvl off = (typdbloc (bl.v) env lvl off)
 
 
 
@@ -921,7 +926,7 @@ let typdecl d env = match d.v with
 	| Dv dv -> let (tdv, envir) = typdecl_v env 0 dv in ( TDv tdv), envir
         | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
         | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env None in
-				let tbl = typbloc bl envir 1 in
+				let tbl, off (* bug le rajouter *) = typbloc bl envir 1 0 in
 					(TDb (tp, tbl)), env_hb 
 
 (*
