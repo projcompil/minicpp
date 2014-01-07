@@ -14,7 +14,7 @@ let ntest = (ref 0), "_sortielazy"
 let nstring = (ref 0), "_chaine"
 let nif = (ref 0), "_else", "_sortiecond"
 let nloop = (ref 0), "_entreeloop", "_testloop"
-let nvar = (ref 0), "__variable"
+let nvar = (ref 0), "_variable"
 
 let (table_chaine : hashstring) = Hashtbl.create 50
 
@@ -146,9 +146,8 @@ let rec code_inst lvl ti = match ti with
 	| TNothing -> nopp
   	| TIexpr te -> { text = (code_expr lvl te) ; data = nop }
   	| TIdecl (tt, tv) -> 
-  					{ text = sub sp sp oi (size_type  ((extract_tvar tv).typ )); data = nop} (*Othmane.*)
-  	| TIdeclinit (tt, tv, te) -> conca [{text = code_expr lvl te  ;data = nop} ; { text = push a0 ; data = nop}] 
-  	(* Pas du tout sûr*) 
+  					{ text = sub sp sp oi (size_type  ((extract_tvar tv).typ )) ; data = nop} (*Othmane.*)
+  	| TIdeclinit (tt, tv, te) ->  addp {text = code_expr lvl te  ; data = nop} { text = push a0 ; data = nop} 
   	| TIdeclobj (tt, tv, s, tl, ni) -> ratec ""
   	(*| TIf (te, ti) -> ratec ""*)
   	| TIfelse (te, ti, tj) -> let (lab1, lab2) = next_labd nif in
