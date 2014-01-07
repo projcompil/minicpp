@@ -111,16 +111,25 @@ let rec code_expr lvl texpr = match texpr.c with
 					| _ -> failwith "Heisenbug 2.\n"
 				   end
 	| TEqident (TQident tid) -> (* il faut corriger les offset dans typage.ml *)
-			assert (tid.lvl <= lvl) ;
-			(move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++ (if tid.byref then add a0 t0 oi tid.offset else lw a0 areg (tid.offset, t1)) ++ (if tid.byref then lw a0 areg (0, a0) else nop)
+			assert (tid.lvl <= lvl) ; (* j'ai mis lbl - l fois au lieu de lvl - 1 fois Othmane.*)
+			(move t1 fp) ++ (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++ (if tid.byref then add a0 t0 oi tid.offset else lw a0 areg (tid.offset, t1)) ++ (if tid.byref then lw a0 areg (0, a0) else nop)
 	| TEassign({ c = TEqident (TQident tid) ; typ = _  }, tf) -> 
 			(code_expr lvl tf) ++
-			(move t1 fp) ++ (iter (lvl-1) (lw t1 areg (8, t1))) ++
+			(move t1 fp) ++ (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++
 			(if tid.byref then lw t1 areg (tid.offset, t1)
 			 else add t1 t1 oi tid.offset) ++
 			(sw a0 areg (0, t1))				
-(* pour l'instant uniquement les variables et non les membres d'objets *)
-	| _ ->  ratec "Compilation de cette partie non encore implémentée.\n"
+(* pour l'instant uniquement les variables et non les membres d'objets *) (*Othmane, de même que TEassign*)
+	| TElincr ({ c = TEqident (TQident tid) ; typ = _  }) | TErincr ({ c = TEqident (TQident tid) ; typ = _  }) ->  (code_expr lvl ({ c = TEqident (TQident tid) ; typ = Tint  })) ++ add a0 a0 oi 1 ++ (move t1 fp) ++
+	 (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++ add t1 t1 oi tid.offset ++ (sw a0 areg (0, t1))
+	| TEldecr ({ c = TEqident (TQident tid) ; typ = _  }) | TErdecr ({ c = TEqident (TQident tid) ; typ = _  }) ->   (code_expr lvl ({ c = TEqident (TQident tid) ; typ = Tint  })) ++ sub a0 a0 oi 1 ++ (move t1 fp) ++
+	 (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++ add t1 t1 oi tid.offset ++ (sw a0 areg (0, t1))
+	| TEaddr ({ c = TEqident (TQident tid) ; typ = _  }) -> 
+			(move t1 fp) ++ (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++
+			  (add a0 t1 oi tid.offset) ++ (if tid.byref then lw a0 areg (0, a0)
+			 else nop)
+
+	|  _ -> ratec "Compilation de cette partie non encore implémentée.\n"
 
 
 
@@ -146,7 +155,7 @@ let rec code_inst lvl ti = match ti with
 	| TNothing -> nopp
   	| TIexpr te -> { text = (code_expr lvl te) ; data = nop }
   	| TIdecl (tt, tv) -> 
-  					{ text = sub sp sp oi (size_type  ((extract_tvar tv).typ )) ; data = nop} (*Othmane.*)
+  					{ text = sub fp fp oi (size_type  ((extract_tvar tv).typ )) ; data = nop} (*Othmane, mit dans sp pour l'instant*)
   	| TIdeclinit (tt, tv, te) ->  addp {text = code_expr lvl te  ; data = nop} { text = push a0 ; data = nop} 
   	| TIdeclobj (tt, tv, s, tl, ni) -> ratec ""
   	(*| TIf (te, ti) -> ratec ""*)
@@ -162,7 +171,7 @@ let rec code_inst lvl ti = match ti with
 						{ text = (concatene (List.map (code_expr lvl) tl1)) ++ (b lab2) ++ (label lab1) ++ ci.text ++ (concatene (List.map (code_expr lvl) tl2)) ++  (label lab2) ++ (code_expr lvl te) ++ (bnez a0 lab1) ; data = ci.data }
   	| TIbloc tb -> code_bloc lvl tb
   	| TCout tls -> conca (List.map (code_cout_expr_str lvl) tls)
-  	| TReturn te -> ratec ""
+  	| 	TReturn te -> { text = code_expr lvl te ; data = nop }(* Othmane,  surement incomplet *)
   	| TAreturn -> ratec ""
 
 and code_bloc lvl (TBloc tl) = conca (List.map (code_inst (lvl+1)) tl)
