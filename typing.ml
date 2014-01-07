@@ -203,8 +203,9 @@ let rec is_sub_class c1 c2 =
 
 let rec is_sub_type t1 t2 = match (t1, t2) with
 	| Tint, Tint | Tnull, Tpointeur(_) -> true
-	| (Tpointeur a), (Tpointeur b) -> is_sub_type a b
+	| (Tpointeur (Tclass a)), (Tpointeur (Tclass b)) -> is_sub_class a b
 	| (Tclass a), (Tclass b) -> is_sub_class a b
+    | a, b when a = b -> true
 	| _ -> false
 
 let is_sub_targ (TArg(t1, v1)) (TArg(t2, v2)) =
