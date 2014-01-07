@@ -118,10 +118,16 @@ let rec code_expr lvl texpr = match texpr.c with
 			(sw a0 areg (0, t1))				
 (* pour l'instant uniquement les variables et non les membres d'objets *)
 
-    | TElincr ({ c = TEqident (TQident tid) ; typ = _ }) | TErincr ({ c = TEqident (TQident tid) ; typ = _ }) -> (code_expr lvl ({ c = TEqident (TQident tid) ; typ = Tint })) ++ add a0 a0 oi 1 ++ (move t1 fp) ++
+    | TElincr ({ c = TEqident (TQident tid) ; typ = typ }) -> (code_expr lvl { c = TEqident (TQident tid) ; typ = typ }) ++ add a0 a0 oi 1 ++ (move t1 fp) ++
              (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++ add t1 t1 oi tid.offset ++ (sw a0 areg (0, t1))
-                     | TEldecr ({ c = TEqident (TQident tid) ; typ = _ }) | TErdecr ({ c = TEqident (TQident tid) ; typ = _ }) -> (code_expr lvl ({ c = TEqident (TQident tid) ; typ = Tint })) ++ sub a0 a0 oi 1 ++ (move t1 fp) ++
+
+    | TErincr ({ c = TEqident (TQident tid) ; typ = typ }) -> (code_expr lvl { c = TEqident (TQident tid) ; typ = typ }) ++ (move a1 a0) ++ (add a1 a1 oi 1) ++ (move t1 fp) ++
+             (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++ add t1 t1 oi tid.offset ++ (sw a1 areg (0, t1))
+    | TEldecr ({ c = TEqident (TQident tid) ; typ = typ  }) -> (code_expr lvl { c = TEqident (TQident tid) ; typ = typ }) ++ sub a0 a0 oi 1 ++ (move t1 fp) ++
                               (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++ add t1 t1 oi tid.offset ++ (sw a0 areg (0, t1))
+
+    | TErdecr ({ c = TEqident (TQident tid) ; typ = typ }) -> (code_expr lvl { c = TEqident (TQident tid) ; typ = typ }) ++ (move a1 a0) ++ (sub a1 a1 oi 1) ++ (move t1 fp) ++
+                              (iter (lvl-tid.lvl) (lw t1 areg (8, t1))) ++ add t1 t1 oi tid.offset ++ (sw a1 areg (0, t1))
 
 	| _ ->  ratec "Compilation de cette partie non encore implémentée.\n"
 
