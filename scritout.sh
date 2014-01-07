@@ -1,7 +1,7 @@
 #!/bin/bash
 
-path=/home/nm/Documents/tests
-pathbin=/home/nm/Documents/minicpp/minic++
+path=/Users/othmane/Desktop/tests
+pathbin=/Users/othmane/Desktop/minicpp/minic++
 pathstore=/tmp/
 nomferreurs=erreurs_recensees
 nomfnotimplem=notimplemented
