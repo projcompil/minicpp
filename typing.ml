@@ -346,7 +346,7 @@ let rec is_left_tvalue te env = match te.c with
                                 | TQident id -> (id.typ <> Fonc) || (id.byref)
                                 | TQmeth _ -> false
                         end
-    | TEpointeur _ | TEthis -> true
+    | TEpointeur _ | TEthis | TEnew _ -> true
 	| TEattr ({ c = te ; typ = (Tclass nc) }, s) (*| TEsderef ({ c = te ; typ = (Tpointeur (Tclass nc)) }, s) *) -> is_member nc s.rep
 	| TEfcall(_,_,_, b) -> b
 	| TEmcall(_,_,_,_,b) -> b
@@ -937,12 +937,12 @@ let rec typinst i env lvl off = match i.v with
 							(TReturn te), env, off
 						else erreur e.loc "L'expression retournée n'est pas une valeur gauche, alors que le prototype de la fonction stipule qu'elle renvoie une référence.\n"
 					else (TReturn te), env, off
-				else erreur e.loc "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction.\n"
+				else erreur e.loc "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction. (1)\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
 		       end
 	| Areturn -> begin try let tr = Smap.find chtypereturn env in 
 				if tr.typ = Tvoid then TAreturn, env, off
-                                else erreur i.loc "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction.\n"
+                                else erreur i.loc "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction. (2)\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
                      end
 
