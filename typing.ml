@@ -157,18 +157,18 @@ let (table_c_member : (string, tdemems) Hashtbl.t ) = (Hashtbl.create 17) ;;
 let ( table_c_size : (string, int) Hashtbl.t )= (Hashtbl.create 17) 
 
 
-(*let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
-let junk2 = Hashtbl.create 17 ;;*)
+let junk1 = Hashtbl.create 17 ;; (* Pour les besoins de l'initialisation des types. *)
+let junk2 = Hashtbl.create 17 ;;
 
-(*Hashtbl.add junk1 "@@@@" ((0, ((* retourne une référence *) false, (*virtual*) false), Tnull, []):(int * (bool*bool) * typ * (targ list))) ;;*)
+Hashtbl.add junk1 "" ((0, ((* retourne une référence *) false, (*virtual*) false), Tnull, []):(int * (bool*bool) * typ * (targ list))) ;;
 
-(*Hashtbl.add junk2 "@@@@" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;*)
-(*
+Hashtbl.add junk2 "" { rep = "" ; typ = Tvoid ; lvl = 0 ; offset = 0 ; byref = false };;
+
 Hashtbl.add table_c_meth "" junk1 ;;
 
 Hashtbl.add table_c_member "" junk2 ;;
-*)
-(*Hashtbl.add table_c_size "" 0 ;;*)
+
+Hashtbl.add table_c_size "" 0 ;;
 
 let ( table_c_env : (string, environnement) Hashtbl.t ) = Hashtbl.create 17
 
@@ -273,8 +273,8 @@ let remontemeth c m = remontegen c m find_all_meth_sr
 let remontemember c m = remontegen c m find_all_member_sr
 
 let find_all_meth c m =
-	(*remontemeth c m*)
-	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
+	remontemeth c m
+	(*Hashtbl.find_all (Hashtbl.find table_c_meth c) m*)
 
 let add_meth c m t b (* attention !! couple de booléens !!! *) l =
 	add_func (Hashtbl.find table_c_meth c) m t b l
@@ -484,7 +484,7 @@ let rec typvar v env lvl t off =
 	let rec auxvar v b t = match v.v with
 		| Ident s -> begin try
 			let tid = Smap.find s env in
-				if tid.lvl = lvl then
+				if tid.lvl = lvl && (tid.typ <> Fonc || t <> Fonc) then
 					erreur v.loc ("Impossible de redéfinir " ^ s ^ ", car cet identifiant est déjà défini à ce niveau.")
 				else { c = (TIdent { rep = s; typ = t ; lvl = lvl; offset = off (* le changer *); byref = b  }) ; typ = t } 
 		     with Not_found -> {c =  (TIdent { rep = s; typ = t ; lvl = lvl; offset = off (* le changer *); byref = b }) ; typ = t } (*erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")*)
@@ -580,7 +580,7 @@ let typproto p env in_class = match p.v with
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
 							else begin
 								add_f id.rep tt (tqvar_by_ref tqv) tl ;
-								(* à complétér*)
+								(* à compléter*)
 								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	in let renv = Smap.add (id.rep) prov env in
 				let brenv = Smap.add (id.rep) prov (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir) in
@@ -589,10 +589,13 @@ let typproto p env in_class = match p.v with
 
 
 					| (TQmeth(s,id)), None ->  ratet "Non implé()menté (méthode de classe).\n"
-					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
+					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth_sr nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
 		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
-        (TProto(tt, tqv, tl)), env, env (* bug modifier environnements !! *)
+        let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
+	        in let renv = Smap.add (id.rep) prov env in
+
+        (TProto(tt, tqv, tl)), env, renv (* bug modifier environnements !! *)
         (*let cemv = get_envc nc in*)
 		(*ratet "proovv non implémenté"*)
 	end
