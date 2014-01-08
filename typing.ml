@@ -627,7 +627,7 @@ let typproto p env in_class = match p.v with
                         let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = (Tclass s) ; lvl = 1 ; offset = 0 ; byref = false (* ou true ? *) } envir)) (get_envc s) in
                                                     (TPconshc(s, s2, tl)), brenv, env
 
-(*					ratet "(définition du constructeur).\n"*)
+(*					ra()tet "(définition du constructeur).\n"*)
 	
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
@@ -766,7 +766,16 @@ let rec typexpr expr env lvl = match expr.v with
 				
 							   else erreur e.loc "Cette expression n'est pas une fonction.\n"
 				| TEqident (TQmeth(_)) -> ratet "(méthode fonction).\n" 
-				| TEattr(te, id) when id.typ = Fonc -> ratet "(appel méthode fonction).\n"
+				| TEattr(te, id) when id.typ = Fonc -> let nc = classe_de te.typ in
+                                                            let lm = find_all_meth nc id.rep in begin
+                                                                    match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lm) with
+                                                                    | None -> erreur expr.loc ("Aucune méthode de la classe" ^ nc  ^ " ne correspond à ce profil d'appel.\n")
+                                                                    | Some(f, i, tt, b) ->  { c = TEfcall(te, tl, i, (fst b)) ; typ = tt }
+                                                            end
+
+               
+                (*ra()tet "(appel méthode fonction).\n"*)
+                        
 	(* rajouter accès méthodes *)
 				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
 		end
