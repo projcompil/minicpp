@@ -605,7 +605,7 @@ let typproto p env in_class = match p.v with
         (*let cemv = get_envc nc in*)
 		(*ra()tet "proovv non implémenté"*)
 	end
-					| (TQmeth(s,id)), (Some (nc, bvir)) -> ratet "(méthode de classe2)."
+					| (TQmeth(s,id)), (Some (nc, bvir)) -> erreur p.loc "Extra-qualification.\n" (*ra()tet "(méthode de classe2)."*)
 				end
 	| Pcons (s, l) -> let tl, renv = add_args l env in
 				if f_is_in_list tl (find_all_meth s (chcons ^ s)) then
