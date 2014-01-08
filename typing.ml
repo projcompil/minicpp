@@ -592,7 +592,9 @@ let typproto p env in_class = match p.v with
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
 		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
-		ratet "proovv non implémenté"
+        (TProto(tt, tqv, tl)), env, env (* bug modifier environnements !! *)
+        (*let cemv = get_envc nc in*)
+		(*ratet "proovv non implémenté"*)
 	end
 					| (TQmeth(s,id)), (Some (nc, bvir)) -> ratet "(méthode de classe2)."
 				end
