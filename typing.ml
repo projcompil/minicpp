@@ -170,8 +170,9 @@ Hashtbl.add table_c_member "" junk2 ;;
 
 Hashtbl.add table_c_size "" 0 ;;
 
-let ( table_c_env : (string, environnement) Hashtbl.t ) = Hashtbl.create 17
+let ( table_c_env : (string, environnement) Hashtbl.t ) = Hashtbl.create 17;;
 
+Hashtbl.add table_c_env "" Smap.empty;;
 
 let biostream = ref false
 
@@ -262,14 +263,15 @@ let find_all_meth_sri c m =
 let find_all_member_sr c m =
         Hashtbl.find_all (Hashtbl.find table_c_member c) m
 
+let rec nettoie l = match l with
+    | [] -> []
+	| ""::l -> nettoie l
+	| x::l when not (Hashtbl.mem table_c_meth x) -> l
+	| l -> l
+
 let remontegen c m f =
 	let rec auxremonte l = 
-		let rec nettoie l = match l with
-			| [] -> []
-			| ""::l -> nettoie l
-			| x::l when not (Hashtbl.mem table_c_meth x) -> l
-			| l -> l
-		in let ln = nettoie l in
+		let ln = nettoie l in
 		(List.flatten (List.map (fun x -> f x m) ln)) @ (List.flatten (List.map (fun x -> auxremonte (Hashtbl.find_all table_c x) ) ln))
 	in auxremonte [c]
 
@@ -285,12 +287,7 @@ let add_meth c m t b (* attention !! couple de booléens !!! *) l =
 
 let remonteisgen c m f =
 	let rec auxremonte l = 
-		let rec nettoie l = match l with
-			| [] -> []
-			| ""::l -> nettoie l
-			| x::l when not (Hashtbl.mem table_c_meth x) -> l
-			| l -> l
-		in let ln = nettoie l in
+		let ln = nettoie l in
 		(List.exists (fun x -> f x m) ln) || (List.exists (fun x -> auxremonte (Hashtbl.find_all table_c x) ) ln)
 	in auxremonte [c]
 
@@ -316,7 +313,8 @@ let is_member_sr c m =
 	Hashtbl.mem ((Hashtbl.find table_c_member c)) m 
 
 let is_member c m =
-	Hashtbl.mem ((Hashtbl.find table_c_member c)) m 
+    remonteisgen c m is_member_sr
+	(*Hashtbl.mem ((Hashtbl.find table_c_member c)) m *)
 
 let add_member c m i =
 	let tc = (Hashtbl.find table_c_member c) in
@@ -332,8 +330,20 @@ let find_all_member c m =
 let find_member c m =
         Hashtbl.find (Hashtbl.find table_c_member c) m
 
-let get_envc c =
+let remonteenvgen c f =
+	let rec auxremonte l = 
+		let ln = nettoie l in
+            let conc = fun y x -> union_env y (f x) in
+            let concl = List.fold_left conc Smap.empty in
+		        union_env (concl ln) (List.fold_left union_env Smap.empty (List.map (fun x ->  auxremonte (Hashtbl.find_all table_c x)) ln))
+    in auxremonte [c]
+
+let get_envc_sr c =
 	Hashtbl.find table_c_env c 
+
+let get_envc c =
+    remonteenvgen c get_envc_sr
+    
 
 let ajoute_env c env =
 	let bindings = Smap.bindings (Hashtbl.find table_c_env c) in
@@ -606,7 +616,7 @@ let typproto p env in_class = match p.v with
 
 
 					| (TQmeth(s,id)), None ->  if (f_is_in_list tl (find_all_meth_sr  s (id.rep))) then 
-                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc s) in
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc_sr s) in
                                                     (TProto(tt, tqv, tl)), brenv, env
                                                else erreur p.loc ("Cette méthode n'a pas été déclarée dans la classe " ^ s^ ".\n")
                         (*ra()tet "Non implé()menté (méthode de classe).\n"*)
@@ -617,7 +627,7 @@ let typproto p env in_class = match p.v with
 	        in let renv = Smap.add (id.rep) prov env in
 
         (TProto(tt, tqv, tl)), env, renv (* bug modifier environnements !! *)
-        (*let cemv = get_envc nc in*)
+        (*let cemv = get_env()c nc in*)
 		(*ra()tet "proovv non implémenté"*)
 	end
 					| (TQmeth(s,id)), (Some (nc, bvir)) -> erreur p.loc "Extra-qualification.\n" (*ra()tet "(méthode de classe2)."*)
