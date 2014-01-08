@@ -526,7 +526,7 @@ let typqident q env lvl bdecl = match q.v with
 						TQident tid
 					else erreur q.loc  ("L'identifiant " ^ s ^ "  n'est pas à portée.\n")
 				else
-					if tid.lvl <> lvl then
+					if tid.lvl <> lvl || tid.typ = Fonc then
 						TQident tid
 					else erreur q.loc ("Impossible de redéfinir l'identifiant " ^ s ^" qui a déjà été défini au même niveau.\n")
 		      with Not_found -> if bdecl || (Hashtbl.mem table_f s) then
