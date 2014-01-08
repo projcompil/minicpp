@@ -140,7 +140,7 @@ type environnement = (*typ*) ident Smap.t
 
 let ( table_f : (string, (int * bool * typ * (targ list))) Hashtbl.t) = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles et de valeurs de retour possibles  pour prendre en compte la surcharge *)
 
-(*Hashtbl.add table_f "@@@" ((0,false,Tnull,[]):(int * bool * typ * (targ list))) ;;*)
+Hashtbl.add table_f "" ((0,false,Tnull,[]):(int * bool * typ * (targ list))) ;;
 
 type hashstring = (string, string) Hashtbl.t
 let (table_c : hashstring) = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
@@ -263,8 +263,8 @@ let find_all_member_sr c m =
 let rec nettoie l = match l with
     | [] -> []
 	| ""::l -> nettoie l
-	| x::l when not (Hashtbl.mem table_c_meth x) -> l
-	| l -> l
+	(*| x::l when not (Hashtbl.mem table_c_meth x) -> l*)
+	| y::l -> y::(nettoie l)
 
 let remontegen c m f =
 	let rec auxremonte l = 
@@ -336,8 +336,9 @@ let remonteenvgen c f =
     in auxremonte [c]
 
 let get_envc_sr c =
-	Hashtbl.find table_c_env c 
-
+    try
+	    Hashtbl.find table_c_env c 
+    with Not_found -> raise (Class_not_found c)
 let get_envc c =
     remonteenvgen c get_envc_sr
     
@@ -613,7 +614,7 @@ let typproto p env in_class = match p.v with
 
 
 					| (TQmeth(s,id)), None ->  if (f_is_in_list tl (find_all_meth_sr  s (id.rep))) then 
-                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc_sr s) in
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc(*_sr*) s) in
                                                     (TProto(tt, tqv, tl)), brenv, env
                                                else erreur p.loc ("Cette méthode n'a pas été déclarée dans la classe " ^ s^ ".\n")
                         (*ra()tet "Non implé()menté (méthode de classe).\n"*)
