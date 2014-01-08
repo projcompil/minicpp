@@ -145,7 +145,7 @@ let ( table_f : (string, (int * bool * typ * (targ list))) Hashtbl.t) = Hashtbl.
 type hashstring = (string, string) Hashtbl.t
 let (table_c : hashstring) = (Hashtbl.create 17) ;; (* on enregistre ici les classes en clé, leurs super classes en champ, toujours avec le chamo "" pour pouvoir enregistrer les classes sans super classes *)
 
-(*Hashtbl.add table_c "@@" "@@";;*)
+Hashtbl.add table_c "" "";;
 
 
 type tdemeths =( string,  (int * (bool*bool) * typ * (targ list))) Hashtbl.t
@@ -256,9 +256,6 @@ let add_f f t b l =
 
 let find_all_meth_sr c m =
 	Hashtbl.find_all (Hashtbl.find table_c_meth c) m
-
-let find_all_meth_sri c m =
-	List.flatten (List.filter (fun y -> y = m) (List.map (fun x -> Hashtbl.find_all table_c_meth x) [ c ]))
 
 let find_all_member_sr c m =
         Hashtbl.find_all (Hashtbl.find table_c_member c) m
