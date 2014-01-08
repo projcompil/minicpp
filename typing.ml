@@ -623,8 +623,11 @@ let typproto p env in_class = match p.v with
 				else let (tl, envir) = add_args l env in
 					if not (f_is_in_list tl (find_all_meth s (chcons ^ s))) then
 						erreur p.loc "Aucun constructeur avec cette signature n'a été déclaré au sein de la classe.\n"
-					else
-					ratet "(définition du constructeur).\n"
+					else 
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = (Tclass s) ; lvl = 1 ; offset = 0 ; byref = false } envir)) (get_envc s) in
+                                                    (TPconshc(s, s2, tl)), brenv, env
+
+(*					ratet "(définition du constructeur).\n"*)
 	
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
