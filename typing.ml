@@ -230,7 +230,7 @@ let classe_de = function
 
 
 (**********)
-let union env1 env2 = (* fusion des deux environnements avec priorité pour les éléments du premier*)
+let union_env env1 env2 = (* fusion des deux environnements avec priorité pour les éléments du premier*)
     let f k a b = match (a,b) with
         | None, None -> None
         | Some(x), _ -> Some(x)
@@ -310,7 +310,8 @@ let add_member c m i =
 
 
 let find_all_member c m =
-        Hashtbl.find_all (Hashtbl.find table_c_member c) m
+    remontemember c m    
+(*    Hashtbl.find_all (Hashtbl.find table_c_member c) m*)
 
 let find_member c m =
         Hashtbl.find (Hashtbl.find table_c_member c) m
@@ -542,7 +543,7 @@ let typqident q env lvl bdecl = match q.v with
                         if is_meth st s then
                             TQmeth (st, { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false (* le changer *) })
                         else erreur q.loc (s ^ " n'est pas une méthode de la classe " ^ st )
-                        (*ratet "(Qmeth)\n"*)
+                        (*ra()tet "(Qmeth)\n"*)
 					else erreur q.loc ("this n'est pas d'un type sous-type de " ^ st ^"\n")
 				with Not_found -> erreur q.loc ("this n'est pas ajouté à l'environnement (bug !!).\n")
 
@@ -588,7 +589,11 @@ let typproto p env in_class = match p.v with
 							end
 
 
-					| (TQmeth(s,id)), None ->  ratet "Non implé()menté (méthode de classe).\n"
+					| (TQmeth(s,id)), None ->  if (f_is_in_list tl (find_all_meth_sr  s (id.rep))) then 
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = Tclassdecl ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc s) in
+                                                    (TProto(tt, tqv, tl)), brenv, env
+                                               else erreur p.loc ("Cette méthode n'a pas été déclarée dans la classe " ^ s^ ".\n")
+                        (*ra()tet "Non implé()menté (méthode de classe).\n"*)
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth_sr nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
 		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
@@ -597,7 +602,7 @@ let typproto p env in_class = match p.v with
 
         (TProto(tt, tqv, tl)), env, renv (* bug modifier environnements !! *)
         (*let cemv = get_envc nc in*)
-		(*ratet "proovv non implémenté"*)
+		(*ra()tet "proovv non implémenté"*)
 	end
 					| (TQmeth(s,id)), (Some (nc, bvir)) -> ratet "(méthode de classe2)."
 				end
