@@ -1,8 +1,6 @@
 open Mips
 open Typing
 open Ast
- (* Ici commence l'assemblage \Production de code\*) 
- (*Une expression entière*)
 
 exception Not_implementedc of string
 let ratec s =
@@ -42,16 +40,9 @@ let addp a b =
 
 (* ***************** *)
 
-let rec concatene l = List.fold_left (++) nop l (*function
-  | [] -> nop 
-  | x::y::[] -> x ++ y
-  | x::l -> x ++ (concatene l)*)
+let rec concatene l = List.fold_left (++) nop l
 
 let rec conca l = List.fold_left addp nopp l
-(*  | [] -> nopp 
-  | x::l -> let reste = conca l in
-		{ text = x.text ++ reste.text ; data = x.data ++ reste.data }
-*)
 
 let rec iter n code = if n=0 then nop 
 		      else 
@@ -81,11 +72,7 @@ let associe_oplog op = match op with
 
 
 let rec code_expr lvl texpr = match texpr.c with
-        | TEint i -> li a0  i
-	(*| TEop (Mod, te, tf) -> 
-		(code_expr lvl te) ++ (push a0) ++
-		(code_expr lvl tf) ++ (pop t1)++
-		(div t2 t1 oreg a0)++(mul t2 t2 oreg a0) ++ (sub a0 t1 oreg t2) *)
+    | TEint i -> li a0  i
 	| TEop(op, te, tf) when List.mem op [Add ; Sub ; Mul ; Div ; Mod ] -> 
 		(code_expr lvl te) ++ (push a0) ++
 		(code_expr lvl tf) ++  (pop t1) ++
@@ -143,11 +130,6 @@ let code_cout_expr_str lvl (*env*) e = match e with
 				{ text = (la a0 alab lab) ++ (li v0 4) ++ (syscall) ; 
 				data = (label lab) ++ (asciiz s) }
 
-(*	| (TIdent { rep = s; typ = t ; lvl = l ; offset = ofs }) -> 
-		assert (l <= lvl);
-   		(move t1 fp) ++ 
-   		iter (lvl - l) ++ (lw t1  (8,t1)); 
-*)
 (*
 	| TEqident (TQident tid) -> 
 			assert (tid.lvl <= lvl) ;
@@ -205,7 +187,6 @@ let code_fichier tf =
 		| [] -> nopp
 		| td::l -> addp (code_decl td) (auxc_fichier l)
 	in auxc_fichier tf.tdecls*)
-	(*failwith "Compilation non implémentée.\n"*)
 
 
 let compile_fichier tf f =
