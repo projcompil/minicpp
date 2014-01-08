@@ -4,7 +4,16 @@
 %{
   open Ast
  (* open Lexer*)
-  (*open Lexerhack*)
+ (*open Lexerhack*)
+  let rec transmet bp q = match q.v with
+    | Ident qi -> { v = (if bp then Po q else Ad q) ; loc = q.loc }
+    | Po qv -> let rqv = transmet bp qv in { v = (Po rqv) ; loc = q.loc } 
+    | Ad qv -> let rqv = transmet bp qv in { v = (Ad rqv) ; loc = q.loc }
+let rec transmetq bp q = match q.v with
+    | Qvar qi -> { v = (if bp then Qpo q else Qad q) ; loc = q.loc }
+    | Qpo qv -> let rqv = transmetq bp qv in { v = (Qpo rqv) ; loc = q.loc } 
+    | Qad qv -> let rqv = transmetq bp qv in { v = (Qad rqv) ; loc = q.loc }
+
 %}
 
 %token <int> INTEGER
@@ -160,8 +169,8 @@ var:
 
 dvar:
 | x = IDENT { Ident x}
-| TIMES ; x = var { Po x }
-| ADDR ; x = var { Ad x }
+| TIMES ; x = var { (transmet true x).v }
+| ADDR ; x = var { (transmet false x).v }
 ; 
 
 qvar:
@@ -170,8 +179,8 @@ qvar:
 
 dqvar:
 | x = qident { Qvar x }
-| TIMES ; x = qvar { Qpo x }
-| ADDR ; x = qvar { Qad x  }
+| TIMES ; x = qvar { (transmetq true x).v }
+| ADDR ; x = qvar { (transmetq false x).v  }
 ; 
 
 qident:
