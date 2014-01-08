@@ -346,7 +346,7 @@ let rec is_left_tvalue te env = match te.c with
                                 | TQident id -> (id.typ <> Fonc) || (id.byref)
                                 | TQmeth _ -> false
                         end
-    | TEpointeur _ -> true
+    | TEpointeur _ | TEthis -> true
 	| TEattr ({ c = te ; typ = (Tclass nc) }, s) (*| TEsderef ({ c = te ; typ = (Tpointeur (Tclass nc)) }, s) *) -> is_member nc s.rep
 	| TEfcall(_,_,_, b) -> b
 	| TEmcall(_,_,_,_,b) -> b
@@ -526,7 +526,7 @@ let typqident q env lvl bdecl = match q.v with
 				if not bdecl then
 					if tid.lvl <= lvl then
 						TQident tid
-					else erreur q.loc  ("L'identifiant " ^ s ^ "  n'est pas à portée.\n")
+					else erreur q.loc  ("L'identifiant " ^ s ^ "  n'est pas à portée. (bdecl = true)\n")
 				else
 					if tid.lvl <> lvl || tid.typ = Fonc then
 						TQident tid
@@ -624,7 +624,7 @@ let typproto p env in_class = match p.v with
 					if not (f_is_in_list tl (find_all_meth s (chcons ^ s))) then
 						erreur p.loc "Aucun constructeur avec cette signature n'a été déclaré au sein de la classe.\n"
 					else 
-                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = (Tclass s) ; lvl = 1 ; offset = 0 ; byref = false } envir)) (get_envc s) in
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = (Tclass s) ; lvl = 1 ; offset = 0 ; byref = false (* ou true ? *) } envir)) (get_envc s) in
                                                     (TPconshc(s, s2, tl)), brenv, env
 
 (*					ratet "(définition du constructeur).\n"*)
@@ -702,7 +702,7 @@ let rec typexpr expr env lvl = match expr.v with
   | Ethis -> begin try 
 		let tid = Smap.find "this" env in 
   			begin match tid.typ with 
-  				| Tpointeur (Tclass s) -> { c = TEthis ; typ = tid.typ }
+  				| Tpointeur (Tclass s) -> { c = TEthis ; typ = (tid.typ) }
   				| _ -> erreur expr.loc "this est un pointeur vers un objet\n"
 			end
 		with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une méthode.\n" end
