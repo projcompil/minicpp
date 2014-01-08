@@ -280,11 +280,23 @@ let find_all_meth c m =
 let add_meth c m t b (* attention !! couple de booléens !!! *) l =
 	add_func (Hashtbl.find table_c_meth c) m t b l
 
+let remonteisgen c m f =
+	let rec auxremonte l = 
+		let rec nettoie l = match l with
+			| [] -> []
+			| ""::l -> nettoie l
+			| x::l when not (Hashtbl.mem table_c_meth x) -> l
+			| l -> l
+		in let ln = nettoie l in
+		(List.exists (fun x -> f x m) ln) || (List.exists (fun x -> auxremonte (Hashtbl.find_all table_c x) ) ln)
+	in auxremonte [c]
+
 let is_meth_sr c m =
 	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m 
 
 let is_meth c m =
-	Hashtbl.mem ((Hashtbl.find table_c_meth c)) m (*List.mem m (find_all_meth c m)*)
+    remonteisgen c m is_meth_sr
+	(*Hashtbl.mem ((Hashtbl.find table_c_meth c)) m (*List.mem m (find_all_meth c m)*)*)
 
 let find_meth c m =
 	(*
