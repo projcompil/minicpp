@@ -45,8 +45,8 @@ type tqident =
   | TQident of ident (* retour éventuel à ident * typ /// string * typ *)
   | TQmeth of string * ident 
 
-
-type tqvar =
+type tqvar = tdqvar atype
+and tdqvar =
   | TQvar of tqident
   | TQpo of tqvar
   | TQad of tqvar
@@ -407,7 +407,7 @@ let rec extract_tvar tv = match tv.c with
 
 let size_tvar tv = size_type((extract_tvar tv).typ)
 
-let rec extract_tqvar tqv = match tqv with
+let rec extract_tqvar tqv = match tqv.c with
 	| TQvar q -> q
 	| TQpo tqva | TQad tqva -> extract_tqvar tqva
 
@@ -417,7 +417,7 @@ let rec tvar_by_ref tva = match tva.c with
 	| TIdent id -> id.byref
 	| TPo tva | TAd tva -> tvar_by_ref tva
 
-let tqvar_by_ref tqva = match tqva with
+let tqvar_by_ref (tqva :tqvar) = match tqva.c with
 	| TQad _ -> true
 	| _ -> false
 
@@ -579,12 +579,12 @@ let typqident q env lvl bdecl = match q.v with
 
 
 
-let rec typqvar v env lvl bdecl = match v.v with
-	| Qvar q -> TQvar (typqident q env lvl bdecl)
+let rec typqvar v env lvl bdecl tt = match v.v with
+    | Qvar q -> { c = TQvar (typqident q env lvl bdecl) ; typ = tt }
 	| Qpo { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible de déclarer un pointeur vers une référence.\n"
-	| Qpo qv -> TQpo (typqvar qv env lvl bdecl)
+    | Qpo qv -> let tqv = (typqvar qv env lvl bdecl tt) in { c = (TQpo tqv) ; typ = Tpointeur (tqv.typ) }
 	| Qad { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible d'utiliser une référence de référence.\n"
-	| Qad qv -> TQad (typqvar qv env lvl bdecl)
+	| Qad qv -> let tqv = (typqvar qv env lvl bdecl tt) in  { c = (TQpo tqv) ; typ = (tqv.typ) }
 
 
 (* vérifier les doublons *)
@@ -599,7 +599,7 @@ let rec add_args l (*lvl*) env = match l with
 
 let typproto p env in_class = match p.v with
 	| Proto (t, qv, l) -> let tt = typtypedef t in
-				let tqv = typqvar qv env 0 true in
+				let tqv = typqvar qv env 0 true tt in
 				   let (tl, envir) = add_args l env in 
 (* ce serait mieux de l'avoir après mais sans duplication de code *)				   let tqid = extract_tqvar tqv in begin
 				   match (tqid, in_class) with
@@ -610,19 +610,19 @@ let typproto p env in_class = match p.v with
 								(* à compléter*)
 								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	in let renv = Smap.add (id.rep) prov env in
-				let brenv = Smap.add (id.rep) prov (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir) in
+				let brenv = Smap.add (id.rep) prov (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir) in
 								(TProto(tt, tqv, tl)), brenv, renv
 							end
 
 
 					| (TQmeth(s,id)), None ->  if (f_is_in_list tl (find_all_meth_sr  s (id.rep))) then 
-                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc_sr s) in
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc_sr s) in
                                                     (TProto(tt, tqv, tl)), brenv, env
                                                else erreur p.loc ("Cette méthode n'a pas été déclarée dans la classe " ^ s^ ".\n")
                         (*ra()tet "Non implé()menté (méthode de classe).\n"*)
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth_sr nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
-		add_meth nc id.rep tt ((tqvar_by_ref tqv), bvir) tl ;
+		add_meth nc id.rep tqv.typ ((tqvar_by_ref tqv), bvir) tl ;
         let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	        in let renv = Smap.add (id.rep) prov env in
 
