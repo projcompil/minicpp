@@ -226,7 +226,8 @@ let is_pointeur = function
 
 let classe_de = function
 	| Tclass s -> s
-	| _ -> failwith "Erreur : l'expression n'est pas un objet.\n"
+    | Tpointeur(Tclass s) -> s
+	| _ -> failwith "Erreur : l'expression n'est pas un objet ou un pointeur vers un objet.\n"
 
 
 (**********)
@@ -742,8 +743,20 @@ let rec typexpr expr env lvl = match expr.v with
 			let tl = List.map (fun x -> typexpr x env lvl) l in
 			match te.c with
 				| TEqident (TQident id) -> if id.typ = Fonc then
-								let lf = Hashtbl.find_all table_f (id.rep) in begin
-				match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lf) with (* ne vas pas : il faut prendre le minimum !!! changer scan_lf i debug*)
+                                if Smap.mem "this" env then
+                                    let tthis = Smap.find "this" env in
+                                        let nc = classe_de tthis.typ in
+                                            let lm = find_all_meth nc id.rep in begin
+				                                match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lm) with
+                                                    | None -> let lf = Hashtbl.find_all table_f (id.rep) in begin
+				match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lf) with 
+					| None -> erreur e.loc "Aucune fonction n'a une signature conforme aux types des arguments avec laquelle elle est appelée, ou bien l'ensemble de ces fonctions n'a pas de minimum pour l'inclusion de profils.\n"
+					| Some(f,i,tt, b) -> { c = TEfcall(te, tl, i, b) ; typ = tt } (* sûrement une erreur ici dans les cas non triviaux debug *)
+			  end
+                                                    | Some(f,i, tt, b) ->  { c = TEfcall(te, tl, i, (fst b)) ; typ = tt }
+         end
+                                            else let lf = Hashtbl.find_all table_f (id.rep) in begin
+				match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lf) with 
 					| None -> erreur e.loc "Aucune fonction n'a une signature conforme aux types des arguments avec laquelle elle est appelée, ou bien l'ensemble de ces fonctions n'a pas de minimum pour l'inclusion de profils.\n"
 					| Some(f,i,tt, b) -> { c = TEfcall(te, tl, i, b) ; typ = tt } (* sûrement une erreur ici dans les cas non triviaux debug *)
 			  end
