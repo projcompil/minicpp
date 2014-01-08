@@ -535,12 +535,12 @@ let typqident q env lvl bdecl = match q.v with
 		end
   | Qmeth (st, s) -> begin
 			if bdecl then
-				 TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false }
+				 TQmeth(st, { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false })
 			else try
 				let tid = Smap.find "this" env in
 					if is_sub_type tid.typ (Tpointeur (Tclass st)) then 
                         if is_meth st s then
-                            TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false (* le changer *) }
+                            TQmeth (st, { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false (* le changer *) })
                         else erreur q.loc (s ^ " n'est pas une méthode de la classe " ^ st )
                         (*ratet "(Qmeth)\n"*)
 					else erreur q.loc ("this n'est pas d'un type sous-type de " ^ st ^"\n")
