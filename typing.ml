@@ -229,6 +229,9 @@ let classe_de = function
     | Tpointeur(Tclass s) -> s
 	| _ -> failwith "Erreur : l'expression n'est pas un objet ou un pointeur vers un objet.\n"
 
+let is_classe = function
+	| Tclass s-> true
+    | _ -> false
 
 (**********)
 let union_env env1 env2 = (* fusion des deux environnements avec priorité pour les éléments du premier*)
@@ -962,7 +965,7 @@ let rec typinst i env lvl off = match i.v with
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
 		       end
 	| Areturn -> begin try let tr = Smap.find chtypereturn env in 
-				if tr.typ = Tvoid then TAreturn, env, off
+				if tr.typ = Tvoid || is_classe tr.typ then TAreturn, env, off
                                 else erreur i.loc "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction. (2)\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
                      end
