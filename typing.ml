@@ -606,7 +606,7 @@ let typproto p env in_class = match p.v with
 					| (TQident id), None -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
 							else begin
-								add_f id.rep tt (tqvar_by_ref tqv) tl ;
+								add_f id.rep tqv.typ (tqvar_by_ref tqv) tl ;
 								(* à compléter*)
 								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	in let renv = Smap.add (id.rep) prov env in
