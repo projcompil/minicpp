@@ -591,7 +591,7 @@ let typproto p env in_class = match p.v with
 
 
 					| (TQmeth(s,id)), None ->  if (f_is_in_list tl (find_all_meth_sr  s (id.rep))) then 
-                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = Tclassdecl ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc s) in
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tt ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc s) in
                                                     (TProto(tt, tqv, tl)), brenv, env
                                                else erreur p.loc ("Cette méthode n'a pas été déclarée dans la classe " ^ s^ ".\n")
                         (*ra()tet "Non implé()menté (méthode de classe).\n"*)
