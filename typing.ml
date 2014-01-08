@@ -907,7 +907,7 @@ let rec typinst i env lvl off = match i.v with
 						erreur v.loc "Cette variable n'a pas le même type que celui de l'objet retourné par le constructeur.\n"
 				else
 				     let tl = List.map (fun x -> typexpr x env lvl) l in
-						let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_all_meth s chcons) in begin
+						let optcons = scan_lf (List.map (fun (x:texpr) -> x.typ) tl) (find_all_meth s (chcons ^ s)) in begin
 							match optcons with
 								| None -> erreur i.loc "Aucun constructeur de la classe ne correspond au profil d'appel dans cette instruction.\n"
 								| Some(la, ni, ttt, _) -> TIdeclobj(tt, tv, s, tl, ni), envir, (off +(size_tvar tv))  (*failwith "(assignation objet retour constructeur) non implé( )menté"*)
