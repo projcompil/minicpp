@@ -69,7 +69,6 @@ type tdecl_c =
   | TClass of string *  tsupers * (tmembre list)
   
 
-
 type texpr = tdexpr atype
 
 and tdexpr  =
@@ -135,8 +134,6 @@ type tfichier =
   }
 
 (* ********************************** *)
-
-(* '*************************)
 module Smap = Map.Make(String)
 
 type environnement = (*typ*) ident Smap.t
@@ -233,7 +230,12 @@ let classe_de = function
 
 
 (**********)
-
+let union env1 env2 = (* fusion des deux environnements avec priorité pour les éléments du premier*)
+    let f k a b = match (a,b) with
+        | None, None -> None
+        | Some(x), _ -> Some(x)
+        | None, Some(y) -> Some(y)
+    in Smap.merge f env1 env2
 
 let add_func tab f t b l =
 	let lf = Hashtbl.find_all tab f in
@@ -351,7 +353,6 @@ let rec is_left_tvalue te env = match te.c with
     | _ -> false  (* y en a-t-il d'autres ? *)
 
 let not_left loc =
-(*	erreurloc, "L'expression n'est pas une valeur gauche.\n"))*)
 	erreur loc "L'expression n'est pas une valeur gauche.\n"
 
 
@@ -501,7 +502,7 @@ let rec typvar v env lvl t off =
 			let envir = Smap.add (idtv.rep) idtv env in
 				(tv, envir)
 
-(** sûrement un problème sur cette fonction, on ajoute un ident de type t, mais comment savoir de quelle type il sera ? *)
+(** sûrement un problème sur cette fonction, on ajoute un ident de type t, mais comment savoir de quelle type il sera ? : résolu par le hack *)
 
 
 let typarg a env = match a.v with
@@ -538,7 +539,10 @@ let typqident q env lvl bdecl = match q.v with
 			else try
 				let tid = Smap.find "this" env in
 					if is_sub_type tid.typ (Tpointeur (Tclass st)) then 
-						ratet "(Qmeth)\n"
+                        if is_meth st s then
+                            TQident { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false (* le changer *) }
+                        else erreur q.loc (s ^ " n'est pas une méthode de la classe " ^ st )
+                        (*ratet "(Qmeth)\n"*)
 					else erreur q.loc ("this n'est pas d'un type sous-type de " ^ st ^"\n")
 				with Not_found -> erreur q.loc ("this n'est pas ajouté à l'environnement (bug !!).\n")
 
