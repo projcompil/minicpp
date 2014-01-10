@@ -328,21 +328,22 @@ let find_member c m =
         Hashtbl.find (Hashtbl.find table_c_member c) m
 
 let remonteenvgen c f =
-	let rec auxremonte l = begin match l with
+	let rec auxremonteenv l = begin match l with
         | [] -> Smap.empty
         | l -> 
 		let ln = nettoie l in
             let conc = fun y x -> union_env y (f x) in
-            let concl = List.fold_left conc Smap.empty in
-		        union_env (concl ln) (List.fold_left union_env Smap.empty (List.map (fun x ->  auxremonte (Hashtbl.find_all table_c x)) ln))
+            let concl = List.fold_left (conc) Smap.empty in
+		        union_env (concl ln) (List.fold_left union_env Smap.empty (List.map (fun x -> auxremonteenv (Hashtbl.find_all table_c x)) ln))
 
     end
-    in auxremonte [c]
+    in auxremonteenv [c]
 
 let get_envc_sr c =
     try
 	    Hashtbl.find table_c_env c 
     with Not_found -> raise (Class_not_found c)
+
 let get_envc c =
     remonteenvgen c get_envc_sr
     
@@ -746,7 +747,7 @@ let rec typexpr expr env lvl = match expr.v with
   | Eattr (e,s)-> let te = typexpr e env lvl in
 			begin match te.typ with 
 				| Tclass nc -> if is_member nc s then 
-							let tidm = find_member nc s in
+							let tidm = List.hd (find_all_member nc s) in
 								{ c = TEattr (te, tidm) ; typ = tidm.typ }
 					       else if is_meth nc s then
 							(*let tidm = find_meth nc s in*)
