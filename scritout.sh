@@ -21,7 +21,7 @@ else
 	argu=""
 fi
 
-if [ -z "$1"] ; then
+if [ -z "$1" ] ; then
 	outilc=0
 else
 	outilc=1
