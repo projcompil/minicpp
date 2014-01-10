@@ -169,17 +169,28 @@ let rec code_inst lvl ti = match ti with
 and code_bloc lvl (TBloc (tl, off)) = conca (List.map (code_inst (lvl+1)) tl)
 (* rajouter offset ici ? *)
 
-let code_proto tp = match tp with
+(*let code_proto tp = match tp with
 	| TProto(tt, tqv, tla) -> ratec ""
 	| _ -> ratec "Pas d'autres fonctions que main.\n"
-
+*)
 (* ne pas gérer le main dans code_proto *)
+
+let rec descend tla = match tla with 
+	| [] -> nop 
+	| (TArg(typ,tvar))::q -> (sub fp fp oi  (size_type tvar.typ)) ++ (descend q)  
+let code_proto tp = match tp with
+	| TProto(tt, tqv, tla) -> {text=(descend tla); data=nop}
+	| _ -> ratec "Pas d'autres fonctions que main.\n"
 
 let code_decl td = match td with
 	| TDv tdv -> nopp (* peut-êttre à changer pour la PµOO *)
 	| TDc tdc -> ratec ""
     | TDb ( (TProto(Tint, (**){ c =(* *)(TQvar(TQident(ti)))(**); typ = _ }(**), [])), tb, off) when ti.rep = "main" -> conca [ { text = (label "main") ; data = nop } ; {text = (sub sp sp oi (8+off)) ++ (add fp sp oi off) ;  data = nop} ; (code_bloc 0 tb) ; { text = (add sp sp oi off) ++ (li v0 10) ++ (syscall); data = nop } ]
-	| TDb (tp, tb, off) -> addp (code_proto tp) (code_bloc 0 tb)
+	| TDb (tp, tb, off) -> conca [ (code_proto tp) ; {text = (add fp sp oi  (8+off))  ++ (sw fp areg (off + 4 , sp)) ++
+ (sw ra areg (off ,sp)) ++ (add sp sp oi (off)) ; data = nop } ; (code_bloc 0 tb) ; 
+ {text = (lw ra areg (0,fp)) ++ (lw fp areg (4,fp)) ++ (add sp sp oi (8+off)) ++ (jr ra) ; data = nop } ]
+            
+            (*addp (code_proto tp) (code_bloc 0 tb)*)
 
 let code_fichier tf =
 	List.fold_left (fun x td -> addp x (code_decl td)) nopp tf.tdecls
