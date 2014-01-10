@@ -366,7 +366,7 @@ let rec is_left_value e (env:environnement) = match e.v with
 			end  
 	| Epointeur _ | Esderef _ | Eattr _ -> true
 	| Epar ex -> is_left_value ex env
-	| _ -> false  (* y en a-t-il d'autres ? *)
+	| _ -> false  
 
 
 let rec is_left_tvalue te env = match te.c with
@@ -415,6 +415,10 @@ let rec extract_tqvar tqv = match tqv.c with
 	| TQpo tqva | TQad tqva -> extract_tqvar tqva
 
 
+let rec name_tqvar tqv =
+    match (extract_tqvar tqv) with
+                    | TQident tid -> tid.rep
+                    | _ -> ratet "Nom de TQmeth non implémenté.\n"
 
 let rec tvar_by_ref tva = match tva.c with
 	| TIdent id -> id.byref
@@ -518,7 +522,7 @@ let rec typvar v env lvl t off =
 				if tid.lvl = lvl && (tid.typ <> Fonc || t <> Fonc) then
 					erreur v.loc ("Impossible de redéfinir " ^ s ^ ", car cet identifiant est déjà défini à ce niveau.")
 				else { c = (TIdent { rep = s; typ = t ; lvl = lvl; offset = off (* le changer *); byref = b  }) ; typ = t } 
-		     with Not_found -> {c =  (TIdent { rep = s; typ = t ; lvl = lvl; offset = off (* le changer *); byref = b }) ; typ = t } (*erreur v.loc ("L'identifiant " ^ s ^ " n'est pas le nom d'une variable déclarée plus tôt.\n")*)
+		     with Not_found -> {c =  (TIdent { rep = s; typ = t ; lvl = lvl; offset = off (* le changer *); byref = b }) ; typ = t } 
 		     end
 		| Po { v = Ad va ; loc = loc } ->  erreur v.loc "Impossible de de prendre un type de pointeur vers une référence.\n"
 		| Po va -> let tva = auxvar va b t in
@@ -533,13 +537,11 @@ let rec typvar v env lvl t off =
 			let envir = Smap.add (idtv.rep) idtv env in
 				(tv, envir)
 
-(** sûrement un problème sur cette fonction, on ajoute un ident de type t, mais comment savoir de quelle type il sera ? : résolu par le hack *)
-
 
 let typarg a env = match a.v with
 	| Arg(t, v) ->  let tt = typtypedef t in
 				if is_bf tt then
-				let (tv, envir) = typvar v env 1 tt 0 (* bug le changer *) in
+				let (tv, envir) = typvar v env 1 tt 0  in
 					if (is_num tv.typ) || (tvar_by_ref tv) then
 						(TArg( (typtypedef t), tv)), envir
 					else erreur a.loc "Les paramètres d'une fonctions doivent être numériques, ou passées par référence.\n"
@@ -571,13 +573,12 @@ let typqident q env lvl bdecl = match q.v with
 				let tid = Smap.find "this" env in
 					if is_sub_type tid.typ (Tpointeur (Tclass st)) then 
                         if is_meth st s then
-                            TQmeth (st, { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false (* le changer *) })
+                            TQmeth (st, { rep = s ; typ = Fonc ;  lvl = lvl ; offset = 0 ; byref = false })
                         else erreur q.loc (s ^ " n'est pas une méthode de la classe " ^ st )
-                        (*ra()tet "(Qmeth)\n"*)
 					else erreur q.loc ("this n'est pas d'un type sous-type de " ^ st ^"\n")
 				with Not_found -> erreur q.loc ("this n'est pas ajouté à l'environnement (bug !!).\n")
 
-		     end (*failwith "Non implé()menté (méthode d'une classe).\n"*)
+		     end 
 
 
 
@@ -590,8 +591,6 @@ let rec typqvar v env lvl bdecl tt = match v.v with
 	| Qad { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible d'utiliser une référence de référence.\n"
 	| Qad qv -> let tqv = (typqvar qv env lvl bdecl tt) in  { c = (TQad tqv) ; typ = (tqv.typ) }
 
-
-(* vérifier les doublons *)
 
 
 (* ajoute une liste de variables issues d'arguments à l'environnement *)
@@ -611,16 +610,15 @@ let typproto p env in_class = match p.v with
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
 							else begin
 								add_f id.rep tqv.typ (tqvar_by_ref tqv) tl ;
-								(* à compléter*)
 								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	in let renv = Smap.add (id.rep) prov env in
-				let brenv = Smap.add (id.rep) prov (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir) in
+				let brenv = Smap.add (id.rep) prov (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) } envir) in
 								(TProto(tt, tqv, tl)), brenv, renv
 							end
 
 
 					| (TQmeth(s,id)), None ->  if (f_is_in_list tl (find_all_meth_sr  s (id.rep))) then 
-                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc(*_sr*) s) in
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) } envir)) (get_envc s) in
                                                     (TProto(tt, tqv, tl)), brenv, env
                                                else erreur p.loc ("Cette méthode n'a pas été déclarée dans la classe " ^ s^ ".\n")
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth_sr nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
@@ -629,22 +627,17 @@ let typproto p env in_class = match p.v with
         let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	        in let renv = Smap.add (id.rep) prov env in
 
-        (TProto(tt, tqv, tl)), env, renv (* bug modifier environnements !! *)
-        (*let cemv = get_env()c nc in*)
-		(*ra()tet "proovv non implémenté"*)
+        (TProto(tt, tqv, tl)), env, renv 
 	end
-					| (TQmeth(s,id)), (Some (nc, bvir)) -> erreur p.loc "Extra-qualification.\n" (*ra()tet "(méthode de classe2)."*)
+					| (TQmeth(s,id)), (Some (nc, bvir)) -> erreur p.loc "Extra-qualification.\n" 
 				end
 	| Pcons (s, l) -> let tl, renv = add_args l env in
 				if f_is_in_list tl (find_all_meth s (chcons ^ s)) then
 					erreur p.loc "Un constructeur de même signature a déjà été déclarée.\n"				       
 				else begin add_meth s (chcons ^ s) (Tclass s) (false, (match in_class with | None -> failwith "Heisenbug 3.\n"
 								     | Some (nc, bvir) -> bvir) ) tl ;
-					(*let prov = { rep = (chcons ^ s) ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = false}
-        in let renv = Smap.add (ch ) prov env in*)
 					(TPcons(s, tl)), env, env
 				end
- (*failwith "Non implé()menté (prototype co0nstructeur).\n"*)
 	| Pconshc (s, s2, l) -> assert (in_class = None); 
 				if s <> s2 then
 					erreur p.loc "Ce prototype n'est pas le prototype d'un constructeur.\n"
@@ -655,7 +648,6 @@ let typproto p env in_class = match p.v with
                         let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = (Tclass s) ; lvl = 1 ; offset = 0 ; byref = false (* ou true ? *) } envir)) (get_envc s) in
                                                     (TPconshc(s, s2, tl)), brenv, env
 
-(*					ra()tet "(définition du constructeur).\n"*)
 	
 (* Retourner l'environnement, vérifier les doublons *)
 let rec auxdecl_v l env lvl t = match l with
@@ -684,10 +676,10 @@ let typmembre s (* classe du membre *) env lvl m  = match m.v with
 			     end
             with Class_not_found s -> erreur m.loc "Cette déclaration comprend une variable de type une classe non définie, ou encore non totalement définie (utiliser des pointeurs pour obtenir des structures récursives).\n"
          end
-			(*failwith "Non implé()menté (membre non implé()menté).\n"*)
+
 	| Mmeth(_, { v = Proto(_, qv, _) ; loc = _ }) when (is_qualified_qvar qv) -> erreur m.loc "Extra-qualification du prototype de la méthode au sein de la déclaration d'une classe.\n"
 	| Mmeth (b, p) -> let (tp, benvir ,envir) = typproto p env (Some (s, b)) in
-				TMmeth(b, tp), envir, 0 (* vérifier qu'il n'y a pas deux méthodes de même signatures *) (*let failwith "Non imp()lémenté (prototype méthode non implé()menté).\n" *)
+				TMmeth(b, tp), envir, 0  
 
 
 let typdecl_c dc env lvl = match dc.v with
@@ -715,52 +707,41 @@ let typdecl_c dc env lvl = match dc.v with
 							add_meth s (chcons ^ s) (Tclass s) (false, false) []; 
 							(TClass(s, (TSuper tl), lm)), renv	
 						end
-					(*with Not_found -> 	*)
-
-(* peut-être récupérer un environnement et le retourner *)
-
-				(* ajouter tailles, membres et méthodes *)
-
-(*failwith "Non implé()menté (déclaration d'une classe)\n" (* ajouter dans l'environnement ? *) *)
-  
 
 
 let rec typexpr expr env lvl = match expr.v with
-  | Eint i -> { c = TEint i ; typ = Tint }
-  | Ethis -> begin try 
+    | Eint i -> { c = TEint i ; typ = Tint }
+    | Ethis -> begin try 
 		let tid = Smap.find "this" env in 
   			begin match tid.typ with 
   				| Tpointeur (Tclass s) -> { c = TEthis ; typ = (tid.typ) }
   				| _ -> erreur expr.loc "this est un pointeur vers un objet\n"
 			end
 		with Not_found -> erreur expr.loc "Utilisation de this en dehors d'une méthode.\n" end
-  | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
-  | Enull-> { c = TEnull ; typ = Tnull }
-  | Eqident q -> let tq = typqident q env lvl false in { c = TEqident tq ; typ = (type_of_tqident tq)}
-  | Epointeur e -> let te = typexpr e env lvl in 
+    | Ebool b -> { c = TEint (if b then 1 else 0) ; typ = Tint }
+    | Enull-> { c = TEnull ; typ = Tnull }
+    | Eqident q -> let tq = typqident q env lvl false in { c = TEqident tq ; typ = (type_of_tqident tq)}
+    | Epointeur e -> let te = typexpr e env lvl in 
 			if is_left_tvalue te env then 
 				begin match te.typ with 
 					| Tpointeur t -> {c = TEpointeur te ; typ = t }
 					| _ -> erreur expr.loc "Déférencement d'une expression qui n'est pas un pointeur.\n"
 				end
 		   	else not_left expr.loc 
-  | Eattr (e,s)-> let te = typexpr e env lvl in
+    | Eattr (e,s)-> let te = typexpr e env lvl in
 			begin match te.typ with 
 				| Tclass nc -> if is_member nc s then 
 							let tidm = List.hd (find_all_member nc s) in
 								{ c = TEattr (te, tidm) ; typ = tidm.typ }
 					       else if is_meth nc s then
-							(*let tidm = find_meth nc s in*)
-								{ c = TEattr (te,  {rep = s ; typ = Fonc ; lvl = lvl ; offset = 0 ; byref = false }) ; typ = Fonc } (*failwith "Méthode non encore implé()mentée.\n"*) (* il faut sûrement rajouter des constructeurs de type, pour prendre en compte les méthodes, et leurs applications !! *)(*{ c = TEattr (te, tidm) ; typ = tidm.typ }*)
+								{ c = TEattr (te,  {rep = s ; typ = Fonc ; lvl = lvl ; offset = 0 ; byref = false }) ; typ = Fonc }  (* il faut sûrement rajouter des constructeurs de type, pour prendre en compte les méthodes, et leurs applications !! *)
 						else erreur expr.loc (s ^ " n'est pas un membre de la classe " ^ nc)
 				| _ -> erreur e.loc "Cette expression ne représente pas un objet, on ne peut donc utiliser l'opérateur . pour accéder à un de ses membres.\n"
 			end
 
-(*failwith "Expression non encore implémeni()tée (attribut d'une expression).\n"*)
-  | Esderef (e,s) -> typexpr { v = Eattr({v = Epointeur(e)  ;loc = e.loc},s) ; loc = expr.loc } env lvl (* let te = typexpr e env lvl in
-			match te.typ with
-				| Tpointeur (TClass s) -> {} *)
-| Eassign (e,f)-> let te = typexpr e env lvl in 
+    | Esderef (e,s) -> typexpr { v = Eattr({v = Epointeur(e)  ;loc = e.loc},s) ; loc = expr.loc } env lvl 
+
+    | Eassign (e,f)-> let te = typexpr e env lvl in 
 			if is_left_tvalue te env then
 				let tf = typexpr f env lvl in
 				if is_sub_type tf.typ te.typ then
@@ -782,14 +763,14 @@ let rec typexpr expr env lvl = match expr.v with
                                                     | None -> let lf = Hashtbl.find_all table_f (id.rep) in begin
 				match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lf) with 
 					| None -> erreur e.loc "Aucune fonction n'a une signature conforme aux types des arguments avec laquelle elle est appelée, ou bien l'ensemble de ces fonctions n'a pas de minimum pour l'inclusion de profils.\n"
-					| Some(f,i,tt, b) -> { c = TEfcall(te, tl, i, b) ; typ = tt } (* sûrement une erreur ici dans les cas non triviaux debug *)
+					| Some(f,i,tt, b) -> { c = TEfcall(te, tl, i, b) ; typ = tt } 
 			  end
                                                     | Some(f,i, tt, b) ->  { c = TEfcall(te, tl, i, (fst b)) ; typ = tt }
          end
                                             else let lf = Hashtbl.find_all table_f (id.rep) in begin
 				match (scan_lf (List.map (fun (x:texpr) -> x.typ) tl) lf) with 
 					| None -> erreur e.loc "Aucune fonction n'a une signature conforme aux types des arguments avec laquelle elle est appelée, ou bien l'ensemble de ces fonctions n'a pas de minimum pour l'inclusion de profils.\n"
-					| Some(f,i,tt, b) -> { c = TEfcall(te, tl, i, b) ; typ = tt } (* sûrement une erreur ici dans les cas non triviaux debug *)
+					| Some(f,i,tt, b) -> { c = TEfcall(te, tl, i, b) ; typ = tt } 
 			  end
 				
 							   else erreur e.loc "Cette expression n'est pas une fonction.\n"
@@ -802,9 +783,7 @@ let rec typexpr expr env lvl = match expr.v with
                                                             end
 
                
-                (*ra()tet "(appel méthode fonction).\n"*)
                         
-	(* rajouter accès méthodes *)
 				| _ -> erreur e.loc "Cette expression n'est pas une fonction et donc ne peut être appliquée.\n"
 		end
 
@@ -816,7 +795,6 @@ let rec typexpr expr env lvl = match expr.v with
                                                                 | Some(la, ni, ttt, _) -> { c = (TEnew(nc, tl, ni)) ; typ = Tpointeur (Tclass nc) }
 		end
 		    else erreur expr.loc "L'opérateur new invoque le constructeur d'une classe qui n'existe pas.\n"
-(*failwith "Expression non encore implé( )mentée (new)\n"*)
   | Elincr e-> let te = typexpr e env lvl in 
 		if is_left_tvalue te env then
 			begin match te.typ with 
@@ -913,7 +891,7 @@ let rec typinst i env lvl off = match i.v with
 	| Ideclobj (tdef, v, s, l)-> let tt = typtypedef tdef in
 				     if tt <> (Tclass s) then
 					erreur i.loc "Le type de cette déclaration ne correspond pas à la classe du constructeur appelé.\n"
-				else (* corriger ici *)
+				else
 				     let (tv, envir) = typvar v env lvl tt off in
 				     let tvid = extract_tvar tv in
 				         if tvid.typ <> tt then
@@ -965,7 +943,6 @@ let rec typinst i env lvl off = match i.v with
 							else erreur x.loc "Cout d'une expression qui n'est ni entière, ni une chaîne.\n"
 					| Estring s -> TEstring s)::(auxcout l)
 		     in (TCout (auxcout le)), env, off
-(* debug*1 traiter le cas où l'on doit renovyer une référence et l'expression n'est pas une valeur gauche*)
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env lvl) in 
 				if is_sub_type te.typ (tr.typ) then 
@@ -981,12 +958,8 @@ let rec typinst i env lvl off = match i.v with
 			if tr.typ = Tvoid || is_classe tr.typ then TAreturn, env, off
                                 else erreur i.loc "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction. (2)\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
-                     end
+                 end
 
-(* and typinst i env = (typdinst (i.v) env)*)
-
-
-(* ajouter la prise en charge des niveaux d'imbrication *)
 and typdbloc bl env lvl off = match bl with
 	| Bloc [] -> (TBloc ([],0)), off
 	| Bloc (i::l) -> let (ti, envir, offs) = typinst i env lvl off in
@@ -997,17 +970,11 @@ and typbloc bl env lvl off = (typdbloc (bl.v) env lvl off)
 
 
 let typdecl d env = match d.v with
-	| Dv dv -> let (tdv, envir, off) = typdecl_v env 0 dv in ( TDv tdv), envir
-        | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir
-        | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env None in
+    | Dv dv -> let (tdv, envir, off) = typdecl_v env 0 dv in ( TDv tdv), envir
+    | Dc dc -> let (tdc, envir) = typdecl_c dc env 0 in (TDc tdc), envir    
+    | Db (p, bl) -> let (tp, envir, env_hb) = typproto p env None in
 				let tbl, off (* bug le rajouter *) = typbloc bl envir 1 0 in
 					(TDb (tp, tbl, off)), env_hb 
-
-(*
- 	| Db (pr,bl) -> let (r, envir) = typbloc bl env in
-				(TDb (TProtovide, r)), envir
-	|
-*)				
 
 let rec auxtfichier l env = match l with
 	| [] -> [] 
