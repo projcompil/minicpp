@@ -53,7 +53,7 @@ and tdqvar =
 
 
 type tproto =
-  | TProto of typ * tqvar * (targ list)
+  | TProto of typ * tqvar * (targ list) * int
   | TPcons of string * (targ list)
   | TPconshc of string * string * (targ list)
 
@@ -136,7 +136,7 @@ type tfichier =
 (* ********************************** *)
 module Smap = Map.Make(String)
 
-type environnement = (*typ*) ident Smap.t
+type environnement = ident Smap.t
 
 let ( table_f : (string, (int * bool * typ * (targ list))) Hashtbl.t) = Hashtbl.create 17 ;; (* on enregistre les fonctions en clé et les listes des arguments possibles et de valeurs de retour possibles  pour prendre en compte la surcharge *)
 
@@ -195,8 +195,8 @@ let rec is_sub_class c1 c2 =
 	(c1 = c2) || (
 		try
 			(remonte c2 (Hashtbl.find_all table_c c1))
-		with _ -> failwith ("La classe " ^ c1 ^ " n'est pas définie."))
-			(*raise (Class_not_found("La classe " ^ c1 ^ " n'est pas définie.")))*)
+		with _ -> 
+			raise (Class_not_found("La classe " ^ c1 ^ " n'est pas définie.")))
 
 
 let rec is_sub_type t1 t2 = match (t1, t2) with
@@ -244,12 +244,12 @@ let union_env env1 env2 = (* fusion des deux environnements avec priorité pour 
 
 let add_func tab f t b l =
 	let lf = Hashtbl.find_all tab f in
-                Hashtbl.add tab f ((begin
-	                match lf with
+    let j = (match lf with
         	                | [] -> 0
-        	                | (i, _, _, _)::l -> (i+1)
-        	        end
-                ), b, t, l)	
+        	                | (i, _, _, _)::l -> (i+1))
+    in
+        Hashtbl.add tab f (j, b, t, l);
+        j    
 
 let add_f f t b l =
 	add_func table_f f t b l
@@ -277,7 +277,6 @@ let remontemember c m = remontegen c m find_all_member_sr
 
 let find_all_meth c m =
 	remontemeth c m
-	(*Hashtbl.find_all (Hashtbl.find table_c_meth c) m*)
 
 let add_meth c m t b (* attention !! couple de booléens !!! *) l =
 	add_func (Hashtbl.find table_c_meth c) m t b l
@@ -293,15 +292,8 @@ let is_meth_sr c m =
 
 let is_meth c m =
     remonteisgen c m is_meth_sr
-	(*Hashtbl.mem ((Hashtbl.find table_c_meth c)) m (*List.mem m (find_all_meth c m)*)*)
 
 let find_meth c m =
-	(*
- (*try*)
-                let table_mc = (Hashtbl.find table_c_meth c) in begin
-                        try
-                        with Not_found -> "L'identfiant " ^ m ^ " n'est pas une méthode de la classe " ^ c ^ ".\n"
-*)
 	Hashtbl.find (Hashtbl.find table_c_meth c) m
 
 
@@ -609,33 +601,33 @@ let typproto p env in_class = match p.v with
 					| (TQident id), None -> if (f_is_in_list tl (Hashtbl.find_all table_f (id.rep))) then
 	erreur p.loc "Une fonction de même signature a déjà été déclarée.\n"
 							else begin
-								add_f id.rep tqv.typ (tqvar_by_ref tqv) tl ;
+                                let i = add_f id.rep tqv.typ (tqvar_by_ref tqv) tl in
 								let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	in let renv = Smap.add (id.rep) prov env in
 				let brenv = Smap.add (id.rep) prov (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) } envir) in
-								(TProto(tt, tqv, tl)), brenv, renv
+								(TProto(tt, tqv, tl, i)), brenv, renv
 							end
 
 
 					| (TQmeth(s,id)), None ->  if (f_is_in_list tl (find_all_meth_sr  s (id.rep))) then 
                         let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) } envir)) (get_envc s) in
-                                                    (TProto(tt, tqv, tl)), brenv, env
+                                                    (TProto(tt, tqv, tl, (*prvisoire : i *) 0)), brenv, env
                                                else erreur p.loc ("Cette méthode n'a pas été déclarée dans la classe " ^ s^ ".\n")
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth_sr nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
-		add_meth nc id.rep tqv.typ ((tqvar_by_ref tqv), bvir) tl ;
+        let i = add_meth nc id.rep tqv.typ ((tqvar_by_ref tqv), bvir) tl in
         let prov = { rep = id.rep ; typ = Fonc ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)}
 	        in let renv = Smap.add (id.rep) prov env in
 
-        (TProto(tt, tqv, tl)), env, renv 
+        (TProto(tt, tqv, tl, i)), env, renv 
 	end
 					| (TQmeth(s,id)), (Some (nc, bvir)) -> erreur p.loc "Extra-qualification.\n" 
 				end
 	| Pcons (s, l) -> let tl, renv = add_args l env in
 				if f_is_in_list tl (find_all_meth s (chcons ^ s)) then
 					erreur p.loc "Un constructeur de même signature a déjà été déclarée.\n"				       
-				else begin add_meth s (chcons ^ s) (Tclass s) (false, (match in_class with | None -> failwith "Heisenbug 3.\n"
-								     | Some (nc, bvir) -> bvir) ) tl ;
+				else begin let i = add_meth s (chcons ^ s) (Tclass s) (false, (match in_class with | None -> failwith "Heisenbug 3.\n"
+								     | Some (nc, bvir) -> bvir) ) tl in
 					(TPcons(s, tl)), env, env
 				end
 	| Pconshc (s, s2, l) -> assert (in_class = None); 
@@ -704,7 +696,7 @@ let typdecl_c dc env lvl = match dc.v with
 						if is_meth s (chcons ^ s) then
 							(TClass(s, (TSuper tl), lm)), renv
 						else begin
-							add_meth s (chcons ^ s) (Tclass s) (false, false) []; 
+                            let i = add_meth s (chcons ^ s) (Tclass s) (false, false) [] in
 							(TClass(s, (TSuper tl), lm)), renv	
 						end
 

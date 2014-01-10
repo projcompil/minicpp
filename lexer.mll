@@ -102,7 +102,7 @@ and chaine = parse
   | "\\\""  { "\""::(chaine lexbuf) }
   | "\092\092"  { "\092"::(chaine lexbuf) }
   | "\\x" (hex_digit hex_digit as s)  { (String.make 1 (char_of_int (int_of_string ("0x" ^ s) ) ))::(chaine lexbuf) }
-  | '\092'    { (*"\092"::*)(chaine lexbuf) }
+  | '\092'    { (chaine lexbuf) }
   | '"'     { [] }
   | [' '-'\127'] as c { (String.make 1 c)::(chaine lexbuf) }
   | eof     { raise (Lexing_error "End of file before a string is finished.") }

@@ -3,13 +3,11 @@
 
 %{
   open Ast
- (* open Lexer*)
- (*open Lexerhack*)
   let rec transmet bp q = match q.v with
     | Ident qi -> { v = (if bp then Po q else Ad q) ; loc = q.loc }
     | Po qv -> let rqv = transmet bp qv in { v = (Po rqv) ; loc = q.loc } 
     | Ad qv -> let rqv = transmet bp qv in { v = (Ad rqv) ; loc = q.loc }
-let rec transmetq bp q = match q.v with
+  let rec transmetq bp q = match q.v with
     | Qvar qi -> { v = (if bp then Qpo q else Qad q) ; loc = q.loc }
     | Qpo qv -> let rqv = transmetq bp qv in { v = (Qpo rqv) ; loc = q.loc } 
     | Qad qv -> let rqv = transmetq bp qv in { v = (Qad rqv) ; loc = q.loc }
