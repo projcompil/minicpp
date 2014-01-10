@@ -328,11 +328,15 @@ let find_member c m =
         Hashtbl.find (Hashtbl.find table_c_member c) m
 
 let remonteenvgen c f =
-	let rec auxremonte l = 
+	let rec auxremonte l = begin match l with
+        | [] -> Smap.empty
+        | l -> 
 		let ln = nettoie l in
             let conc = fun y x -> union_env y (f x) in
             let concl = List.fold_left conc Smap.empty in
 		        union_env (concl ln) (List.fold_left union_env Smap.empty (List.map (fun x ->  auxremonte (Hashtbl.find_all table_c x)) ln))
+
+    end
     in auxremonte [c]
 
 let get_envc_sr c =
@@ -964,15 +968,11 @@ let rec typinst i env lvl off = match i.v with
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env lvl) in 
 				if is_sub_type te.typ (tr.typ) then 
-                    begin print_string (string_of_bool tr.byref);
-					if tr.byref then begin
-                        Printf.printf "%b" (is_left_tvalue te env) ;
+					if tr.byref then 
 						if is_left_tvalue te env then
 							(TReturn te), env, off
 						else erreur e.loc "L'expression retournée n'est pas une valeur gauche, alors que le prototype de la fonction stipule qu'elle renvoie une référence.\n"
-                    end
 					else (TReturn te), env, off
-                   end
 				else erreur e.loc "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction. (1)\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
 		       end
