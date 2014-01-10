@@ -9,7 +9,7 @@ Ici la casse est significative. On utilise maintenant la Hashtbl h, pour trouver
 
 La fonction chaine permet de traiter correctement les chaînes de caractères du C++ en faisant attention aux caractères d'échappement.
 
-> n gère crrectement la base octale.
+> On gère correctement la base octale.
 
 II/ L'arbre de syntaxe abstraite
 
@@ -53,4 +53,10 @@ On incrémente les labels (entrée des boucles etc.) afin d'éviter less colliso
 
 On code pour l'instant peu de choses (sûrement un problème de gestion de la pile dans les blocs et gestion des références).
 
-> 19 fichiers correctement compilés (exécutés par Mars, spim rajoute une erreur due à la gestion du caractère backslash : \) sur 59 fichiers tests, dont 32 erreurs de non implémentation.
+> 19 fichiers correctement compilés (exécutés par Mars, spim rajoute une erreur due à la gestion du caractère backslash : \) sur 59 fichiers tests, dont 32 erreurs de non implémentation (POO notamment)
+
+
+
+> Annexe : - On utilise maintenant ocamlbuild (* make sert uniquement à l'appliquer *)
+
+On a utilisé Git (hébergé sur Github) pour ce projet.
