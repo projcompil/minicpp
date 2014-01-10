@@ -1,34 +1,56 @@
+Projet d'thmane Safsafi et Nissim Zerbib
+
+Les nouveux points sont indiqués par '>'.
+
 I/ Le lexer
 
 Ici la casse est significative. On utilise maintenant la Hashtbl h, pour trouver les mots clés.
-Le lexer hack se trouve maintenant dans lexerhack.ml.
+> Le lexer hack se trouve maintenant dans lexerhack.ml.
 
 La fonction chaine permet de traiter correctement les chaînes de caractères du C++ en faisant attention aux caractères d'échappement.
 
+> n gère crrectement la base octale.
 
 II/ L'arbre de syntaxe abstraite
 
 On est resté proche de la grammaire du sujet pour faire l'arbre de syntaxe abstraite.
-Les arbres de syntaxe abstraite sont maintenant décorés (via le type polymorphe pos).
+> Les arbres de syntaxe abstraite sont maintenant décorés (via le type polymorphe pos).
+
 
 III/ Le parser
 
 On a réglé la plupart des conflits par l'utilisation de règles de précédence. (IFX et LPAR)
 On a bien fait attention à enregistrer dans la table du lexer hack l'identifiant de la classe déclarée avant de traiter ses membres (par exemple on déclare dans un ABR des attributs de type ABR).
 
+> On a modifié le Parser pour permuter les symboles * et & (int *& v produit maintenant Ad(Po "v") )
+
+> Parsing des 215 fichiers tests correctement. (automatisée par le script bash scritout.sh, maintenant dans les sources et ayant évolué)
+
 IV/ Le lexer hack
 
 Le lexer hack consiste simplement en une Hashtbl dans un module séparé, afin de différencier identifiants de type et les autres identifiants.
 
 
-V/ Typage
+> V/ Typage
 
 On transforme les arbres de syntaxe abstraites en ajoutant les types pour les expressions, ajoutant d'autres informations pour les identifiants.
 
-On utilise de nombreuses tables de hachage pour mémoriser des informations utiles.
+On utilise de nombreuses tables de hachage pour mémoriser des informations utiles. On remonte la hiérarchie des classes, et on affecte des numéros aux fonctins et méthodes. (Afin de transmettre au compilateur quelle fonction est appelée en cas de surcharge.)
 
 On stocke dans l'environnement le type de retour des fonctions, en ajoutant la chaîne chtypereturn = "@typereturn" en clé et le type en champ, afin de pouvoir renvoyer une erreur de typage lorsqu'un return de la fonction renvoie un type qui n'est pas un sous-type du type de la fonction.
 
-VI/ Production de code
+> Typage des 161 fichiers tests correctement (du moins aucune erreur signalée dans typing/good et exec, et tous les fichiers de typind/bad renvoient une erreur)
+
+Addendum : on considère (++i) et (--i) comme des valeurs gauches. Si le fichier n'inclut pas iostream, il ne peut utiliser la fonction std::cout.
+Le type ident sert à beaucoup de choses (variables, types de retour, etc...)et est présent dans l'environnement.
+Le code de typing.ml ne répond pas aux canons de la modularité.
+
+> VI/ Production de code
 
 On a bien fait attention à rendre les opérateurs && et || paresseux (via un saut conditionnel).
+On évite de reproduire des chaînes identiques via une Hashtbl.
+On incrémente les labels (entrée des boucles etc.) afin d'éviter less collisons.
+
+On code pour l'instant peu de choses (sûrement un problème de gestion de la pile dans les blocs et gestion des références).
+
+> 19 fichiers correctement compilés (exécutés par Mars, spim rajoute une erreur due à la gestion du caractère backslash : \) sur 59 fichiers tests, dont 32 erreurs de non implémentation.
