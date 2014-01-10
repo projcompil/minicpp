@@ -166,7 +166,7 @@ let rec code_inst lvl ti = match ti with
   	| TReturn te -> ratec ""
   	| TAreturn -> ratec ""
 
-and code_bloc lvl (TBloc tl) = conca (List.map (code_inst (lvl+1)) tl)
+and code_bloc lvl (TBloc (tl, off)) = conca (List.map (code_inst (lvl+1)) tl)
 (* rajouter offset ici ? *)
 
 let code_proto tp = match tp with

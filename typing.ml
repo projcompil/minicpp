@@ -119,7 +119,7 @@ type tinst =
   | TAreturn
 
 
-and tbloc = TBloc of tinst list
+and tbloc = TBloc of (tinst list) * int
 
 
 and tdecl =
@@ -988,10 +988,10 @@ let rec typinst i env lvl off = match i.v with
 
 (* ajouter la prise en charge des niveaux d'imbrication *)
 and typdbloc bl env lvl off = match bl with
-	| Bloc [] -> (TBloc []), off
+	| Bloc [] -> (TBloc ([],0)), off
 	| Bloc (i::l) -> let (ti, envir, offs) = typinst i env lvl off in
-				let (TBloc tl), offr = typdbloc (Bloc l) envir lvl offs in
-					(TBloc (ti::tl)), (offs + offr)
+				let (TBloc (tl,offb)), offr = typdbloc (Bloc l) envir lvl offs in
+					(TBloc ((ti::tl),offr)), (offs + offr)
 and typbloc bl env lvl off = (typdbloc (bl.v) env lvl off)
 
 
