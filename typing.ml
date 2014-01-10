@@ -417,7 +417,8 @@ let rec tvar_by_ref tva = match tva.c with
 
 let tqvar_by_ref (tqva :tqvar) = match tqva.c with
 	| TQad _ -> true
-	| _ -> false
+	| TQvar _ -> false
+    | TQpo _ -> false
 
 
 let is_qualified_qvar qv =
@@ -582,7 +583,7 @@ let rec typqvar v env lvl bdecl tt = match v.v with
 	| Qpo { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible de déclarer un pointeur vers une référence.\n"
     | Qpo qv -> let tqv = (typqvar qv env lvl bdecl tt) in { c = (TQpo tqv) ; typ = Tpointeur (tqv.typ) }
 	| Qad { v = Qad qv ; loc = loc } -> erreur v.loc "Impossible d'utiliser une référence de référence.\n"
-	| Qad qv -> let tqv = (typqvar qv env lvl bdecl tt) in  { c = (TQpo tqv) ; typ = (tqv.typ) }
+	| Qad qv -> let tqv = (typqvar qv env lvl bdecl tt) in  { c = (TQad tqv) ; typ = (tqv.typ) }
 
 
 (* vérifier les doublons *)
@@ -614,10 +615,9 @@ let typproto p env in_class = match p.v with
 
 
 					| (TQmeth(s,id)), None ->  if (f_is_in_list tl (find_all_meth_sr  s (id.rep))) then 
-                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = (tqvar_by_ref tqv)} (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc(*_sr*) s) in
+                        let brenv = union_env (Smap.add "this" { rep = "this" ; typ = (Tpointeur(Tclass s)) ; lvl = 0 ; offset = 0 ; byref = false } (Smap.add chtypereturn {rep = chtypereturn ; typ = tqv.typ ; lvl = 1 ; offset = 0 ; byref = (tqvar_by_ref tqv) (* à changer *)} envir)) (get_envc(*_sr*) s) in
                                                     (TProto(tt, tqv, tl)), brenv, env
                                                else erreur p.loc ("Cette méthode n'a pas été déclarée dans la classe " ^ s^ ".\n")
-                        (*ra()tet "Non implé()menté (méthode de classe).\n"*)
 					| (TQident id), (Some (nc, bvir)) -> if f_is_in_list tl (find_all_meth_sr nc id.rep) then erreur p.loc "Une méthode de même signature a déjà été déclarée.\n"
 	else begin
 		add_meth nc id.rep tqv.typ ((tqvar_by_ref tqv), bvir) tl ;
@@ -964,16 +964,20 @@ let rec typinst i env lvl off = match i.v with
 	| Return e -> begin try let tr = Smap.find chtypereturn env in
 			let te = (typexpr e env lvl) in 
 				if is_sub_type te.typ (tr.typ) then 
-					if tr.byref then
+                    begin print_string (string_of_bool tr.byref);
+					if tr.byref then begin
+                        Printf.printf "%b" (is_left_tvalue te env) ;
 						if is_left_tvalue te env then
 							(TReturn te), env, off
 						else erreur e.loc "L'expression retournée n'est pas une valeur gauche, alors que le prototype de la fonction stipule qu'elle renvoie une référence.\n"
+                    end
 					else (TReturn te), env, off
+                   end
 				else erreur e.loc "Le type de l'expression retournée ne correspond pas à un sous-type de retour du prototype de la fonction. (1)\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
 		       end
 	| Areturn -> begin try let tr = Smap.find chtypereturn env in 
-				if tr.typ = Tvoid || is_classe tr.typ then TAreturn, env, off
+			if tr.typ = Tvoid || is_classe tr.typ then TAreturn, env, off
                                 else erreur i.loc "Le type de l'expression retournée ne correspond pas au type de retour du prototype de la fonction. (2)\n"
 			with Not_found -> erreur i.loc ("Return en dehors d'une fonction ?!! La fonction n'a pas ajouté " ^ chtypereturn ^" au contexte.\n")
                      end
